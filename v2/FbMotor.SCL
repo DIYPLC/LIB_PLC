@@ -1,0 +1,193 @@
+FUNCTION_BLOCK FbMotor //Двигатель с частотником и контактором.
+
+//                 DbMotor
+//    +-------------------------------+
+//    |            FbMotor            |
+// ->-|MotorRun                MotorOn|->-
+//   -|VoltageOk           ContactorOn|-
+//   -|DriveOk            ErrorVoltage|-
+//   -|ContactorOk          ErrorDrive|-
+//   -|TimeMonitoring   ErrorContactor|-
+//   -|TimeDelayOn                    |
+//   -|TimeDelayOff                   |
+//   -|Ts_ms                          |
+//   -|Reset                          |
+//    +-------------------------------+
+
+VAR_INPUT //Входные переменные, сохраняемые.
+MotorRun       :BOOL := FALSE; //Команда: включить двигатель.
+VoltageOk      :BOOL := FALSE; //Схема собрана 380VAC Ok.
+DriveOk        :BOOL := FALSE; //Обратная связь: нет ошибок на частотном приводе.
+ContactorOk    :BOOL := FALSE; //Обратная связь: контактор включился.
+TimeMonitoring :DINT := 1000 ; //Время гарантированного включения контактора [мс].
+TimeDelayOn    :DINT := 1000 ; //Время задержки включения частотника [мс].
+TimeDelayOff   :DINT := 5000 ; //Врямя задержки выключения контактора [мс].
+Ts_ms          :DINT := 100  ; //Шаг дискретизации по времени [мс].
+Reset          :BOOL := FALSE; //Сброс при перезагрузке.
+END_VAR
+
+VAR_OUTPUT //Выходные переменные, сохраняемые.
+MotorOn        :BOOL := FALSE; //Включить двигатель.
+ContactorOn    :BOOL := FALSE; //Включить контактор.
+ErrorVoltage   :BOOL := FALSE; //Схема разобрана нет 380VAC.
+ErrorDrive     :BOOL := FALSE; //Ошибка частотного привода.
+ErrorContactor :BOOL := FALSE; //Ошибка контактора.
+END_VAR
+
+VAR //Внутренние переменные, сохраняемые.
+State1 :INT  := 0; //Граф сосояния частотника и контактора.
+Timer1 :DINT := 0; //Таймер для задержки переключения между частотником и контактором [мс].
+Timer2 :DINT := 0; //Таймер для формирования ошибки контактора [мс].
+END_VAR
+
+CONST //Константы.
+STATE_STOP          := 0; //Состояние "Стоп".
+STATE_CONTACTOR_ON  := 1; //Состояние "Включение контактора".
+STATE_DRIVE_ON      := 2; //Состояние "Включение частотного привода".
+STATE_RUN           := 3; //Состояние "Работа".
+STATE_DRIVE_OFF     := 4; //Состояние "Выключение частотного привода".
+STATE_CONTACTOR_OFF := 5; //Состояние "Выключение контактора".
+END_CONST
+
+//Схема разобрана нет 380VAC.
+ErrorVoltage := NOT(VoltageOk);
+
+//Ошибка частотного привода.
+ErrorDrive := NOT(DriveOk);
+
+//Формируем ошибку контактора.
+//Контактор включается не сразу.
+//За время TimeMonitoring контактор обязан включиться, иначе ошибка.
+//Так же следим чтобы контактор выключился и контакты не залипли.
+IF (ContactorOn) THEN
+//Следим чтобы контактор вовремя включился.
+  IF (ContactorOk) THEN
+  //Контактор включился.
+  Timer2 := 0;
+  ErrorContactor := FALSE;
+  ELSE
+    IF (Timer2 <= TimeMonitoring) THEN
+    //Контактор еще не включился.
+    Timer2 := Timer2 + Ts_ms;
+    ErrorContactor := FALSE;
+    ELSE
+    //Ошибка контактор не включился за время TimeMonitoring
+    ErrorContactor := TRUE;
+    END_IF;
+  END_IF;
+ELSE
+//Следим чтобы контактор вовремя выключился.
+  IF NOT(ContactorOk) THEN
+  //Контактор выключился.
+  Timer2 := 0;
+  ErrorContactor := FALSE;
+  ELSE
+    IF (Timer2 <= TimeMonitoring) THEN
+    //Контактор еще не выключился.
+    Timer2 := Timer2 + Ts_ms;
+    ErrorContactor := FALSE;
+    ELSE
+    //Ошибка контактор не выключился за время TimeMonitoring
+    ErrorContactor := TRUE;
+    END_IF;
+  END_IF;
+END_IF;
+
+//Сброс при перезагрузке или ошибке.
+IF (Reset OR ErrorVoltage OR ErrorDrive) THEN
+State1 := STATE_STOP;
+END_IF;
+
+//При включении двигателя должен сначала включиться контактор затем частотный привод.
+//При выключении двигателя должен сначала выключиться частотный привод, а затем контактор.
+//Это необходимо для увеличения времени жизни контактора.
+//Граф состояний.
+CASE State1 OF
+
+//Состояние "Стоп".
+STATE_STOP:
+MotorOn     := FALSE;
+ContactorOn := FALSE;
+Timer1 := 0;
+//Если получили разрешение на включение то включаем контактор.
+IF (MotorRun) THEN
+State1 := STATE_CONTACTOR_ON;
+END_IF;
+
+//Состояние "Включение контактора".
+STATE_CONTACTOR_ON:
+MotorOn     := FALSE;
+ContactorOn := TRUE;
+Timer1 := Timer1 + Ts_ms;
+//Перед включением частотника делаем паузу чтоб контактор успел включиться.
+IF (Timer1 >= TimeDelayOn) THEN
+State1 := STATE_DRIVE_ON;
+END_IF;
+
+//Состояние "Включение частотного привода".
+STATE_DRIVE_ON:
+MotorOn     := TRUE;
+ContactorOn := TRUE;
+Timer1 := 0;
+State1 := STATE_RUN;
+
+//Состояние "Работа".
+STATE_RUN:
+MotorOn     := TRUE;
+ContactorOn := TRUE;
+Timer1 := 0;
+//Если пришла команда выключить двигатель то сначала выключаем частотник.
+IF NOT(MotorRun) THEN
+State1 := STATE_DRIVE_OFF;
+END_IF;
+
+//Состояние "Выключение частотного привода".
+STATE_DRIVE_OFF:
+MotorOn     := FALSE;
+ContactorOn := TRUE;
+Timer1 := Timer1 + Ts_ms;
+//Перед выключением контактора делаем паузу чтоб выключится без нагрузки.
+IF (Timer1 >= TimeDelayOff) THEN
+State1 := STATE_CONTACTOR_OFF;
+END_IF;
+
+//Состояние "Выключение контактора".
+STATE_CONTACTOR_OFF:
+MotorOn     := FALSE;
+ContactorOn := FALSE;
+Timer1 := 0;
+//Переходим в состояние стоп.
+State1 := STATE_STOP;
+
+//СТОП при неопределенном состоянии.
+ELSE
+State1 := STATE_STOP;
+END_CASE;
+
+END_FUNCTION_BLOCK
+
+// Схема подключения блока FbMotor.
+//
+//                +-------------------+
+//                | 380 VAC           |
+//                +-------------------+
+//                          |
+//                          v
+//                +-------------------+
+//                | Вводной автомат   |--> VoltageOk
+//                +-------------------+
+//                          |
+//                          v
+//                +-------------------+
+//     MotorOn -->| Частотный привод  |--> DriveOk
+//                +-------------------+
+//                          |
+//                          v
+//                +-------------------+
+// ContactorOn -->| Контактор         |--> ContactorOk
+//                +-------------------+
+//                          |
+//                          v
+//                +-------------------+
+//                | Двигатель         |
+//                +-------------------+

@@ -1,0 +1,68 @@
+FUNCTION_BLOCK FbDriverAi420 //Драйвер аналогово входа 4...20мА.
+
+//            DbDriverAi420
+//    +---------------------------+
+//    |       FbDriverAi420       |
+// ->-|ADC             SensorValue|->-
+//   -|SensorMaxValue      Current|-
+//   -|SensorMinValue        Error|-
+//   -|ErrorValue                 |
+//   -|SimulationValue            |
+//   -|SimulationOn               |
+//    +---------------------------+
+
+VAR_INPUT //Входные переменные, сохраняемые.
+ADC             :WORD := 0    ; //АЦП Сигнал от датчика 0...27648.
+SensorMaxValue  :REAL := 100.0; //Диаппазон датчика максимум.
+SensorMinValue  :REAL := 0.0  ; //Диаппазон датчика минимум.
+ErrorValue      :REAL := 0.0  ; //Значение для SensorValue при ошибке датчика.
+SimulationValue :REAL := 0.0  ; //Значение для SensorValue при симуляции.
+SimulationOn    :BOOL := FALSE; //Включить симуляцию.
+END_VAR
+
+VAR_OUTPUT //Выходные переменные, сохраняемые.
+SensorValue :REAL := 0.0  ; //Выход в единицах датчика.
+Current     :REAL := 0.0  ; //Ток на аналоговом входе 4...20мА.
+Error       :BOOL := FALSE; //Ошибка аналогово входа или датчика.
+END_VAR
+
+//Ошибка аналогово входа или датчика.
+Error := (ADC = W#16#7FFF) OR (ADC = W#16#8000); //32767,-32768
+
+//Ток на аналоговом входе 4...20мА.
+IF (Error) THEN
+Current := 0.0;
+ELSE
+//Масштабирование 0...27648 [АЦП] -> 4...20[мА]
+Current := ((INT_TO_REAL(WORD_TO_INT(ADC)) * 16.0 ) / 27648.0) + 4.0;
+END_IF;
+
+IF (SimulationOn) THEN //Включена симуляция.
+SensorValue := SimulationValue; //Значение для SensorValue при симуляции.
+ELSE
+    IF (Error) THEN //Ошибка аналогово входа или датчика.
+    SensorValue := ErrorValue; //Значение для SensorValue при ошибке датчика.
+    ELSE
+    //Масштабирование 4...20[мА] -> SensorMinValue...SensorMaxValue
+    SensorValue := (SensorMaxValue - SensorMinValue) * ((Current - 4.0) / 16.0) + SensorMinValue;
+    END_IF;
+END_IF;
+
+//Амплитудный ограничитель диапазона датчика SensorMinValue...SensorMaxValue
+IF (SensorValue >= SensorMaxValue) THEN //Ограничение выхода сверху.
+SensorValue := SensorMaxValue; 
+ELSE
+    IF (SensorValue <= SensorMinValue) THEN //Ограничение выхода снизу.
+    SensorValue := SensorMinValue;
+    ELSE
+    //Выход без ограничений.
+    SensorValue := SensorValue;
+    END_IF;
+END_IF;
+
+END_FUNCTION_BLOCK
+
+//Описание работы драйвера аналогово входа 4...20мА.
+//1.Сначала сигнал с АЦП 0...27648 преобразуется в токовый сигна 4...20мА.
+//2.Если не включена симуляция и нет ошибок сигнал 4...20мА преобразуется в сигнал датчика SensorMinValue...SensorMaxValue.
+//3.Сигнал датчика ограничивается в пределах его диаппазона измерения SensorMinValue...SensorMaxValue.

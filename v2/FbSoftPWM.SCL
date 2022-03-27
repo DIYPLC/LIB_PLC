@@ -1,0 +1,107 @@
+FUNCTION_BLOCK FbSoftPWM //ШИМ генератор двухканальный.
+
+//            DbSoftPWM
+//     +---------------------+
+//     |      FbSoftPWM      |
+//  ->-|DutyCucle      PWMPOS|->-
+//    -|PeriodPositive PWMNEG|->-
+//    -|PeriodNegative       |
+//    -|DBMAX                |
+//    -|DBMIN                |
+//    -|Ts                   |
+//     +---------------------+
+
+VAR_INPUT //Входные переменные, сохраняемые.
+DutyCucle      :REAL := 50.0;   //Коэффициент заполнения -100...0...100 [%].
+PeriodPositive :REAL := 10.0;   //Период ШИМ для положительного коэффициента заполнения [с].
+PeriodNegative :REAL := 10.0;   //Период ШИМ для отрицательного коэффициента заполнения [с].
+DBMAX          :REAL := 0.001;  //dead band - Зона нечувствительности, верхняя граница [%].
+DBMIN          :REAL := -0.001; //dead band - Зона нечувствительности, нижняя граница [%].
+Ts             :REAL := 0.1;    //Шаг дискретизации по времени [с].
+END_VAR
+
+VAR_OUTPUT //Выходные переменные, сохраняемые.
+PWMPOS :BOOL := FALSE; //Выход ШИМ для положительных значений входа.
+PWMNEG :BOOL := FALSE; //Выход ШИМ для отрицательных значений входа.
+END_VAR
+
+VAR //Внутренние переменные, сохраняемые.
+TimerPositive :REAL := 0.0; //Таймер для положительного коэффициента заполнения [с].
+TimerNegative :REAL := 0.0; //Таймер для отрицательного коэффициента заполнения [с].
+END_VAR
+
+VAR_TEMP  //Временные переменные, не сохраняемые.
+Percent           :REAL; //Входной сигнал после зоны нечувствительности и амплитудного ограничителя -100...0...100[%].
+TimePulsePositive :REAL; //Время импульса для положительного коэффициента заполнения [с].
+TimePulseNegative :REAL; //Время импульса для отрицательного коэффициента заполнения [с].
+END_VAR
+
+//Зона нечувствительности для входного сигнала.
+IF ((DBMIN<DutyCucle)AND(DutyCucle<DBMAX)) THEN
+Percent:=0.0;
+ELSE
+Percent:=DutyCucle;
+END_IF;
+
+//Амплитудный ограничитель входного сигнала от -100% до 100%.
+IF (Percent>=100.0) THEN
+Percent:=100.0;
+END_IF;
+IF (Percent<=-100.0) THEN
+Percent:=-100.0;
+END_IF;
+
+//Формирование импульсов на открытие.
+IF (Percent>0.0) THEN
+PWMNEG:=FALSE;
+TimerNegative:=0.0;
+TimePulsePositive:=PeriodPositive*Percent*0.01;
+    IF (TimerPositive<=TimePulsePositive) THEN
+    PWMPOS:=TRUE;
+    ELSE
+    PWMPOS:=FALSE;
+    END_IF;
+TimerPositive:=TimerPositive+Ts;
+    IF (TimerPositive>=PeriodPositive) THEN
+    TimerPositive:=0.0;
+    END_IF;
+END_IF;
+
+//Формирование импульсов на закрытие.
+IF (Percent<0.0) THEN
+PWMPOS:=FALSE;
+TimerPositive:=0.0;
+TimePulseNegative:=PeriodNegative*Percent*(-0.01);
+    IF (TimerNegative<=TimePulseNegative) THEN
+    PWMNEG:=TRUE;
+    ELSE
+    PWMNEG:=FALSE;
+    END_IF;
+TimerNegative:=TimerNegative+Ts;
+    IF (TimerNegative>=PeriodNegative) THEN
+    TimerNegative:=0.0;
+    END_IF;
+END_IF;
+
+//Нет импульсов.
+IF (Percent=0.0) THEN
+PWMPOS:=FALSE;
+PWMNEG:=FALSE;
+TimerPositive:=0.0;
+TimerNegative:=0.0;
+END_IF;
+
+END_FUNCTION_BLOCK
+
+//  +---------+
+//  | GNU GPL |
+//  +---------+
+//  |
+//  |
+//  .= .-_-. =.
+// ((_/)o o(\_))
+//  `-'(. .)`-'
+//  |/| \_/ |\
+//  ( |     | )
+//  /"\_____/"\
+//  \__)   (__/

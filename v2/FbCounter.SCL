@@ -1,0 +1,85 @@
+FUNCTION_BLOCK FbCounter //Счетчик импульсов.
+
+//         DbCounter
+//    +-----------------+
+//    |    FbCounter    |
+// ->-|INC           CNT|->-
+//   -|DEC      OVERFLOW|-
+//   -|RESET            |
+//   -|SETVALUE         |
+//   -|VALUE            |
+//    +-----------------+
+
+VAR_INPUT //Входные переменные, сохраняемые.
+INC      :BOOL := FALSE; //Вход импульсов +1.
+DEC      :BOOL := FALSE; //Вход импульсов -1.
+RESET    :BOOL := FALSE; //Сбросить счетчик на 0.
+SETVALUE :BOOL := FALSE; //Установить на выходе значение VALUE.
+VALUE    :DINT := 0    ; //Предустановленное значение счета.
+END_VAR
+
+VAR_OUTPUT //Выходные переменные, сохраняемые.
+CNT      :DINT := 0    ; //Выход счетчика.
+OVERFLOW :BOOL := FALSE; //Флаг переполнения счетчика.
+END_VAR
+
+VAR //Внутренние переменные, сохраняемые.
+INCPrevios :BOOL := FALSE; //Предыдущее состояние входа +1.
+DECPrevios :BOOL := FALSE; //Предыдущее состояние входа -1.
+END_VAR
+
+CONST //Константы.
+LIMIT_MAX :=  2147483647; //Максимальное значение счетчика.
+LIMIT_MIN := -2147483648; //Минимальное значение счетчика.
+END_CONST
+
+//Прямой счет по нарастающему фронту импульсов +1.
+IF (INC AND NOT(INCPrevios)) THEN
+    IF (CNT >= LIMIT_MAX) THEN //Ограничение сверху.
+    CNT := LIMIT_MAX;
+    OVERFLOW := TRUE;
+    ELSE //Прямой счет.
+    CNT := CNT + 1;
+    OVERFLOW := FALSE;
+    END_IF;
+END_IF;
+
+//Обратный счет по нарастающему фронту импульсов -1.
+IF (DEC AND NOT(DECPrevios)) THEN
+    IF (CNT <= LIMIT_MIN) THEN //Ограничение снизу.
+    CNT := LIMIT_MIN;
+    OVERFLOW := TRUE;
+    ELSE //Обратный счет.
+    CNT := CNT - 1;
+    OVERFLOW := FALSE;
+    END_IF;
+END_IF;
+
+//Установить значение счетчика.
+IF (SETVALUE) THEN
+CNT := VALUE;
+END_IF;
+
+//Сбросить счетчик.
+IF (RESET) THEN
+CNT := 0;
+END_IF;
+
+//Запомнить предыдущее состояние входа.
+INCPrevios := INC;
+DECPrevios := DEC;
+
+END_FUNCTION_BLOCK
+
+//  +---------+
+//  | GNU GPL |
+//  +---------+
+//  |
+//  |
+//  .= .-_-. =.
+// ((_/)o o(\_))
+//  `-'(. .)`-'
+//  |/| \_/ |\
+//  ( |     | )
+//  /"\_____/"\
+//  \__)   (__/
