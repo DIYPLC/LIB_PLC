@@ -1,0 +1,105 @@
+//Проект демонстрирующий возможность написание всего проекта на SCL.
+//Для компиляции необходимо импортировать таблицу символов *.asc
+FUNCTION_BLOCK IntegratorOde0 //Интегрирование по времени.
+TITLE = 'Интегратор ode0';
+VAR_INPUT //Входные переменные, сохраняемые.
+X:REAL:=0.0; //Вход X(t).
+K:REAL:=0.0; //Усиление X(t)*K.
+Ts:REAL:=0.0; //Шаг дискретизации по времени в секундах (dt).
+END_VAR
+VAR_OUTPUT //Выходные переменные, сохраняемые.
+Y:REAL:=0.0; //Выход (интеграл X(t)*K от 0 до t по dt).
+END_VAR
+//Исходный код.
+Y:=Y+K*X*Ts; //Прямоугольный интегратор 0го порядка.
+END_FUNCTION_BLOCK
+
+FUNCTION CalcTimeSample:VOID //Системная функция расчета и контроля времени скана.
+TITLE = 'Время скана OB1';
+VAR_INPUT //Входные переменные.
+TsMsInt:INT:=0; //Шаг дискретизации по времени в миллисекундах, спроектирован под OB1.
+END_VAR
+VAR_OUTPUT //Выходные переменные.
+Ts:REAL:=0.0; //Шаг дискретизации по времени в секундах.
+END_VAR
+//Исходный код.
+Ts:=INT_TO_REAL(TsMsInt)/1000.0; //Расчет времени скана в секундах.
+END_FUNCTION
+
+DATA_BLOCK DBIntegrator1 IntegratorOde0 //Instance data block.
+BEGIN
+END_DATA_BLOCK
+
+DATA_BLOCK DBIntegrator2 IntegratorOde0 //Instance data block.
+BEGIN
+END_DATA_BLOCK
+
+DATA_BLOCK DBIntegrator3 IntegratorOde0 //Instance data block.
+BEGIN
+END_DATA_BLOCK
+
+DATA_BLOCK DBTemp
+STRUCT // Объявление переменных
+Ts:REAL:=0.0; //Мониторинг времени скана.
+Integrator1:REAL:=0.0; //Интегратор1.
+Integrator2:REAL:=0.0; //Интегратор2.
+Integrator3:REAL:=0.0; //Интегратор3.
+END_STRUCT
+BEGIN // Инициализация переменных.
+//Массивов нет.
+END_DATA_BLOCK
+
+ORGANIZATION_BLOCK OB1
+VAR_TEMP
+  OB1_EV_CLASS : BYTE ;    //Bits 0-3 = 1 (Coming event), Bits 4-7 = 1 (Event class 1)
+  OB1_SCAN_1 : BYTE ;    //1 (Cold restart scan 1 of OB 1), 3 (Scan 2-n of OB 1)
+  OB1_PRIORITY : BYTE ;    //Priority of OB Execution
+  OB1_OB_NUMBR : BYTE ;    //1 (Organization block 1, OB1)
+  OB1_RESERVED_1 : BYTE ;    //Reserved for system
+  OB1_RESERVED_2 : BYTE ;    //Reserved for system
+  OB1_PREV_CYCLE : INT ;    //Cycle time of previous OB1 scan (milliseconds)
+  OB1_MIN_CYCLE : INT ;    //Minimum cycle time of OB1 (milliseconds)
+  OB1_MAX_CYCLE : INT ;    //Maximum cycle time of OB1 (milliseconds)
+  OB1_DATE_TIME : DATE_AND_TIME ;    //Date and time OB1 started
+END_VAR
+BEGIN
+//Вызов функции расчета времени скана.
+CalcTimeSample(
+TsMsInt:=OB1_PREV_CYCLE,
+Ts:=DBTemp.Ts);
+//Вызов интегратора №3.
+DBIntegrator1.X:=1.0;
+DBIntegrator1.K:=1.0;
+DBIntegrator1.Ts:=DBTemp.Ts;
+IntegratorOde0.DBIntegrator1();
+DBTemp.Integrator1:=DBIntegrator1.Y;
+//Вызов интегратора №3.
+DBIntegrator2.X:=1000.0;
+DBIntegrator2.K:=1.0;
+DBIntegrator2.Ts:=DBTemp.Ts;
+IntegratorOde0.DBIntegrator2();
+DBTemp.Integrator2:=DBIntegrator2.Y;
+END_ORGANIZATION_BLOCK
+
+ORGANIZATION_BLOCK OB35
+VAR_TEMP
+  OB35_EV_CLASS : BYTE ;    //Bits 0-3 = 1 (Coming event), Bits 4-7 = 1 (Event class 1)
+  OB35_STRT_INF : BYTE ;    //16#36 (OB 35 has started)
+  OB35_PRIORITY : BYTE ;    //Priority of OB Execution
+  OB35_OB_NUMBR : BYTE ;    //35 (Organization block 35, OB35)
+  OB35_RESERVED_1 : BYTE ;    //Reserved for system
+  OB35_RESERVED_2 : BYTE ;    //Reserved for system
+  OB35_PHASE_OFFSET : WORD ;    //Phase offset (msec)
+  OB35_RESERVED_3 : INT ;    //Reserved for system
+  OB35_EXC_FREQ : INT ;    //Frequency of execution (msec)
+  OB35_DATE_TIME : DATE_AND_TIME ;    //Date and time OB35 started
+END_VAR
+BEGIN
+//Вызов интегратора №3.
+DBIntegrator3.X:=1.0;
+DBIntegrator3.K:=1.0;
+DBIntegrator3.Ts:=0.1;
+IntegratorOde0.DBIntegrator3();
+DBTemp.Integrator3:=DBIntegrator3.Y;
+END_ORGANIZATION_BLOCK
+
