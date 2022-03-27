@@ -1,0 +1,124 @@
+FUNCTION_BLOCK FbBlinkPCS7 //Пример программы для PCS7.
+//Блок использует SFC6 для формирования сигнала Reset.
+TITLE   = 'Blink for PCS7.'
+AUTHOR  : 'AUTHOR'
+VERSION : '1.1'
+{//Атрибуты FB для PCS7.
+S7_tasklist           := 'OB100'; //Список вызывающих OB
+S7_m_c                := 'true' ; //Блок может управляться или наблюдаться из OS.
+S7_tag                := 'true' ; //Блок входит в писок тегов OS. 
+S7_read_back          := 'true' ; //Chart>Readback активен для прототипов DB.
+GenerateReferenceData := 'y'    ; //Опции компилятора
+SCL_CreateDebugInfo   := 'y'    ; //Опции компилятора
+SetOKFlag             := 'y'    ; //Опции компилятора
+OptimizeObjectCode    := 'y'      //Опции компилятора
+}
+
+VAR_INPUT //Входные переменные, сохраняемые.
+//Переменные для WinCC
+TimeOn
+{//Атрибуты для переменных PCS7.
+S7_unit    := 's'   ; //Единицы измерения [с].
+S7_m_c     := 'true'; //'true' для тегов WinCC.
+S7_dynamic := 'true'  //'true' для просмотра в CFC.
+} :REAL    := 1.0   ; //Время включения лампочки [с].
+TimeOff
+{//Атрибуты для переменных PCS7.
+S7_unit    := 's'   ; //Единицы измерения [с].
+S7_m_c     := 'true'; //'true' для тегов WinCC.
+S7_dynamic := 'true'  //'true' для просмотра в CFC.
+} :REAL    := 1.0   ; //Время выключения лампочки [с].
+Ts
+{//Атрибуты для переменных PCS7.
+S7_sampletime := 'true' ; //Шаг дискретизации по времени [с].
+S7_link       := 'false'; //'false' запрет CFC соединений.
+S7_unit       := 's'    ; //Единицы измерения [с].
+S7_dynamic    := 'true'   //'true' для просмотра в CFC.
+} :REAL := 0.0          ; //Шаг дискретизации по времени [с].
+END_VAR
+
+VAR_OUTPUT //Выходные переменные, сохраняемые.
+BlinkLamp
+{//Атрибуты для переменных PCS7.
+S7_m_c     := 'true'; //'true' для тегов WinCC.
+S7_dynamic := 'true'  //'true' для просмотра в CFC.
+}: BOOL:=FALSE; //Мигающая лампочка.
+END_VAR 
+
+VAR_IN_OUT //Входные / выходные переменные, сохраняемые.
+END_VAR
+
+VAR //Внутренние переменные, сохраняемые.
+Reset     :BOOL := FALSE; //Сброс алгоритма.
+Timer1    :REAL := 0    ; //Таймер1 [с].
+State1    :INT  := 0    ; //Граф состояний.
+OB_NUMBER :INT  := 0    ; //Номер вызывающего OB.
+END_VAR 
+
+VAR_TEMP //Внутренние переменные, не сохраняемые.
+TOP_SI: STRUCT
+    EV_CLASS :BYTE ;
+    EV_NUM   :BYTE ;
+    PRIORITY :BYTE ;
+    NUM      :BYTE ;
+    TYP2_3   :BYTE ;
+    TYP1     :BYTE ;
+    ZI1      :WORD ;
+    ZI2_3    :DWORD;
+END_STRUCT;
+START_UP_SI: STRUCT
+    EV_CLASS :BYTE ;
+    EV_NUM   :BYTE ;
+    PRIORITY :BYTE ;
+    NUM      :BYTE ;
+    TYP2_3   :BYTE ;
+    TYP1     :BYTE ;
+    ZI1      :WORD ;
+    ZI2_3    :DWORD;
+END_STRUCT;
+ERROR_RD_SINFO :INT;
+END_VAR
+
+CONST //Константы.
+STATE_RESET := 0;
+STATE_ON    := 1;
+STATE_OFF   := 2;
+END_CONST
+
+//Reset - флаг первого скана PLC.
+ERROR_RD_SINFO := SFC6(TOP_SI := TOP_SI, START_UP_SI := START_UP_SI); //RD_SINFO
+OB_NUMBER := WORD_TO_INT(BYTE_TO_WORD(TOP_SI.NUM));
+Reset := (OB_NUMBER = 100);
+
+IF (Reset) THEN //Сброс при перезагрузке.
+State1 := STATE_RESET;
+END_IF;
+
+CASE (State1) OF //Граф состояний.
+
+STATE_RESET: //Сброс.
+BlinkLamp := FALSE;
+Timer1   := 0;
+State1 := STATE_ON;
+
+STATE_ON: //Включить лампочку на заданное время.
+BlinkLamp := TRUE;
+Timer1 := Timer1 + Ts;
+IF (Timer1 >= TimeOn) THEN
+State1 := STATE_OFF;
+Timer1 := 0.0;
+END_IF;    
+
+STATE_OFF: //Выключить лампочку на заданное время.
+BlinkLamp := FALSE;
+Timer1 := Timer1 + Ts;
+IF (Timer1 >= TimeOff) THEN
+State1 := STATE_ON;
+Timer1 := 0.0;
+END_IF;    
+
+ELSE //RESET при неопределенном состоянии.
+State1 := STATE_RESET;
+END_CASE; //CASE (State1) OF
+
+END_FUNCTION_BLOCK

@@ -1,0 +1,20 @@
+ORGANIZATION_BLOCK OB122 //Вызывается если вытаскиваем модули: AO.
+
+VAR_TEMP
+OB122_EV_CLASS  :BYTE         ; //16#29, Event class 2, Entering event state, Internal fault event
+OB122_SW_FLT    :BYTE         ; //16#XX Software error code
+OB122_PRIORITY  :BYTE         ; //Priority of OB Execution
+OB122_OB_NUMBR  :BYTE         ; //122 (Organization block 122, OB122)
+OB122_BLK_TYPE  :BYTE         ; //16#88/8C/8E Type of block fault occured in
+OB122_MEM_AREA  :BYTE         ; //Memory area where access error occured
+OB122_MEM_ADDR  :WORD         ; //Memory address where access error occured
+OB122_BLK_NUM   :WORD         ; //Block number in which error occured
+OB122_PRG_ADDR  :WORD         ; //Program address where error occured
+OB122_DATE_TIME :DATE_AND_TIME; //Date and time OB1 started
+END_VAR
+
+BEGIN
+
+;
+
+END_ORGANIZATION_BLOCK
