@@ -1,0 +1,18 @@
+ORGANIZATION_BLOCK OB83 //Вызывается если вытаскиваем модули: DI DO AI.
+
+VAR_TEMP
+OB83_EV_CLASS   :BYTE         ; //16#38/39, Event class 3, module inserted/removed (8/9)
+OB83_FLT_ID     :BYTE         ; //16#XX, Fault identifcation code
+OB83_PRIORITY   :BYTE         ; //Priority of OB Execution
+OB83_OB_NUMBR   :BYTE         ; //83 (Organization block 83, OB83)
+OB83_RESERVED_1 :BYTE         ; //Reserved for system
+OB83_MDL_ID     :BYTE         ; //Input module (01010100), Output module (01010101)
+OB83_MDL_ADDR   :WORD         ; //Base address of module with point fault
+OB83_RACK_NUM   :INT          ; //Number of rack that has module with point fault
+OB83_MDL_TYPE   :WORD         ; //Module type with point fault
+OB83_DATE_TIME  :DATE_AND_TIME; //Date and time OB83 started   
+END_VAR
+
+BEGIN
+;
+END_ORGANIZATION_BLOCK

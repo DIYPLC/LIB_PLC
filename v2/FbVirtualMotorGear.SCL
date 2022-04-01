@@ -1,0 +1,80 @@
+FUNCTION_BLOCK FbVirtualMotorGear //Виртуальный МЭО для отладки шагового регулятора.
+
+//         DbVirtualMotorGear
+//    +--------------------------+
+//    |    FbVirtualMotorGear    |
+// ->-|CmdOpen           Position|->-
+// ->-|CmdClose        SensorOpen|-
+//   -|TimeOpen       SensorClose|-
+//   -|TimeClose                 |
+//   -|Ts                        |
+//   -|Reset                     |
+//    +--------------------------+
+
+VAR_INPUT //Входные переменные, сохраняемые.
+CmdOpen   :BOOL := FALSE; //Команда на открытие +.
+CmdClose  :BOOL := FALSE; //Команда на закрытие -.
+TimeOpen  :REAL := 60.0 ; //Время необходимое для открытия задвижки [с].
+TimeClose :REAL := 50.0 ; //Время необходимое для закрытия задвижки [с].
+Ts        :REAL := 0.1  ; //Шаг дискретизации по времени в секундах.
+Reset     :BOOL := FALSE; //Сброс при перезагрузке.
+END_VAR
+
+VAR_OUTPUT //Выходные переменные, сохраняемые.
+Position    :REAL := 0.0  ; //Положение штока 0...100 [%].
+SensorOpen  :BOOL := FALSE; //Датчик на открытие задвижки.
+SensorClose :BOOL := FALSE; //Датчик на закрытие задвижки.
+END_VAR
+
+VAR_TEMP  //Временные переменные, не сохраняемые.
+SpeedPos :REAL; //Скорость открытия.
+SpeedNeg :REAL; //Скорость закрытия.
+END_VAR
+
+IF(Reset) THEN
+Position := 0.0;
+END_IF;
+
+SpeedPos := 100.0 / TimeOpen ; //[%/s]
+SpeedNeg := 100.0 / TimeClose; //[%/s]
+
+IF(CmdOpen) THEN
+Position := Position + SpeedPos * Ts; //[%]
+END_IF;
+
+IF(CmdClose) THEN
+Position := Position - SpeedNeg * Ts; //[%]
+END_IF;
+
+IF(Position >= 100.0) THEN
+Position := 100.0;
+SensorOpen := TRUE;
+ELSE
+SensorOpen := FALSE;
+END_IF;
+
+IF(Position <= 0.0) THEN
+Position := 0.0;
+SensorClose := TRUE;
+ELSE
+SensorClose := FALSE;
+END_IF;
+
+END_FUNCTION_BLOCK
+
+//  +---------+
+//  | GNU GPL |
+//  +---------+
+//  |
+//  |
+//  .= .-_-. =.
+// ((_/)o o(\_))
+//  `-'(. .)`-'
+//  |/| \_/ |\
+//  ( |     | )
+//  /"\_____/"\
+//  \__)   (__/
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// License: GNU GPL v2

@@ -1,0 +1,33 @@
+//Переменные для обмена данными с SCADA/HMI.
+//ВНИМАНИЕ к этим переменным WinCC обращается по фиксированному абсолютному адресу.
+//При компиляции блоков данных возможна потеря технологических значений переменных в блоках данных.
+//Для сохранения данных истользовать VAT таблицу ReadBack.
+
+DATA_BLOCK DbHmi1PIRCA1 //ПИД- регулятор давления.
+STRUCT //Объявление переменных.
+Setpoint        :REAL := 5.0   ; //1PIRCA1 Заданное значение давления [Бар] SCADA/HMI -> PLC.
+ProcessVariable :REAL := 4.9   ; //1PIRCA1 Измеренное значение давления [Бар] PLC -> SCADA/HMI.
+ControlSignal   :REAL := 25.0  ; //1PIRCA1 Сигнал управления приводом [Гц] PLC -> SCADA/HMI.
+ControlWord     :WORD := W#16#0; //1PIRCA1 Слово управления SCADA/HMI -> PLC.
+StatusWord      :WORD := W#16#0; //1PIRCA1 Слово состояния PLC -> SCADA/HMI.
+ErrorWord       :WORD := W#16#0; //1PIRCA1 Слово активных ошибок и аварий PLC -> SCADA/HMI.
+END_STRUCT
+BEGIN //Инициализация переменных массива.
+END_DATA_BLOCK
+
+//  +---------+
+//  | GNU GPL |
+//  +---------+
+//  |
+//  |
+//  .= .-_-. =.
+// ((_/)o o(\_))
+//  `-'(. .)`-'
+//  |/| \_/ |\
+//  ( |     | )
+//  /"\_____/"\
+//  \__)   (__/
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// License: GNU GPL v2
