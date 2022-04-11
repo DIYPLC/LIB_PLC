@@ -1,0 +1,22 @@
+//Файл генерирует блоки данных к функциональным блокам.
+
+DATA_BLOCK Db1PIRCA1 Fb1PIRCA1 //Instance data block.
+BEGIN
+END_DATA_BLOCK
+
+//  +---------+
+//  | GNU GPL |
+//  +---------+
+//  |
+//  |
+//  .= .-_-. =.
+// ((_/)o o(\_))
+//  `-'(. .)`-'
+//  |/| \_/ |\
+//  ( |     | )
+//  /"\_____/"\
+//  \__)   (__/
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// License: GNU GPL v2

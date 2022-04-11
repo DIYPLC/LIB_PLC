@@ -1,0 +1,72 @@
+FUNCTION_BLOCK FbTaskCyclic //Задача вызывается циклически.
+
+//      DbTaskCyclic
+//    +--------------+
+//    | FbTaskCyclic |
+// ->-|Ts_ms         |
+// ->-|Reset         |
+//    +--------------+
+
+VAR_INPUT //Входные переменные, не сохраняемые.
+Ts_ms :DINT := 100  ; //Шаг дискретизации по времени [мс].
+Reset :BOOL := FALSE; //Сброс при перезагрузке.
+END_VAR
+
+VAR_OUTPUT //Выходные переменные, не сохраняемые.
+END_VAR
+
+//Входы выходы ПЛК Di Do Ai Ao подключаем здесь.
+
+//ПИД- регулятор уровня.
+//                 Db1PIRCA1
+//    +---------------------------------+
+//    |            Fb1LIRCA1            |
+// ->-|SensorPressure     DriveFrequency|->-
+//   -|RemoteStartButton         MotorOn|-
+//   -|RemoteStopButton      ContactorOn|-
+//   -|VoltageOk                   Error|-
+//   -|DriveOk                          |
+//   -|ContactorOk                      |
+//   -|InterlockOn                      |
+//   -|GroupStart                       |
+//   -|GroupStop                        |
+//   -|Ts_ms                            |
+//   -|Reset                            |
+//    +---------------------------------+
+//Db1PIRCA1.SensorPressure     := Ai1PIRCA1PT           ; //Датчик давления 0...27648[АЦП].
+Db1PIRCA1.SensorPressure     := Db1PIRCA1.DriveFrequency; //Датчик давления 0...27648[АЦП].
+Db1PIRCA1.RemoteStartButton  := TRUE                    ; //Кнопка без фиксации NO "ПУСК" на пульте местного управления.
+Db1PIRCA1.RemoteStopButton   := TRUE                    ; //Кнопка без фиксации NC "СТОП" на пульте местного управления.
+Db1PIRCA1.VoltageOk          := TRUE                    ; //Схема собрана (вводной автомат 380VAC включен).
+Db1PIRCA1.DriveOk            := TRUE                    ; //Частотный привод: Готовность к работе (нет ошибок).
+//Db1PIRCA1.ContactorOk      := TRUE                    ; //Контактор включился NO контакт.
+Db1PIRCA1.ContactorOk        := Db1PIRCA1.ContactorOn   ; //Контактор включился NO контакт.
+Db1PIRCA1.InterlockOn        := FALSE                   ; //Включена технологическая блокировка регулятора.
+Db1PIRCA1.GroupStart         := FALSE                   ; //Групповой пуск (подать импульс).
+Db1PIRCA1.GroupStop          := FALSE                   ; //Групповой стоп (подать импульс).
+Db1PIRCA1.Ts_ms              := Ts_ms                   ; //Шаг дискретизации по времени [мс].
+Db1PIRCA1.Reset              := Reset                   ; //Сброс при перезагрузке.
+Fb1PIRCA1.Db1PIRCA1()                                   ; //ПИД- регулятор уровня.
+//Ao1PIRCA1FR                := Db1PIRCA1.DriveFrequency; //Частотный привод: Сигнал задания частоты 0...27648[ЦАП].
+//                           := Db1PIRCA1.MotorOn       ; //Частотный привод: Включить привод.
+//                           := Db1PIRCA1.ContactorOn   ; //Включить контактор между частотным приводом и двигателем.
+//                           := Db1PIRCA1.Error         ; //Флаг ошибки.
+
+END_FUNCTION_BLOCK
+
+//  +---------+
+//  | GNU GPL |
+//  +---------+
+//  |
+//  |
+//  .= .-_-. =.
+// ((_/)o o(\_))
+//  `-'(. .)`-'
+//  |/| \_/ |\
+//  ( |     | )
+//  /"\_____/"\
+//  \__)   (__/
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// License: GNU GPL v2
