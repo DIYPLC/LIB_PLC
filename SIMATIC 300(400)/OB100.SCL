@@ -1,0 +1,19 @@
+ORGANIZATION_BLOCK OB100 //Программа первого скана.
+
+VAR_TEMP
+OB100_EV_CLASS   :BYTE         ; //16#13, Event class 1, Entering event state, Event logged in diagnostic buffer
+OB100_STRTUP     :BYTE         ; //16#81/82/83/84 Method of startup
+OB100_PRIORITY   :BYTE         ; //Priority of OB Execution
+OB100_OB_NUMBR   :BYTE         ; //100 (Organization block 100, OB100)
+OB100_RESERVED_1 :BYTE         ; //Reserved for system
+OB100_RESERVED_2 :BYTE         ; //Reserved for system
+OB100_STOP       :WORD         ; //Event that caused CPU to stop (16#4xxx)
+OB100_STRT_INFO  :DWORD        ; //Information on how system started
+OB100_DATE_TIME  :DATE_AND_TIME; //Date and time OB100 started
+END_VAR
+
+BEGIN
+
+;
+
+END_ORGANIZATION_BLOCK
