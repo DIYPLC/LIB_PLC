@@ -1,0 +1,66 @@
+FUNCTION_BLOCK FbDelayN //Блок задержки сигнала на 100 тактов.
+
+//      DbDelayN
+//    +----------+
+//    | FbDelayN |
+// ->-|In     Out|->-
+//    +----------+
+
+//Атрибуты для STEP7.
+TITLE   = 'Блок задержки сигнала на 100 тактов.'
+VERSION : '2.0'
+AUTHOR  : 'VA'
+FAMILY  : LibPlc
+{//Атрибуты для PCS7.
+S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
+S7_blockview := 'big'  ; //CFC: отображение блока мелнькое или большое.
+//Опции компилятора SCL.
+GenerateReferenceData := 'y' ; //SCL: Генерировать перекрестные ссылки.
+CreateDebugInfo       := 'y' ; //SCL: Генерировать оладочную информацию.
+SetOKFlag             := 'y' ; //SCL: ENO = 1
+MonitorArrayLimits    := 'y' ; //SCL: Следить за границами массивов.
+OptimizeObjectCode    := 'y'   //SCL: Оптимизация объектного кода.
+}
+
+VAR_INPUT //Входные переменные, сохраняемые.
+In :REAL := 0.0; //Вход.
+END_VAR
+
+VAR_OUTPUT //Выходные переменные, сохраняемые.
+Out :REAL := 0.0; //Выход.
+END_VAR
+
+CONST //Константы.
+NUMBER := 98; //Размер массива Тактов 100 - 2 = 98.
+END_CONST
+
+VAR //Внутренние переменные, сохраняемые.
+Buffer1: ARRAY [0..NUMBER] OF REAL; //Буфер задержки сигнала.
+Counter1 :INT := 0; //Счетчик.
+END_VAR
+
+//W(Z)=Z^(-N), N=NUMBER+2
+Out := Buffer1[NUMBER];
+FOR COUNTER1 := NUMBER TO 1 BY -1 DO
+Buffer1[COUNTER1] := Buffer1[Counter1 - 1];
+END_FOR;
+Buffer1[0] := In;
+
+END_FUNCTION_BLOCK
+
+//  +---------+
+//  | GNU GPL |
+//  +---------+
+//  |
+//  |
+//  .= .-_-. =.
+// ((_/)o o(\_))
+//  `-'(. .)`-'
+//  |/| \_/ |\
+//  ( |     | )
+//  /"\_____/"\
+//  \__)   (__/
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// License: GNU GPL v2
