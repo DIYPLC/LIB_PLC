@@ -1,0 +1,63 @@
+FUNCTION_BLOCK FbFilterNaN //Фильтр NaN и Inf для чисел REAL.
+
+//      DbFilterNaN
+//    +-------------+
+//    | FbFilterNaN |
+// ->-|In        Out|->-
+//    |        Alarm|-
+//    +-------------+
+
+//Атрибуты для STEP7.
+TITLE   = 'Фильтр NaN и Inf для чисел REAL.'
+VERSION : '2.0'
+AUTHOR  : 'VA'
+FAMILY  : 'LibPlc'
+{//Атрибуты для PCS7.
+S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
+S7_blockview := 'big'  ; //CFC: отображение блока мелнькое или большое.
+//Опции компилятора SCL.
+GenerateReferenceData := 'y' ; //SCL: Генерировать перекрестные ссылки.
+CreateDebugInfo       := 'y' ; //SCL: Генерировать оладочную информацию.
+SetOKFlag             := 'y' ; //SCL: ENO = 1
+MonitorArrayLimits    := 'y' ; //SCL: Следить за границами массивов.
+OptimizeObjectCode    := 'y'   //SCL: Оптимизация объектного кода.
+}
+
+VAR_INPUT //Входные переменные, сохраняемые.
+In:REAL := 0.0; //Вход.
+END_VAR
+
+VAR_OUTPUT //Выходные переменные, сохраняемые.
+Out   :REAL := 0.0  ; //Выход.
+Alarm :BOOL := FALSE; //Флаг ошибки.
+END_VAR
+
+//Если In==(NaN или Inf или -Inf) то Out=0 иначе Out=In.
+//DW#16#7F800000=DW#2#01111111_10000000_00000000_00000000
+//Стандарт IEEE 754.
+IF ((REAL_TO_DWORD(In) AND DW#16#7F800000) = DW#16#7F800000) THEN
+Out   := 0.0;
+Alarm := TRUE;
+ELSE
+Out   := In;
+Alarm := FALSE;
+END_IF;
+
+END_FUNCTION_BLOCK
+
+//  +---------+
+//  | GNU GPL |
+//  +---------+
+//  |
+//  |
+//  .= .-_-. =.
+// ((_/)o o(\_))
+//  `-'(. .)`-'
+//  |/| \_/ |\
+//  ( |     | )
+//  /"\_____/"\
+//  \__)   (__/
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// License: GNU GPL v2

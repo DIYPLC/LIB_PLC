@@ -1,0 +1,48 @@
+ORGANIZATION_BLOCK OB86 //Loss of Rack Fault
+
+//Атрибуты для STEP7.
+TITLE   = 'Loss of Rack Fault'
+VERSION : '2.0'
+AUTHOR  : 'VA'
+FAMILY  : 'SIMATIC'
+{
+//Опции компилятора SCL.
+GenerateReferenceData := 'y' ; //SCL: Генерировать перекрестные ссылки.
+CreateDebugInfo       := 'y' ; //SCL: Генерировать оладочную информацию.
+SetOKFlag             := 'y' ; //SCL: ENO = 1
+MonitorArrayLimits    := 'y' ; //SCL: Следить за границами массивов.
+OptimizeObjectCode    := 'y'   //SCL: Оптимизация объектного кода.
+}
+
+VAR_TEMP
+OB86_EV_CLASS   : BYTE                      ; //16#38/39 Event class 3
+OB86_FLT_ID     : BYTE                      ; //16#C1/C4/C5, Fault identifcation code
+OB86_PRIORITY   : BYTE                      ; //Priority of OB Execution
+OB86_OB_NUMBR   : BYTE                      ; //86 (Organization block 86, OB86)
+OB86_RESERVED_1 : BYTE                      ; //Reserved for system
+OB86_RESERVED_2 : BYTE                      ; //Reserved for system
+OB86_MDL_ADDR   : WORD                      ; //Base address of IM module in rack with fault
+OB86_RACKS_FLTD : ARRAY  [0 .. 31 ] OF BOOL ; //Racks in fault
+OB86_DATE_TIME  : DATE_AND_TIME             ; //Date and time OB86 started
+END_VAR
+
+BEGIN
+"DbDebug".OB86_CNT_ERR := "DbDebug".OB86_CNT_ERR + 1 ;//Счетчик вызовов обработчика ошибок OB86.
+END_ORGANIZATION_BLOCK
+
+//  +---------+
+//  | GNU GPL |
+//  +---------+
+//  |
+//  |
+//  .= .-_-. =.
+// ((_/)o o(\_))
+//  `-'(. .)`-'
+//  |/| \_/ |\
+//  ( |     | )
+//  /"\_____/"\
+//  \__)   (__/
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// License: GNU GPL v2
