@@ -13,6 +13,9 @@ ControlSignal   :REAL := 25.0  ; //1PIRCA1 Сигнал управления приводом [Гц] PLC -
 ControlWord     :WORD := W#16#0; //1PIRCA1 Слово управления SCADA/HMI -> PLC.
 StatusWord      :WORD := W#16#0; //1PIRCA1 Слово состояния PLC -> SCADA/HMI.
 ErrorWord       :WORD := W#16#0; //1PIRCA1 Слово активных ошибок и аварий PLC -> SCADA/HMI.
+PressureSensorMax  :REAL := 10.0; //Диаппазон датчика максимум 10[Бар].
+PressureSensorMin  :REAL := 0.0 ; //Диаппазон датчика минимум   0[Бар].
+PressureFilterTime :REAL := 1.0 ; //Постоянная времени фильтра датчика [с].
 END_STRUCT
 BEGIN //Инициализация переменных массива.
 END_DATA_BLOCK
