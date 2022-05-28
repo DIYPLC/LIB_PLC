@@ -217,7 +217,7 @@ END_FUNCTION_BLOCK
 //           +------>-|OutMax              |   |   +------------+       |                               |
 //           | +---->-|OutMin              |   |   |   FbRamp   |       |               DbLimit_min     |
 //           | |     -|Ts                  |   +->-|In       Out|->-----+             +-----------+     |
-//           | |     -|Manual              |  5s->-|TAcc        |       |   +-+       |  FbLimit  |     |
+//           | |     -|Manual              |  6s->-|TAcc        |       |   +-+       |  FbLimit  |     |
 //           | |     -|ManOn               |  9s->-|TDec        |       +->-|+|----->-|In      Out|->-+ |
 //           | |      +--------------------+      -|Ts          |     -7%->-|+|  100%-|OutMax     |   | |
 //           | |                                   +------------+           +-+    0%-|OutMin     |   | |
