@@ -1,0 +1,58 @@
+FUNCTION_BLOCK FbFilterM //Фильтр медианный.
+
+//       DbFilterM 
+//    +-------------+
+//    |  FbFilterM  |
+// ->-|In        Out|->-
+//   -|Size         |
+//   -|Ts_in        |
+//   -|Ts_ms        |
+//    +-------------+
+
+//Атрибуты для STEP7.
+TITLE   = 'Фильтр медианный.'
+VERSION : '0.1'
+AUTHOR  : 'VA'
+FAMILY  : 'LibPlc'
+{//Атрибуты для PCS7.
+S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
+S7_blockview := 'big'  ; //CFC: отображение блока мелнькое или большое.
+//Опции компилятора SCL.
+GenerateReferenceData := 'y' ; //SCL: Генерировать перекрестные ссылки.
+CreateDebugInfo       := 'y' ; //SCL: Генерировать оладочную информацию.
+SetOKFlag             := 'y' ; //SCL: ENO = 1
+MonitorArrayLimits    := 'y' ; //SCL: Следить за границами массивов.
+OptimizeObjectCode    := 'y'   //SCL: Оптимизация объектного кода.
+}
+
+VAR_INPUT //Входные переменные, сохраняемые.
+In    :REAL := 0.0 ; //Входной сигнал до фильтрации.
+Size  :INT  := 64  ; //Размер массива для сортировки (Количество выборок).
+Ts_in :DINT := 1000; //Время между выборками и сортировками для входа In [мс].
+Ts_ms :DINT := 100 ; //Шаг дискретизации по времени [мс].
+END_VAR
+
+VAR_OUTPUT //Выходные переменные, сохраняемые.
+Out :REAL := 0.0; //Выходной сигнал (середина отсортированного массива).
+END_VAR
+
+;
+
+END_FUNCTION_BLOCK
+
+//  +---------+
+//  | GNU GPL |
+//  +---------+
+//  |
+//  |
+//  .= .-_-. =.
+// ((_/)o o(\_))
+//  `-'(. .)`-'
+//  |/| \_/ |\
+//  ( |     | )
+//  /"\_____/"\
+//  \__)   (__/
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// License: GNU GPL v2

@@ -5,6 +5,7 @@
 FbPIDcontrol       //LibPlc Регулятор ПИД.
 FbScale            //LibPlc Линейное преобразование.
 FbFilterA          //LibPlc Апериодическое звено первого порядка.
+FbFilterM          //LibPlc Фильтр медианный.
 FbDeriveF          //LibPlc Производная с фильтрацией.
 FbDelayN           //LibPlc Задержка на N тактов.
 FbIntegrator       //LibPlc Интегратор W(s)=1/s.
