@@ -1,5 +1,12 @@
 FUNCTION_BLOCK FbTriggerRS //RS- Триггер с приоритетом на сброс.
 
+//       DbTriggerRS
+//     +-------------+
+//     | FbTriggerRS |
+//  ->-|S           Q|->-
+//  ->-|R            |
+//     +-------------+
+
 //Атрибуты для STEP7.
 TITLE   = 'RS- Триггер с приоритетом на сброс.'
 VERSION : '2.0'
@@ -7,21 +14,8 @@ AUTHOR  : 'VA'
 FAMILY  : 'LibPlc'
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
-S7_blockview := 'big'  ; //CFC: отображение блока мелнькое или большое.
-//Опции компилятора SCL.
-GenerateReferenceData := 'y' ; //SCL: Генерировать перекрестные ссылки.
-CreateDebugInfo       := 'y' ; //SCL: Генерировать оладочную информацию.
-SetOKFlag             := 'y' ; //SCL: ENO = 1
-MonitorArrayLimits    := 'y' ; //SCL: Следить за границами массивов.
-OptimizeObjectCode    := 'y'   //SCL: Оптимизация объектного кода.
+S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
 }
-
-//       DbTriggerRS
-//     +-------------+
-//     | FbTriggerRS |
-//  ->-|S           Q|->-
-//  ->-|R            |
-//     +-------------+
 
 VAR_INPUT //Входные переменные, сохраняемые.
 S:BOOL:=FALSE; //Set — установить единицу.

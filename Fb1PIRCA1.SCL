@@ -3,10 +3,10 @@ FUNCTION_BLOCK Fb1PIRCA1 //ПИД- регулятор давления.
 // Система стабилизации давления жидкости в баке.
 // Поддерживаем постоянное давление после насоса с частотных приводом.
 //
-//                 Db1LIRCA1
+//                 Db1PIRCA1
 //    +---------------------------------+
-//    |            Fb1LIRCA1            |
-// ->-|SensorPressure     DriveFrequency|->-
+//    |            Fb1PIRCA1            |
+// ->-|ADC_Pressure        DAC_Frequency|->-
 //   -|RemoteStartButton         MotorOn|-
 //   -|RemoteStopButton      ContactorOn|-
 //   -|VoltageOk                   Error|-
@@ -18,6 +18,16 @@ FUNCTION_BLOCK Fb1PIRCA1 //ПИД- регулятор давления.
 //   -|Ts_ms                            |
 //   -|Reset                            |
 //    +---------------------------------+
+//                    ^
+//                    |
+//                    v
+//    +---------------------------------+
+//    |                                 |
+//    |          DbHmi1PIRCA1           |
+//    |                                 |
+//    |      SCADA / HMI interface      |
+//    |                                 |
+//    +---------------------------------+
 
 //Атрибуты для STEP7.
 TITLE   = '1PIRCA1 ПИД- регулятор давления.'
@@ -28,17 +38,11 @@ FAMILY  : '1PIRCA1'
 S7_m_c     := 'true'   ; //CFC: Блок может управляться или наблюдаться из OS.
 S7_tag     := 'true'   ; //CFC: Блок входит в писок тегов OS. 
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
-S7_blockview := 'big'  ; //CFC: отображение блока мелнькое или большое.
-//Опции компилятора SCL.
-GenerateReferenceData := 'y' ; //SCL: Генерировать перекрестные ссылки.
-CreateDebugInfo       := 'y' ; //SCL: Генерировать оладочную информацию.
-SetOKFlag             := 'y' ; //SCL: ENO = 1
-MonitorArrayLimits    := 'y' ; //SCL: Следить за границами массивов.
-OptimizeObjectCode    := 'y'   //SCL: Оптимизация объектного кода.
+S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
 }
 
 VAR_INPUT //Входные переменные, сохраняемые.
-SensorPressure    :WORD := 0    ; //Датчик давления 0...27648[АЦП].
+ADC_Pressure      :WORD := 0    ; //Датчик давления 0...27648[АЦП].
 RemoteStartButton :BOOL := FALSE; //Кнопка без фиксации NO "ПУСК" на пульте местного управления.
 RemoteStopButton  :BOOL := FALSE; //Кнопка без фиксации NC "СТОП" на пульте местного управления.
 VoltageOk         :BOOL := FALSE; //Схема собрана (вводной автомат 380VAC включен).
@@ -52,10 +56,10 @@ Reset             :BOOL := FALSE; //Сброс при перезагрузке.
 END_VAR
 
 VAR_OUTPUT //Выходные переменные, сохраняемые.
-DriveFrequency :WORD := 0    ; //Частотный привод: Сигнал задания частоты 0...27648[ЦАП].
-MotorOn        :BOOL := FALSE; //Частотный привод: Включить привод.
-ContactorOn    :BOOL := FALSE; //Включить контактор между частотным приводом и двигателем.
-Error          :BOOL := FALSE; //Флаг ошибки.
+DAC_Frequency :WORD := 0    ; //Частотный привод: Сигнал задания частоты 0...27648[ЦАП].
+MotorOn       :BOOL := FALSE; //Частотный привод: Включить привод.
+ContactorOn   :BOOL := FALSE; //Включить контактор между частотным приводом и двигателем.
+Error         :BOOL := FALSE; //Флаг ошибки.
 END_VAR
 
 VAR //Внутренние переменные, сохраняемые.
@@ -327,7 +331,7 @@ END_IF;
 //   -|SimulationValue            |
 //   -|SimulationOn               |
 //    +---------------------------+
-DbDriverAi420_PV.ADC             := SensorPressure              ; //АЦП Сигнал от датчика 0...27648.
+DbDriverAi420_PV.ADC             := ADC_Pressure                ; //АЦП Сигнал от датчика 0...27648.
 DbDriverAi420_PV.SensorMaxValue  := 10.0                        ; //Диаппазон датчика максимум.
 DbDriverAi420_PV.SensorMinValue  := 0.0                         ; //Диаппазон датчика минимум.
 DbDriverAi420_PV.ErrorValue      := 0.0                         ; //Значение для SensorValue при ошибке датчика.
@@ -460,14 +464,14 @@ ControlSignal      := DbRamp_CS.Out    ; //Выходной сигнал.
 //   -|SimulationValue        |
 //   -|SimulationOn           |
 //    +-----------------------+
-DbDriverAo420_CS.In               := ControlSignal           ; //Вход сигнала на исполнительный механизм.
-DbDriverAo420_CS.InMax            := 50.0                    ; //Исполнительный механизм максимум.
-DbDriverAo420_CS.InMin            := 0.0                     ; //Исполнительный механизм минимум.
-DbDriverAo420_CS.SimulationValue  := 0.0                     ; //Значение для исполнительного механизма при симуляции.
-DbDriverAo420_CS.SimulationOn     := FALSE                   ; //Включить симуляцию.
-DbDriverAo420_CS()                                           ; //Драйвер аналогово выхода 4...20мА.
-DriveFrequency                    := DbDriverAo420_CS.DAC    ; //ЦАП Сигнал на исполнительный механизм 0...27648.
-//                                := DbDriverAo420_CS.Current; //Ток на аналоговом выходе 4...20мА.
+DbDriverAo420_CS.In              := ControlSignal           ; //Вход сигнала на исполнительный механизм.
+DbDriverAo420_CS.InMax           := 50.0                    ; //Исполнительный механизм максимум.
+DbDriverAo420_CS.InMin           := 0.0                     ; //Исполнительный механизм минимум.
+DbDriverAo420_CS.SimulationValue := 0.0                     ; //Значение для исполнительного механизма при симуляции.
+DbDriverAo420_CS.SimulationOn    := FALSE                   ; //Включить симуляцию.
+DbDriverAo420_CS()                                          ; //Драйвер аналогово выхода 4...20мА.
+DAC_Frequency                    := DbDriverAo420_CS.DAC    ; //ЦАП Сигнал на исполнительный механизм 0...27648.
+//                               := DbDriverAo420_CS.Current; //Ток на аналоговом выходе 4...20мА.
 
 //Предупреждение о выходе за допустимые пределы измеренного значения.
 //          DbAlarm
@@ -639,3 +643,4 @@ END_FUNCTION_BLOCK
 // Author: VA
 // Contacts: DIY.PLC.314@gmail.com
 // License: GNU GPL v2
+

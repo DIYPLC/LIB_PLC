@@ -5,14 +5,6 @@ TITLE   = 'Циклическая программа.'
 VERSION : '2.0'
 AUTHOR  : 'VA'
 FAMILY  : 'SIMATIC'
-{
-//Опции компилятора SCL.
-GenerateReferenceData := 'y' ; //SCL: Генерировать перекрестные ссылки.
-CreateDebugInfo       := 'y' ; //SCL: Генерировать оладочную информацию.
-SetOKFlag             := 'y' ; //SCL: ENO = 1
-MonitorArrayLimits    := 'y' ; //SCL: Следить за границами массивов.
-OptimizeObjectCode    := 'y'   //SCL: Оптимизация объектного кода.
-}
 
 VAR_TEMP
 OB1_EV_CLASS   :BYTE         ; //Bits 0-3 = 1 (Coming event), Bits 4-7 = 1 (Event class 1)
