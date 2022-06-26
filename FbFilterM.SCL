@@ -1,3 +1,4 @@
+//БЛОК В РАЗРАБОТКЕ НЕ ИСПОЛЬЗОВАТЬ!!!
 FUNCTION_BLOCK FbFilterM //Фильтр медианный.
 
 //       DbFilterM
