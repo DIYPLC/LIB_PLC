@@ -1,0 +1,96 @@
+FUNCTION_BLOCK FbBlink //Мигающий светодиод.
+
+//            DbBlink 
+//    +---------------------+
+//    |       FbBlink       |
+//   -|TimeOn      BlinkLamp|->-
+//   -|TimeOff              |
+//   -|Ts_ms                |
+//   -|Reset                |
+//    +---------------------+
+
+//Атрибуты для STEP7.
+TITLE   = 'Мигающий светодиод.'
+VERSION : '1.0'
+AUTHOR  : 'VA'
+FAMILY  : 'LibPlc'
+{//Атрибуты для PCS7.
+S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
+S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
+}
+
+VAR_INPUT //Входные переменные, сохраняемые.
+TimeOn  :DINT := 1000 ; //Время включения лампочки [мс].
+TimeOff :DINT := 1000 ; //Время выключения лампочки [мс].
+Ts_ms   :DINT := 100  ; //Шаг дискретизации по времени [мс].
+Reset   :BOOL := FALSE; //Сброс при перезагрузке.
+END_VAR
+
+VAR_OUTPUT //Выходные переменные, сохраняемые.
+BlinkLamp: BOOL:=FALSE; //Мигающая лампочка.
+END_VAR 
+
+VAR //Внутренние переменные, сохраняемые.
+Timer1 :DINT := 0; //Таймер1 [мс].
+State1 :INT  := 0; //Граф состояний.
+END_VAR 
+
+CONST //Константы.
+STATE_RESET := 0;
+STATE_ON    := 1;
+STATE_OFF   := 2;
+END_CONST
+
+//Пример построения универсального кроссплатформенного графа состояний.
+//Использую этот код как заготовку под более сложные алгоритмы.
+//Данный алгоритм гораздо быстрее разрабатывать чем конечный автомат с памятьтю.
+
+IF (Reset) THEN //Сброс при перезагрузке.
+State1 := STATE_RESET;
+END_IF;
+
+CASE (State1) OF //Граф состояний.
+
+STATE_RESET: //Сброс.
+BlinkLamp := FALSE;
+Timer1    := 0;
+State1 := STATE_ON;
+
+STATE_ON: //Включить лампочку на заданное время.
+BlinkLamp := TRUE;
+Timer1 := Timer1 + Ts_ms;
+IF (Timer1 >= TimeOn) THEN
+State1 := STATE_OFF;
+Timer1 := 0;
+END_IF;    
+
+STATE_OFF: //Выключить лампочку на заданное время.
+BlinkLamp := FALSE;
+Timer1 := Timer1 + Ts_ms;
+IF (Timer1 >= TimeOff) THEN
+State1 := STATE_ON;
+Timer1 := 0;
+END_IF;    
+
+ELSE //RESET при неопределенном состоянии.
+State1 := STATE_RESET;
+END_CASE; //CASE (State1) OF
+
+END_FUNCTION_BLOCK
+
+//  +---------+
+//  | GNU GPL |
+//  +---------+
+//  |
+//  |
+//  .= .-_-. =.
+// ((_/)o o(\_))
+//  `-'(. .)`-'
+//  |/| \_/ |\
+//  ( |     | )
+//  /"\_____/"\
+//  \__)   (__/
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// License: GNU GPL v2

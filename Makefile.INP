@@ -39,6 +39,7 @@ FbTimerTof         //LibPlc Таймер TOF.
 FbTimerTon         //LibPlc Таймер TON.
 FbWordToBits       //LibPlc Преобразование слова в 16 бит.
 FbBitsToWord       //LibPlc Преобразование 16 бит в слово.
+FbBlink            //LibPlc Мигающий светодиод.
 // LibPlc Технологические блоки.
 FbMotor            //LibPlc Двигатель с частотником и контактором.
 FbValve            //LibPlc Пневмоцилиндр с коцевиками.
