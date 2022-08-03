@@ -1,5 +1,5 @@
 # EditorConfig is awesome: https://EditorConfig.org
 
 [*.scl]
-charset = CP1251
+charset = Latin/Cyrillic
 end_of_line = crlf
