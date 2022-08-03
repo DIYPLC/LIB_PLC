@@ -1,0 +1,5 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+[*.scl]
+charset = CP1251
+end_of_line = crlf
