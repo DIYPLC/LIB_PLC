@@ -6,7 +6,7 @@ FUNCTION_BLOCK FbGSS //Генератор сигналов и псевдослучайных чисел.
 //    -|Amplitude       Sine|->-
 //    -|Period        Cosine|->-
 //    -|Phase     RectangleR|->-
-//    -|Offset      ctangleB|->-
+//    -|Offset    RectangleB|->-
 //    -|PulseTime   Triangle|->-
 //    -|Ts              Prnd|->-
 //     +--------------------+
