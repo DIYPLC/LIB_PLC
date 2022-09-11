@@ -1,6 +1,6 @@
 DATA_BLOCK DbDebug //¬ременные переменные дл€ отладки.
 AUTHOR : 'VA'
-FAMILY : 'LibPlc'
+FAMILY : 'LIB_PLC'
 //ќбъ€вление переменных.
 STRUCT
 OB82_CNT_ERR     :DINT          := L#0                       ;//—четчик вызовов обработчика ошибок OB82.

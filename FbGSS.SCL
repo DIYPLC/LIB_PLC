@@ -15,7 +15,7 @@ FUNCTION_BLOCK FbGSS //Генератор сигналов и псевдослучайных чисел.
 TITLE   = 'Генератор сигналов и псевдослучайных чисел.'
 VERSION : '2.0'
 AUTHOR  : 'VA'
-FAMILY  : 'LibPlc'
+FAMILY  : 'LIB_PLC'
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
 S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.

@@ -25,7 +25,7 @@ FUNCTION_BLOCK FbWordToBits //ѕреобразование слова в 16 бит.
 TITLE   = 'ѕреобразование слова в 16 бит.'
 VERSION : '2.0'
 AUTHOR  : 'VA'
-FAMILY  : 'LibPlc'
+FAMILY  : 'LIB_PLC'
 {//јтрибуты дл€ PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен дл€ прототипов DB.
 S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
