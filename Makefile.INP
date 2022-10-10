@@ -48,7 +48,7 @@ FbCounter          //LibPlc Счетчик импульсов.
 // LibPlc платформозависимые блоки SIEMENS.
 FbDriverAi420      //LibPlc Драйвер аналогово входа 4...20мА.
 FbDriverAo420      //LibPlc Драйвер аналогово выхода 4...20мА.
-FbDriverFRA        //LibPlc Управление приводом MITSUBISHI FRA-740, FRA-840 по PROFIBUS PD.
+FbDriverFRA        //LibPlc Управление приводом MITSUBISHI FR-A740, FR-A840 по PROFIBUS PD.
 
 //Блоки данных для сопряжения с SCADA HMI.
 //При компиляции блоков данных возможна потеря технологических значений переменных в блоках данных.

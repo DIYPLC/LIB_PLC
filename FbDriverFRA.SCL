@@ -1,4 +1,4 @@
-FUNCTION_BLOCK FbDriverFRA //Управление приводом MITSUBISHI FRA-740, FRA-840 по PROFIBUS PD.
+FUNCTION_BLOCK FbDriverFRA //Управление приводом MITSUBISHI FR-A740, FR-A840 по PROFIBUS PD.
 //PROFIDRIVE profile PPO type1.
 
 //       DbDriverFRA
@@ -29,7 +29,7 @@ FUNCTION_BLOCK FbDriverFRA //Управление приводом MITSUBISHI FRA-740, FRA-840 по 
 //    +---------------+
 
 //Атрибуты для STEP7.
-TITLE   = 'Управление приводом MITSUBISHI FRA-740, FRA-840 по PROFIBUS PD.'
+TITLE   = 'Управление приводом MITSUBISHI FR-A740, FR-A840 по PROFIBUS PD.'
 VERSION : '2.0'
 AUTHOR  : 'VA'
 FAMILY  : 'SIMATIC'
@@ -262,7 +262,7 @@ END_FUNCTION_BLOCK
 (*
 
 -Описание.
-Данная программа драйвер предназначена для сопряжения частотного преобразователя MITSUBISHI FRA-740, FRA-840 c программируемым логическим контроллером SIEMENS SIMATIC S7-300, S7-400 по сети PROFIBUS через плату связи FR-A7NP, FR-A8NP.
+Данная программа драйвер предназначена для сопряжения частотного преобразователя MITSUBISHI FR-A740, FR-A840 c программируемым логическим контроллером SIEMENS SIMATIC S7-300, S7-400 по сети PROFIBUS через плату связи FR-A7NP, FR-A8NP.
 Программа написана на языке SLC и компилируется в SIEMENS SIMATIC STEP7 или PCS7.
 Драйвер позволяет:
 Включать/выключать двигатель, задавать/измерять частоту 3х фазной сети, про-сматривать ток двигателя,
