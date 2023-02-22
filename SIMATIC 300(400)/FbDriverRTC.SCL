@@ -1,26 +1,31 @@
 FUNCTION_BLOCK FbDriverRTC //Блок чтения часов реального времени.
 
-//       DbDriverRTC
-//     +-------------+
-//     | FbDriverRTC |
-//     |         Year|->-
-//     |        Month|->-
-//     |          Day|->-
-//     |         Hour|->-
-//     |      Minutes|->-
-//     |      Seconds|->-
-//     |  Millisecond|->-
-//     |      Weekday|->-
-//     +-------------+
+//         DbDriverRTC
+//     +-----------------+
+//     |   FbDriverRTC   |
+//  ->-|Reset        Year|->-
+//     |            Month|->-
+//     |              Day|->-
+//     |             Hour|->-
+//     |          Minutes|->-
+//     |          Seconds|->-
+//     |      Millisecond|->-
+//     |          Weekday|->-
+//     |            Ts_ms|->-
+//     |               Ts|->-
+//     |           Ts_max|->-
+//     |          Blink1s|->-
+//     +-----------------+
 
 //Атрибуты для STEP7.
 TITLE   = 'Блок чтения часов реального времени.'
-VERSION : '2.0'
+VERSION : '3.0'
 AUTHOR  : 'VA'
 FAMILY  : 'SIMATIC'
+
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
-S7_blockview := 'big'  ; //CFC: отображение блока мелнькое или большое.
+S7_blockview := 'big'  ; //CFC: отображение блока маленькое или большое.
 //Опции компилятора SCL.
 GenerateReferenceData := 'y' ; //SCL: Генерировать перекрестные ссылки.
 CreateDebugInfo       := 'y' ; //SCL: Генерировать оладочную информацию.
@@ -29,15 +34,23 @@ MonitorArrayLimits    := 'y' ; //SCL: Следить за границами массивов.
 OptimizeObjectCode    := 'y'   //SCL: Оптимизация объектного кода.
 }
 
+VAR_INPUT //Входные переменные, сохраняемые.
+Reset       :BOOL := FALSE; //Сброс при перезагрузке.
+END_VAR
+
 VAR_OUTPUT //Выходные переменные, сохраняемые.
-Year        :INT := 0; //Текущее время- Год 20xx.
-Month       :INT := 0; //Текущее время- Месяц 1...12.
-Day         :INT := 0; //Текущее время- День 1...31.
-Hour        :INT := 0; //Текущее время- Час 0...23.
-Minutes     :INT := 0; //Текущее время- Минута 0...59.
-Seconds     :INT := 0; //Текущее время- Секунда 0...59.
-Millisecond :INT := 0; //Текущее время- Миллисекунды 0...999.
-Weekday     :INT := 0; //Текущее время- День недели 1...7.
+Year        :INT  := 0    ; //Текущее время- Год 20xx.
+Month       :INT  := 0    ; //Текущее время- Месяц 1...12.
+Day         :INT  := 0    ; //Текущее время- День 1...31.
+Hour        :INT  := 0    ; //Текущее время- Час 0...23.
+Minute      :INT  := 0    ; //Текущее время- Минута 0...59.
+Second      :INT  := 0    ; //Текущее время- Секунда 0...59.
+Millisecond :INT  := 0    ; //Текущее время- Миллисекунды 0...999.
+Weekday     :INT  := 0    ; //Текущее время- День недели 1...7.
+Ts_ms       :DINT := 0    ; //Шаг дискретизации по времени [мс].
+Ts          :REAL := 0.0  ; //Шаг дискретизации по времени [с].
+Ts_max      :DINT := 0    ; //Максимальное время скана [мс].
+Blink1s     :BOOL := FALSE; //Моргание 500ms ON + 500ms OFF.
 END_VAR
 
 VAR //Внутренние переменные, сохраняемые.
@@ -54,54 +67,133 @@ ArrayByte:ARRAY[0..7] OF BYTE; //Массив из 8 байт.
 //ArrayByte[6] Милисекунда в формате BCD.
 //ArrayByte[7] Милисекунды и день недели в формате BCD.
 END_STRUCT;
+Time_ms_previous :DINT := 0; //RTC предидущее значение 0...59999ms.
 END_VAR
 
 VAR_TEMP  //Временные переменные, не сохраняемые.
-ErrorCode :INT;  //Код ошики SFC должен быть 0.
-TmpBYTE   :BYTE; //Временная переменная.
-ms_x10    :BYTE; //Временная переменная 1.
-ms_x100   :BYTE; //Временная переменная 2.
-ms_x1     :BYTE; //Временная переменная 3.
+ErrorCode       :INT ; //Код ошики SFC должен быть 0.
+TmpBYTE         :BYTE; //Временная переменная.
+ms_x10          :BYTE; //Временная переменная 1.
+ms_x100         :BYTE; //Временная переменная 2.
+ms_x1           :BYTE; //Временная переменная 3.
+Time_ms_current :DINT; //RTC 0...59999ms.
 END_VAR
 
 //Чтение RTC.
-ErrorCode := SFC1(CDT:=DateAndTime);
+ErrorCode := SFC1(CDT:=DateAndTime); //READ_CLK();
 IF (ErrorCode = 0) THEN
+
 //Расшифровка BCD формата времени- год.
-TmpBYTE := ROR(IN:=(StructDateAndTime.ArrayByte[0] AND 2#1111_0000),N:=4);
-Year := 2000 + BYTE_TO_INT(TmpBYTE)*10 + BYTE_TO_INT(StructDateAndTime.ArrayByte[0] AND 2#0000_1111);
+Year := 2000 + BCD_TO_INT(StructDateAndTime.ArrayByte[0]);
+
 //Расшифровка BCD формата времени- месяц.
-TmpBYTE := ROR(IN:=(StructDateAndTime.ArrayByte[1] AND 2#1111_0000),N:=4);
-Month := BYTE_TO_INT(TmpBYTE)*10 + BYTE_TO_INT(StructDateAndTime.ArrayByte[1] AND 2#0000_1111);
+Month := BCD_TO_INT(StructDateAndTime.ArrayByte[1]);
+
 //Расшифровка BCD формата времени- день.
-TmpBYTE := ROR(IN:=(StructDateAndTime.ArrayByte[2] AND 2#1111_0000),N:=4);
-Day := BYTE_TO_INT(TmpBYTE)*10 + BYTE_TO_INT(StructDateAndTime.ArrayByte[2] AND 2#0000_1111);
+Day := BCD_TO_INT(StructDateAndTime.ArrayByte[2]);
+
 //Расшифровка BCD формата времени- час.
-TmpBYTE := ROR(IN:=(StructDateAndTime.ArrayByte[3] AND 2#1111_0000),N:=4);
-Hour := BYTE_TO_INT(TmpBYTE)*10 + BYTE_TO_INT(StructDateAndTime.ArrayByte[3] AND 2#0000_1111);
+Hour := BCD_TO_INT(StructDateAndTime.ArrayByte[3]);
+
 //Расшифровка BCD формата времени- минута.
-TmpBYTE := ROR(IN:=StructDateAndTime.ArrayByte[4] AND 2#1111_0000,N:=4);
-Minutes := BYTE_TO_INT(TmpBYTE)*10 + BYTE_TO_INT(StructDateAndTime.ArrayByte[4] AND 2#0000_1111);
+Minute := BCD_TO_INT(StructDateAndTime.ArrayByte[4]);
+
 //Расшифровка BCD формата времени- секунда.
-TmpBYTE := ROR(IN:=StructDateAndTime.ArrayByte[5] AND 2#1111_0000,N:=4);
-Seconds := BYTE_TO_INT(TmpBYTE)*10 + BYTE_TO_INT(StructDateAndTime.ArrayByte[5] AND 2#0000_1111);
+Second := BCD_TO_INT(StructDateAndTime.ArrayByte[5]);
+
 //Расшифровка BCD формата времени- миллисекунда.
 ms_x10  := StructDateAndTime.ArrayByte[6] AND 2#0000_1111; //ms x10
 ms_x100 := ROR(IN:=StructDateAndTime.ArrayByte[6] AND 2#1111_0000,N:=4); //ms x100
 ms_x1   := ROR(IN:=StructDateAndTime.ArrayByte[7] AND 2#1111_0000,N:=4); //ms x1
 Millisecond := BYTE_TO_INT(ms_x100)*100 + BYTE_TO_INT(ms_x10)*10 + BYTE_TO_INT(ms_x1);
+
 //Расшифровка BCD формата времени- день недели.
 Weekday := BYTE_TO_INT(StructDateAndTime.ArrayByte[7] AND 2#0000_1111);
+
 ELSE
 Year        := 0;
 Month       := 0;
 Day         := 0;
 Hour        := 0;
-Minutes     := 0;
-Seconds     := 0;
+Minute      := 0;
+Second      := 0;
 Millisecond := 0;
 Weekday     := 0;
 END_IF;
+
+//--------------------------------------------------------------------------------------------
+
+//Моргание 500ms ON + 500ms OFF.
+Blink1s := Millisecond <= 499;
+
+//--------------------------------------------------------------------------------------------
+
+//Расчет времени скана ПЛК с точки зрения RTC.
+//Может быть полезна для OB1 в S7-1200 и для OB1 в CFC PCS7.
+
+//RTC 0...59999ms
+Time_ms_current := (INT_TO_DINT(Second) * 1000) + INT_TO_DINT(Millisecond);
+
+//Инициализируем время при перезагрузке.
+IF (Reset) THEN
+Time_ms_previous := Time_ms_current;
+END_IF;
+
+//Разность времени с учетом переполнения.
+IF (Time_ms_current >= Time_ms_previous) THEN
+Ts_ms := Time_ms_current - Time_ms_previous;
+//Ts_ms = 7 - 2 = 5 ms
+//0
+//1
+//2 <- Time_ms_previous
+//3
+//4
+//5
+//6
+//7 <- Time_ms_current
+//8
+//9
+ELSE
+Ts_ms := (60000 - Time_ms_previous) + Time_ms_current;
+//Ts_ms = (60000 - 59997) + 2 = 5 ms
+//59995
+//59996
+//59997 <- Time_ms_previous
+//59998
+//59999
+//0
+//1
+//2 <- Time_ms_current
+//3
+//4
+END_IF;
+
+//Запомнить предидущее время.
+Time_ms_previous := Time_ms_current;
+
+//Время скана не может быть больше 1000ms
+//Защита на случай если ПЛК переведут в стоп на длительное время.
+//Защита от внезапной корректировки времени RTC.
+//Защита от неверных входных данных.
+IF ((Ts_ms >= 1000) OR (Ts_ms < 0)) THEN
+Ts_ms := 0;
+END_IF;
+
+//Шаг дискретизации по времени [с].
+Ts := DINT_TO_REAL(Ts_ms) * 0.001;
+
+//--------------------------------------------------------------------------------------------
+
+//Максимальное время скана [мс].
+IF (Ts_ms >= Ts_max) THEN
+Ts_max := Ts_ms;
+END_IF;
+
+IF (Reset) THEN
+Ts_max := 0;
+END_IF;
+
+//--------------------------------------------------------------------------------------------
 
 END_FUNCTION_BLOCK
 
