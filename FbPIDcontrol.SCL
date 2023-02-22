@@ -20,7 +20,7 @@ FUNCTION_BLOCK FbPIDcontrol //ПИД-регулятор.
 
 //Атрибуты для STEP7.
 TITLE   = 'ПИД-регулятор.'
-VERSION : '3.1'
+VERSION : '3.2'
 AUTHOR  : 'VA'
 FAMILY  : 'LIB_PLC'
 {//Атрибуты для PCS7.
@@ -146,9 +146,13 @@ END_FUNCTION_BLOCK
 // Fb          - Function block       - Функциональный блок.
 // Db          - Data block           - Блок данных.
 // PIDcontrol  - PID Controller       - ПИД- регулятор (пропорционально интегрально дифференциальный регулятор).
-// SP          - Setpoint             - Заданное значение.
-// PV          - Process Variable     - Измеренное значение.
+// SP          - Set Point            - Заданное значение.
+// PV          - Process Variable     - Измеренное значение ==SP.
+// CV          - Control Variable     - Измеренное значение.
 // CS          - Control Signal       - Сигнал управления == Out.
+// MV          - Manipulated Value    - Сигнал управления == Out.
+// MV          - Manipulated Variable - Сигнал управления == Out.
+// OP          - Output Power         - Сигнал управления == Out.
 // Er          - Error                - Ошибка регулирования, рассогласование.
 // DBmax       - Dead band maximum    - Максимум зоны нечувствительности.
 // DBmin       - Dead band minimum    - Минимум зоны нечувствительности.
