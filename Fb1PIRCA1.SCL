@@ -34,6 +34,7 @@ TITLE   = '1PIRCA1 ПИД- регулятор давления.'
 VERSION : '2.0'
 AUTHOR  : 'VA'
 FAMILY  : '1PIRCA1'
+
 {//Атрибуты для PCS7.
 S7_m_c     := 'true'   ; //CFC: Блок может управляться или наблюдаться из OS.
 S7_tag     := 'true'   ; //CFC: Блок входит в писок тегов OS. 
@@ -64,9 +65,9 @@ END_VAR
 
 VAR //Внутренние переменные, сохраняемые.
 //Промежуточные переменные для быстрой диагностики.
-ProcessVariable :REAL := 0.0  ; //Измеренное значение регулируемого параметра [Бар].
-Setpoint        :REAL := 0.0  ; //Заданное значение регулируемого параметра [Бар].
-ControlSignal   :REAL := 0.0  ; //Сигнал управления на исполнительный механизм [Гц].
+PV              :REAL := 0.0  ; //Измеренное значение регулируемого параметра [Бар].
+SP              :REAL := 0.0  ; //Заданное значение регулируемого параметра [Бар].
+MV              :REAL := 0.0  ; //Сигнал управления на исполнительный механизм [Гц].
 Ts              :REAL := 0.1  ; //Шаг дискретизации по времени [с].
 ModeStop        :BOOL := FALSE; //Сигал текущего режима работы "СТОП".
 ModeManual      :BOOL := FALSE; //Сигал текущего режима работы "РУЧНОЙ".
@@ -86,10 +87,10 @@ DbFilterA_PV     :FbFilterA     ; //Фильтр апериодический.
 DbLimit_PV       :FbLimit       ; //Амплитудный ограничитель.
 DbLimit_SP       :FbLimit       ; //Амплитудный ограничитель.
 DbPIDcontrol1    :FbPIDcontrol  ; //ПИД-регулятор.
-DbRamp_CS        :FbRamp        ; //Рампа разгона / торможения.
-DbDriverAo420_CS :FbDriverAo420 ; //Драйвер аналогово выхода 4...20мА.
+DbRamp_MV        :FbRamp        ; //Рампа разгона / торможения.
+DbDriverAo420_MV :FbDriverAo420 ; //Драйвер аналогово выхода 4...20мА.
 DbAlarm_PV       :FbAlarm       ; //Блок предупреждений.
-DbAlarm_CS       :FbAlarm       ; //Блок предупреждений.
+DbAlarm_MV       :FbAlarm       ; //Блок предупреждений.
 END_VAR
 
 VAR_TEMP //Внутренние переменные, не сохраняемые.
@@ -129,24 +130,24 @@ Ts := DINT_TO_REAL(Ts_ms) * 0.001;
 //    |         Out14|->-
 //    |         Out15|->-
 //    +--------------+
-DbWordToBits_CW.In := "Db1PIRCA1Hmi".ControlWord; //Входной сигнал.
-DbWordToBits_CW()                               ; //Преобразование слова в 16 бит.
-HmiButtonStop      := DbWordToBits_CW.Out0      ; //Выходной сигнал бит0.
-HmiButtonManual    := DbWordToBits_CW.Out1      ; //Выходной сигнал бит1.
-HmiButtonAuto      := DbWordToBits_CW.Out2      ; //Выходной сигнал бит2.
-//                 := DbWordToBits_CW.Out3      ; //Выходной сигнал бит3.
-//                 := DbWordToBits_CW.Out4      ; //Выходной сигнал бит4.
-//                 := DbWordToBits_CW.Out5      ; //Выходной сигнал бит5.
-//                 := DbWordToBits_CW.Out6      ; //Выходной сигнал бит6.
-//                 := DbWordToBits_CW.Out7      ; //Выходной сигнал бит7.
-//                 := DbWordToBits_CW.Out8      ; //Выходной сигнал бит8.
-//                 := DbWordToBits_CW.Out9      ; //Выходной сигнал бит9.
-//                 := DbWordToBits_CW.Out10     ; //Выходной сигнал бит10.
-//                 := DbWordToBits_CW.Out11     ; //Выходной сигнал бит11.
-//                 := DbWordToBits_CW.Out12     ; //Выходной сигнал бит12.
-//                 := DbWordToBits_CW.Out13     ; //Выходной сигнал бит13.
-//                 := DbWordToBits_CW.Out14     ; //Выходной сигнал бит14.
-//                 := DbWordToBits_CW.Out15     ; //Выходной сигнал бит15.
+DbWordToBits_CW.In := "Db1PIRCA1Hmi".CW    ; //Входной сигнал.
+DbWordToBits_CW()                          ; //Преобразование слова в 16 бит.
+HmiButtonStop      := DbWordToBits_CW.Out0 ; //Выходной сигнал бит0.
+HmiButtonManual    := DbWordToBits_CW.Out1 ; //Выходной сигнал бит1.
+HmiButtonAuto      := DbWordToBits_CW.Out2 ; //Выходной сигнал бит2.
+//                 := DbWordToBits_CW.Out3 ; //Выходной сигнал бит3.
+//                 := DbWordToBits_CW.Out4 ; //Выходной сигнал бит4.
+//                 := DbWordToBits_CW.Out5 ; //Выходной сигнал бит5.
+//                 := DbWordToBits_CW.Out6 ; //Выходной сигнал бит6.
+//                 := DbWordToBits_CW.Out7 ; //Выходной сигнал бит7.
+//                 := DbWordToBits_CW.Out8 ; //Выходной сигнал бит8.
+//                 := DbWordToBits_CW.Out9 ; //Выходной сигнал бит9.
+//                 := DbWordToBits_CW.Out10; //Выходной сигнал бит10.
+//                 := DbWordToBits_CW.Out11; //Выходной сигнал бит11.
+//                 := DbWordToBits_CW.Out12; //Выходной сигнал бит12.
+//                 := DbWordToBits_CW.Out13; //Выходной сигнал бит13.
+//                 := DbWordToBits_CW.Out14; //Выходной сигнал бит14.
+//                 := DbWordToBits_CW.Out15; //Выходной сигнал бит15.
 
 //Предупреждение: Нажата кнопка СТОП на пульте местного управления.
 ErrorButtonStop := NOT(RemoteStopButton);
@@ -205,25 +206,25 @@ ModeAuto                     := DbModeSelector1.LampAuto  ; //Флаг "Активен АВТО
 // ->-|In14          |
 // ->-|In15          |
 //    +--------------+
-DbBitsToWord_SW.In0     := ModeStop             ; //Входной сигнал бит0.
-DbBitsToWord_SW.In1     := ModeManual           ; //Входной сигнал бит1.
-DbBitsToWord_SW.In2     := ModeAuto             ; //Входной сигнал бит2.
-DbBitsToWord_SW.In3     := FALSE                ; //Входной сигнал бит3.
-DbBitsToWord_SW.In4     := FALSE                ; //Входной сигнал бит4.
-DbBitsToWord_SW.In5     := FALSE                ; //Входной сигнал бит5.
-DbBitsToWord_SW.In6     := FALSE                ; //Входной сигнал бит6.
-DbBitsToWord_SW.In7     := FALSE                ; //Входной сигнал бит7.
-DbBitsToWord_SW.In8     := FALSE                ; //Входной сигнал бит8.
-DbBitsToWord_SW.In9     := FALSE                ; //Входной сигнал бит9.
-DbBitsToWord_SW.In10    := FALSE                ; //Входной сигнал бит10.
-DbBitsToWord_SW.In11    := FALSE                ; //Входной сигнал бит11.
-DbBitsToWord_SW.In12    := FALSE                ; //Входной сигнал бит12.
-DbBitsToWord_SW.In13    := FALSE                ; //Входной сигнал бит13.
-DbBitsToWord_SW.In14    := FALSE                ; //Входной сигнал бит14.
-DbBitsToWord_SW.In14    := FALSE                ; //Входной сигнал бит14.
-DbBitsToWord_SW.In15    := FALSE                ; //Входной сигнал бит15.
-DbBitsToWord_SW()                               ; //Преобразование 16 бит в слово.
-"Db1PIRCA1Hmi".StatusWord := DbBitsToWord_SW.Out; //Выходной сигнал.
+DbBitsToWord_SW.In0  := ModeStop           ; //Входной сигнал бит0.
+DbBitsToWord_SW.In1  := ModeManual         ; //Входной сигнал бит1.
+DbBitsToWord_SW.In2  := ModeAuto           ; //Входной сигнал бит2.
+DbBitsToWord_SW.In3  := FALSE              ; //Входной сигнал бит3.
+DbBitsToWord_SW.In4  := FALSE              ; //Входной сигнал бит4.
+DbBitsToWord_SW.In5  := FALSE              ; //Входной сигнал бит5.
+DbBitsToWord_SW.In6  := FALSE              ; //Входной сигнал бит6.
+DbBitsToWord_SW.In7  := FALSE              ; //Входной сигнал бит7.
+DbBitsToWord_SW.In8  := FALSE              ; //Входной сигнал бит8.
+DbBitsToWord_SW.In9  := FALSE              ; //Входной сигнал бит9.
+DbBitsToWord_SW.In10 := FALSE              ; //Входной сигнал бит10.
+DbBitsToWord_SW.In11 := FALSE              ; //Входной сигнал бит11.
+DbBitsToWord_SW.In12 := FALSE              ; //Входной сигнал бит12.
+DbBitsToWord_SW.In13 := FALSE              ; //Входной сигнал бит13.
+DbBitsToWord_SW.In14 := FALSE              ; //Входной сигнал бит14.
+DbBitsToWord_SW.In14 := FALSE              ; //Входной сигнал бит14.
+DbBitsToWord_SW.In15 := FALSE              ; //Входной сигнал бит15.
+DbBitsToWord_SW()                          ; //Преобразование 16 бит в слово.
+"Db1PIRCA1Hmi".SW    := DbBitsToWord_SW.Out; //Выходной сигнал.
 
 //Сборка слова активных ошибок и аварий EW из 16 бит, для передачи в SCADA/HMI.
 //Слово активных ошибок и аварий EW используется для предупреждения оператора.
@@ -247,25 +248,25 @@ DbBitsToWord_SW()                               ; //Преобразование 16 бит в слов
 // ->-|In14          |
 // ->-|In15          |
 //    +--------------+
-DbBitsToWord_EW.In0    := DbAlarm_PV.AlarmLo     ; //Входной сигнал бит0.
-DbBitsToWord_EW.In1    := DbAlarm_PV.AlarmHi     ; //Входной сигнал бит1.
-DbBitsToWord_EW.In2    := DbAlarm_CS.AlarmLo     ; //Входной сигнал бит2.
-DbBitsToWord_EW.In3    := DbAlarm_CS.AlarmHi     ; //Входной сигнал бит3.
-DbBitsToWord_EW.In4    := DbDriverAi420_PV.Error ; //Входной сигнал бит4.
-DbBitsToWord_EW.In5    := DbMotor1.ErrorVoltage  ; //Входной сигнал бит5.
-DbBitsToWord_EW.In6    := DbMotor1.ErrorDrive    ; //Входной сигнал бит6.
-DbBitsToWord_EW.In7    := DbMotor1.ErrorContactor; //Входной сигнал бит7.
-DbBitsToWord_EW.In8    := ErrorButtonStop        ; //Входной сигнал бит8.
-DbBitsToWord_EW.In9    := InterlockOn            ; //Входной сигнал бит9.
-DbBitsToWord_EW.In10   := GroupStop              ; //Входной сигнал бит10.
-DbBitsToWord_EW.In11   := FALSE                  ; //Входной сигнал бит11.
-DbBitsToWord_EW.In12   := FALSE                  ; //Входной сигнал бит12.
-DbBitsToWord_EW.In13   := FALSE                  ; //Входной сигнал бит13.
-DbBitsToWord_EW.In14   := FALSE                  ; //Входной сигнал бит14.
-DbBitsToWord_EW.In14   := FALSE                  ; //Входной сигнал бит14.
-DbBitsToWord_EW.In15   := FALSE                  ; //Входной сигнал бит15.
-DbBitsToWord_EW()                                ; //Преобразование 16 бит в слово.
-"Db1PIRCA1Hmi".ErrorWord := DbBitsToWord_EW.Out  ; //Выходной сигнал.
+DbBitsToWord_EW.In0  := DbAlarm_PV.AlarmLo     ; //Входной сигнал бит0.
+DbBitsToWord_EW.In1  := DbAlarm_PV.AlarmHi     ; //Входной сигнал бит1.
+DbBitsToWord_EW.In2  := DbAlarm_MV.AlarmLo     ; //Входной сигнал бит2.
+DbBitsToWord_EW.In3  := DbAlarm_MV.AlarmHi     ; //Входной сигнал бит3.
+DbBitsToWord_EW.In4  := DbDriverAi420_PV.Error ; //Входной сигнал бит4.
+DbBitsToWord_EW.In5  := DbMotor1.ErrorVoltage  ; //Входной сигнал бит5.
+DbBitsToWord_EW.In6  := DbMotor1.ErrorDrive    ; //Входной сигнал бит6.
+DbBitsToWord_EW.In7  := DbMotor1.ErrorContactor; //Входной сигнал бит7.
+DbBitsToWord_EW.In8  := ErrorButtonStop        ; //Входной сигнал бит8.
+DbBitsToWord_EW.In9  := InterlockOn            ; //Входной сигнал бит9.
+DbBitsToWord_EW.In10 := GroupStop              ; //Входной сигнал бит10.
+DbBitsToWord_EW.In11 := FALSE                  ; //Входной сигнал бит11.
+DbBitsToWord_EW.In12 := FALSE                  ; //Входной сигнал бит12.
+DbBitsToWord_EW.In13 := FALSE                  ; //Входной сигнал бит13.
+DbBitsToWord_EW.In14 := FALSE                  ; //Входной сигнал бит14.
+DbBitsToWord_EW.In14 := FALSE                  ; //Входной сигнал бит14.
+DbBitsToWord_EW.In15 := FALSE                  ; //Входной сигнал бит15.
+DbBitsToWord_EW()                              ; //Преобразование 16 бит в слово.
+"Db1PIRCA1Hmi".EW    := DbBitsToWord_EW.Out    ; //Выходной сигнал.
 
 // Двигатель с частотником и контактором.
 //                 DbMotor
@@ -363,14 +364,14 @@ DbFilterA_PV()                                      ; //Фильтр апериодический.
 //   -|OutMax     |
 //   -|OutMin     |
 //    +-----------+
-DbLimit_PV.In       := DbFilterA_PV.Out            ; //Вход амплитудного ограничителя.
-DbLimit_PV.OutMax   := "Db1PIRCA1Hmi".PressureMaxAi; //Максимальное значение выхода.
-DbLimit_PV.OutMin   := "Db1PIRCA1Hmi".PressureMinAi; //Минимальное значение выхода.
-DbLimit_PV()                                       ; //Амплитудный ограничитель.
-ProcessVariable     := DbLimit_PV.Out              ; //Выход амплитудного ограничителя.
+DbLimit_PV.In     := DbFilterA_PV.Out            ; //Вход амплитудного ограничителя.
+DbLimit_PV.OutMax := "Db1PIRCA1Hmi".PressureMaxAi; //Максимальное значение выхода.
+DbLimit_PV.OutMin := "Db1PIRCA1Hmi".PressureMinAi; //Минимальное значение выхода.
+DbLimit_PV()                                     ; //Амплитудный ограничитель.
+PV                := DbLimit_PV.Out              ; //Выход амплитудного ограничителя.
 
 //Отображение давления на SCADA/HMI.
-"Db1PIRCA1Hmi".ProcessVariable := ProcessVariable;
+"Db1PIRCA1Hmi".PV := PV;
 
 //Ограничение заданного значения давления 0...10[Бар].
 //       DbLimit
@@ -380,48 +381,48 @@ ProcessVariable     := DbLimit_PV.Out              ; //Выход амплитудного ограни
 //   -|OutMax     |
 //   -|OutMin     |
 //    +-----------+
-DbLimit_SP.In      := "Db1PIRCA1Hmi".Setpoint     ; //Вход амплитудного ограничителя.
-DbLimit_SP.OutMax  := "Db1PIRCA1Hmi".PressureMaxAi; //Максимальное значение выхода.
-DbLimit_SP.OutMin  := "Db1PIRCA1Hmi".PressureMinAi; //Минимальное значение выхода.
-DbLimit_SP()                                      ; //Амплитудный ограничитель.
-Setpoint           := DbLimit_SP.Out              ; //Выход амплитудного ограничителя.
+DbLimit_SP.In     := "Db1PIRCA1Hmi".SP           ; //Вход амплитудного ограничителя.
+DbLimit_SP.OutMax := "Db1PIRCA1Hmi".PressureMaxAi; //Максимальное значение выхода.
+DbLimit_SP.OutMin := "Db1PIRCA1Hmi".PressureMinAi; //Минимальное значение выхода.
+DbLimit_SP()                                     ; //Амплитудный ограничитель.
+SP                := DbLimit_SP.Out              ; //Выход амплитудного ограничителя.
 
 //Сигнал управления от SADA/HMI.
-ControlSignal := "Db1PIRCA1Hmi".ControlSignal;
+MV := "Db1PIRCA1Hmi".MV;
 
 //Стабилизация давления жидкости 0...10[Бар] -> 0...50[Гц].
 //         DbPIDcontrol
 //    +--------------------+
 //    |    FbPIDcontrol    |
-// ->-|ProcessVariable  Out|->-
-//   -|Setpoint            |
+// ->-|PV                MV|->-
+//   -|SP                  |
 //   -|Kp                  |
 //   -|Ki                  |
 //   -|Kd                  |
 //   -|Kdf                 |
-//   -|DBmax               |
-//   -|DBmin               |
-//   -|OutMax              |
-//   -|OutMin              |
+//   -|DBMAX               |
+//   -|DBMIN               |
+//   -|MVMAX               |
+//   -|MVMIN               |
 //   -|Ts                  |
 //   -|Manual              |
 //   -|ManOn               |
 //    +--------------------+
-DbPIDcontrol1.ProcessVariable := ProcessVariable      ; //Измеренное значение регулируемого параметра.
-DbPIDcontrol1.Setpoint        := Setpoint             ; //Заданное значение регулируемого параметра.
-DbPIDcontrol1.Kp              := "Db1PIRCA1Hmi".Kp    ; //Коэффициент усиления пропорциональный.
-DbPIDcontrol1.Ki              := "Db1PIRCA1Hmi".Ki    ; //Коэффициент усиления интегральный.
-DbPIDcontrol1.Kd              := "Db1PIRCA1Hmi".Kd    ; //Коэффициент усиления дифференциальный.
-DbPIDcontrol1.Kdf             := "Db1PIRCA1Hmi".Kdf   ; //Коэффициент фильтрации дифференциальный Kdf=1/Tdf.
-DbPIDcontrol1.DBmax           := "Db1PIRCA1Hmi".DBmax ; //Зона нечувствительности к ошибке регулирования, максимум.
-DbPIDcontrol1.DBmin           := "Db1PIRCA1Hmi".DBmin ; //Зона нечувствительности к ошибке регулирования, минимум.
-DbPIDcontrol1.OutMax          := "Db1PIRCA1Hmi".OutMax; //Максимальное значение сигнала управления.
-DbPIDcontrol1.OutMin          := "Db1PIRCA1Hmi".OutMin; //Минимальное значение сигнала управления.
-DbPIDcontrol1.Ts              := Ts                   ; //Шаг дискретизации по времени в секундах.
-DbPIDcontrol1.Manual          := ControlSignal        ; //Сигнал управления в ручном режиме работы.
-DbPIDcontrol1.ManOn           := NOT(ModeAuto)        ; //Включить ручной режим работы регулятора.
-DbPIDcontrol1()                                       ; //ПИД-регулятор.
-//                            := DbPIDcontrol1.Out    ; //Сигнал управления на исполнительный механизм.
+DbPIDcontrol1.PV     := PV                   ; //Измеренное значение регулируемого параметра.
+DbPIDcontrol1.SP     := SP                   ; //Заданное значение регулируемого параметра.
+DbPIDcontrol1.Kp     := "Db1PIRCA1Hmi".Kp    ; //Коэффициент усиления пропорциональный.
+DbPIDcontrol1.Ki     := "Db1PIRCA1Hmi".Ki    ; //Коэффициент усиления интегральный.
+DbPIDcontrol1.Kd     := "Db1PIRCA1Hmi".Kd    ; //Коэффициент усиления дифференциальный.
+DbPIDcontrol1.Kdf    := "Db1PIRCA1Hmi".Kdf   ; //Коэффициент фильтрации дифференциальный Kdf=1/Tdf.
+DbPIDcontrol1.DBMAX  := "Db1PIRCA1Hmi".DBMAX ; //Зона нечувствительности к ошибке регулирования, максимум.
+DbPIDcontrol1.DBMIN  := "Db1PIRCA1Hmi".DBMIN ; //Зона нечувствительности к ошибке регулирования, минимум.
+DbPIDcontrol1.MVMAX  := "Db1PIRCA1Hmi".MVMAX ; //Максимальное значение сигнала управления.
+DbPIDcontrol1.MVMIN  := "Db1PIRCA1Hmi".MVMIN ; //Минимальное значение сигнала управления.
+DbPIDcontrol1.Ts     := Ts                   ; //Шаг дискретизации по времени в секундах.
+DbPIDcontrol1.Manual := MV                   ; //Сигнал управления в ручном режиме работы.
+DbPIDcontrol1.ManOn  := NOT(ModeAuto)        ; //Включить ручной режим работы регулятора.
+DbPIDcontrol1()                              ; //ПИД-регулятор.
+//                   := DbPIDcontrol1.MV     ; //Сигнал управления на исполнительный механизм.
 
 //Ограничение величины ускорения / замедления привода 0...50[Гц].
 //        DbRamp
@@ -432,15 +433,15 @@ DbPIDcontrol1()                                       ; //ПИД-регулятор.
 //   -|TDec        |
 //   -|Ts          |
 //    +------------+
-DbRamp_CS.In       := DbPIDcontrol1.Out      ; //Входной сигнал.
-DbRamp_CS.TAcc     := "Db1PIRCA1Hmi".RampTAcc; //Время разгона на единицу [с].
-DbRamp_CS.TDec     := "Db1PIRCA1Hmi".RampTDec; //Время торможения на единицу [c].
-DbRamp_CS.Ts       := Ts                     ; //Шаг дискретизации по времени [с].
-DbRamp_CS()                                  ; //Рампа разгона / торможения.
-ControlSignal      := DbRamp_CS.Out          ; //Выходной сигнал.
+DbRamp_MV.In   := DbPIDcontrol1.MV       ; //Входной сигнал.
+DbRamp_MV.TAcc := "Db1PIRCA1Hmi".RampTAcc; //Время разгона на единицу [с].
+DbRamp_MV.TDec := "Db1PIRCA1Hmi".RampTDec; //Время торможения на единицу [c].
+DbRamp_MV.Ts   := Ts                     ; //Шаг дискретизации по времени [с].
+DbRamp_MV()                              ; //Рампа разгона / торможения.
+MV             := DbRamp_MV.Out          ; //Выходной сигнал.
 
 //Сигнал управления отображение на SADA/HMI.
-"Db1PIRCA1Hmi".ControlSignal := ControlSignal;
+"Db1PIRCA1Hmi".MV := MV;
 
 //Задание частоты на привод 0...50[Гц] 4...20[мА].
 //          DbDriverAo420
@@ -452,14 +453,14 @@ ControlSignal      := DbRamp_CS.Out          ; //Выходной сигнал.
 //   -|SimulationValue        |
 //   -|SimulationOn           |
 //    +-----------------------+
-DbDriverAo420_CS.In              := ControlSignal                ; //Вход сигнала на исполнительный механизм.
-DbDriverAo420_CS.InMax           := "Db1PIRCA1Hmi".MotorMaxAo    ; //Исполнительный механизм максимум.
-DbDriverAo420_CS.InMin           := "Db1PIRCA1Hmi".MotorMinAo    ; //Исполнительный механизм минимум.
-DbDriverAo420_CS.SimulationValue := "Db1PIRCA1Hmi".SimulationAo  ; //Значение для исполнительного механизма при симуляции.
-DbDriverAo420_CS.SimulationOn    := "Db1PIRCA1Hmi".SimulationAoOn; //Включить симуляцию.
-DbDriverAo420_CS()                                               ; //Драйвер аналогово выхода 4...20мА.
-DAC_Frequency                    := DbDriverAo420_CS.DAC         ; //ЦАП Сигнал на исполнительный механизм 0...27648.
-//                               := DbDriverAo420_CS.Current     ; //Ток на аналоговом выходе 4...20мА.
+DbDriverAo420_MV.In              := MV                           ; //Вход сигнала на исполнительный механизм.
+DbDriverAo420_MV.InMax           := "Db1PIRCA1Hmi".MotorMaxAo    ; //Исполнительный механизм максимум.
+DbDriverAo420_MV.InMin           := "Db1PIRCA1Hmi".MotorMinAo    ; //Исполнительный механизм минимум.
+DbDriverAo420_MV.SimulationValue := "Db1PIRCA1Hmi".SimulationAo  ; //Значение для исполнительного механизма при симуляции.
+DbDriverAo420_MV.SimulationOn    := "Db1PIRCA1Hmi".SimulationAoOn; //Включить симуляцию.
+DbDriverAo420_MV()                                               ; //Драйвер аналогово выхода 4...20мА.
+DAC_Frequency                    := DbDriverAo420_MV.DAC         ; //ЦАП Сигнал на исполнительный механизм 0...27648.
+//                               := DbDriverAo420_MV.Current     ; //Ток на аналоговом выходе 4...20мА.
 
 //Предупреждение о выходе за допустимые пределы измеренного значения.
 //          DbAlarm
@@ -471,9 +472,9 @@ DAC_Frequency                    := DbDriverAo420_CS.DAC         ; //ЦАП Сигнал 
 //   -|TimeDelay        |
 //   -|Ts_ms            |
 //    +-----------------+
-DbAlarm_PV.In        := ProcessVariable              ; //Входной сигнал.
-DbAlarm_PV.LevelHi   := "Db1PIRCA1Hmi".AlarmPV_Hi    ; //Верхняя граница предупреждения.
-DbAlarm_PV.LevelLo   := "Db1PIRCA1Hmi".AlarmPV_Lo    ; //Нижняя граница предупреждения.
+DbAlarm_PV.In        := PV                           ; //Входной сигнал.
+//DbAlarm_PV.LevelHi := "Db1PIRCA1Hmi".AlarmPV_Hi    ; //Верхняя граница предупреждения.
+//DbAlarm_PV.LevelLo := "Db1PIRCA1Hmi".AlarmPV_Lo    ; //Нижняя граница предупреждения.
 DbAlarm_PV.TimeDelay := "Db1PIRCA1Hmi".AlarmDelayTime; //Время задержки включения [мс].
 DbAlarm_PV.Ts_ms     := Ts_ms                        ; //Шаг дискретизации по времени [мс].
 DbAlarm_PV()                                         ; //Блок предупреждений.
@@ -490,14 +491,14 @@ DbAlarm_PV()                                         ; //Блок предупреждений.
 //   -|TimeDelay        |
 //   -|Ts_ms            |
 //    +-----------------+
-DbAlarm_CS.In        := ControlSignal                ; //Входной сигнал.
-DbAlarm_CS.LevelHi   := "Db1PIRCA1Hmi".AlarmCS_Hi    ; //Верхняя граница предупреждения.
-DbAlarm_CS.LevelLo   := "Db1PIRCA1Hmi".AlarmCS_Lo    ; //Нижняя граница предупреждения.
-DbAlarm_CS.TimeDelay := "Db1PIRCA1Hmi".AlarmDelayTime; //Время задержки включения [мс].
-DbAlarm_CS.Ts_ms     := Ts_ms                        ; //Шаг дискретизации по времени [мс].
-DbAlarm_CS()                                         ; //Блок предупреждений.
-//                   := DbAlarm_CS.AlarmHi           ; //Достигнут верхний предел.
-//                   := DbAlarm_CS.AlarmLo           ; //Достигнут нижний предел.
+DbAlarm_MV.In        := MV                           ; //Входной сигнал.
+DbAlarm_MV.LevelHi   := "Db1PIRCA1Hmi".AlarmMV_Hi    ; //Верхняя граница предупреждения.
+DbAlarm_MV.LevelLo   := "Db1PIRCA1Hmi".AlarmMV_Lo    ; //Нижняя граница предупреждения.
+DbAlarm_MV.TimeDelay := "Db1PIRCA1Hmi".AlarmDelayTime; //Время задержки включения [мс].
+DbAlarm_MV.Ts_ms     := Ts_ms                        ; //Шаг дискретизации по времени [мс].
+DbAlarm_MV()                                         ; //Блок предупреждений.
+//                   := DbAlarm_MV.AlarmHi           ; //Достигнут верхний предел.
+//                   := DbAlarm_MV.AlarmLo           ; //Достигнут нижний предел.
 
 END_FUNCTION_BLOCK
 
@@ -506,16 +507,16 @@ END_FUNCTION_BLOCK
 //                                DbDriverAi420                DbScale          DbFilterA          DbLimit                           
 //                        +---------------------------+     +-----------+     +-----------+     +-----------+                        
 // +----------------+     |       FbDriverAi420       |     |  FbScale  |     | FbFilterA |     |  FbLimit  |     +-----------------+
-// | SensorPressure |-->--|ADC             SensorValue|-->--|In      Out|-->--|In      Out|-->--|In      Out|-->--| ProcessVariable |
+// | SensorPressure |-->--|ADC             SensorValue|-->--|In      Out|-->--|In      Out|-->--|In      Out|-->--| PV              |
 // +----------------+    -|SensorMaxValue      Current|-   -|InMax      |    -|Tf         |    -|OutMax     |     +-----------------+
 //                       -|SensorMinValue        Error|-   -|InMin      |    -|Ts         |    -|OutMin     |                        
 // +-------+             -|ErrorValue                 |    -|OutMax     |     +-----------+     +-----------+                        
-// | HmiOP |----------->--|SimulationValue            |    -|OutMin     |                                          
+// | MV    |----------->--|SimulationValue            |    -|OutMin     |                                          
 // +-------+             -|SimulationOn               |     +-----------+                                          
 //                        +---------------------------+                                                            
 //
 // +-----------------+     +------------------------------+
-// | ProcessVariable |-->--| Db1PIRCA1Hmi.ProcessVariable |
+// | PV              |-->--| Db1PIRCA1Hmi.PV              |
 // +-----------------+     +------------------------------+
 
 // Заданное значение с SCADA/HMI.
@@ -523,7 +524,7 @@ END_FUNCTION_BLOCK
 //                                  DbLimit                    
 //                               +-----------+                 
 // +-----------------------+     |  FbLimit  |     +----------+
-// | Db1PIRCA1Hmi.Setpoint |-->--|In      Out|-->--| Setpoint |
+// | Db1PIRCA1Hmi.SP       |-->--|In      Out|-->--| SP       |
 // +-----------------------+    -|OutMax     |     +----------+
 //                              -|OutMin     |                 
 //                               +-----------+                 
@@ -531,29 +532,29 @@ END_FUNCTION_BLOCK
 // ПИД- регулятор (стабилизация заданного значения давления).
 //
 // +----------------------------+     +---------------+
-// | Db1PIRCA1Hmi.ControlSignal |-->--| ControlSignal |
+// | Db1PIRCA1Hmi.MV            |-->--| MV            |
 // +----------------------------+     +---------------+
 //
 //                                        DbPIDcontrol              DbRamp                  
 //                                   +--------------------+     +------------+              
 // +--------------------+            |    FbPIDcontrol    |     |   FbRamp   |     +---------------+
-// | ProcessVariable    |---------->-|ProcessVariable  Out|-->--|In       Out|-->--| ControlSignal |
-// +--------------------+       +-->-|Setpoint            |    -|TAcc        |     +---------------+
+// | PV                 |---------->-|PV                MV|-->--|In       Out|-->--| MV            |
+// +--------------------+       +-->-|SP                  |    -|TAcc        |     +---------------+
 // +----------+                 |   -|Kp                  |    -|TDec        |              
-// | Setpoint |-----------------+   -|Ki                  |    -|Ts          |              
+// | SP       |-----------------+   -|Ki                  |    -|Ts          |              
 // +----------+                     -|Kd                  |     +------------+              
 //                                  -|Kdf                 |                                 
-//                                  -|DBmax               |                                 
-// +---------------+                -|DBmin               |                                 
-// | ControlSignal |------------+   -|OutMax              |                                 
-// +---------------+            |   -|OutMin              |                                 
+//                                  -|DBMAX               |                                 
+// +---------------+                -|DBMIN               |                                 
+// | MV            |------------+   -|MVMAX               |                                 
+// +---------------+            |   -|MVMIN               |                                 
 //                              |   -|Ts                  |                                 
 // +----------+     +-----+     +-->-|Manual              |                                 
 // | ModeAuto |-->--| NOT |-------->-|ManOn               |                                 
 // +----------+     +-----+          +--------------------+                                 
 //
 // +---------------+     +----------------------------+
-// | ControlSignal |-->--| Db1PIRCA1Hmi.ControlSignal |
+// | MV            |-->--| Db1PIRCA1Hmi.MV            |
 // +---------------+     +----------------------------+
 //
 
@@ -562,7 +563,7 @@ END_FUNCTION_BLOCK
 //                             DbDriverAo420                  
 //                       +-----------------------+            
 // +---------------+     |     FbDriverAo420     |     +----------------+
-// | ControlSignal |-->--|In                  DAC|-->--| DriveFrequency |
+// | MV            |-->--|In                  DAC|-->--| DriveFrequency |
 // +---------------+    -|InMax           Current|-    +----------------+
 //                      -|InMin                  |            
 //                      -|SimulationValue        |            
@@ -575,18 +576,18 @@ END_FUNCTION_BLOCK
 // | 1LIRCA1 ПИД- регулятор давления.                     | X |
 // +------------------------------------------------------+---+
 // | +-------+ +--------------------------------------------+ |
-// | |  5.00 | | Заданное значение            0...10[Бар] B | | <- Db1PIRCA1Hmi.Setpoint
+// | |  5.00 | | Заданное значение            0...10[Бар] B | | <- Db1PIRCA1Hmi.SP
 // | +-------+ +--------------------------------------------+ |
 // | +-------+ +--------------------------------------------+ |
-// | |  5.01 | | Измеренное значение          0...10[Бар] G | | <- Db1PIRCA1Hmi.ProcessVariable
+// | |  5.01 | | Измеренное значение          0...10[Бар] G | | <- Db1PIRCA1Hmi.PV
 // | +-------+ +--------------------------------------------+ |
 // | +-------+ +--------------------------------------------+ |
-// | | 37.00 | | Сигнал управления            0...50 [Hz] R | | <- Db1PIRCA1Hmi.ControlSignal
+// | | 37.00 | | Сигнал управления            0...50 [Hz] R | | <- Db1PIRCA1Hmi.MV
 // | +-------+ +--------------------------------------------+ |
 // | +---------+ +--------+ +------+ +--------+ +-----------+ |
-// | | АВТОМАТ | | РУЧНОЙ | | СТОП | | ТРЕНДЫ | | НАСТРОЙКИ | | <- Db1PIRCA1Hmi.ControlWord, Db1PIRCA1Hmi.StatusWord
+// | | АВТОМАТ | | РУЧНОЙ | | СТОП | | ТРЕНДЫ | | НАСТРОЙКИ | | <- Db1PIRCA1Hmi.CW, Db1PIRCA1Hmi.SW
 // | +---------+ +--------+ +------+ +--------+ +-----------+ |
-// | Код ошибки: 0 (OK).                                      | <- Db1PIRCA1Hmi.ErrorWord
+// | Код ошибки: 0 (OK).                                      | <- Db1PIRCA1Hmi.EW
 // +----------------------------------------------------------+
 //
 //                       Db1LIRCA1            
@@ -598,22 +599,22 @@ END_FUNCTION_BLOCK
 //          +----------------+----------------+
 //          |          Db1PIRCA1Hmi           |
 //          +----------------+----------------+
-// network                   |
+// Network                   |
 //          +----------------+----------------+
 //          |            SCADA/HMI            |
 //          +---------------------------------+
 //
 // Переключатель режимов работы подключается к кнопкам SCADA/HMI и посту местного управления.
 //
-//                                                   DbModeSelector
-//                                            +------------------------+
-//                                            |     FbModeSelector     |
-// Db1PIRCA1Hmi.ControlWord.HmiButtonStop--->-|ButtonStop      LampStop|->-Db1PIRCA1Hmi.StatusWord.ModeStop
-// Db1PIRCA1Hmi.ControlWord.HmiButtonManual->-|ButtonManual  LampManual|->-Db1PIRCA1Hmi.StatusWord.ModeManual
-// Db1PIRCA1Hmi.ControlWord.HmiButtonAuto--->-|ButtonAuto      LampAuto|->-Db1PIRCA1Hmi.StatusWord.ModeAuto
-//                                           -|Error                   |
-//                                           -|Reset                   |
-//                                            +------------------------+
+//                                         DbModeSelector
+//                                   +------------------------+
+//                                   |     FbModeSelector     |
+// Db1PIRCA1Hmi.CW.HmiButtonStop--->-|ButtonStop      LampStop|->-Db1PIRCA1Hmi.SW.ModeStop
+// Db1PIRCA1Hmi.CW.HmiButtonManual->-|ButtonManual  LampManual|->-Db1PIRCA1Hmi.SW.ModeManual
+// Db1PIRCA1Hmi.CW.HmiButtonAuto--->-|ButtonAuto      LampAuto|->-Db1PIRCA1Hmi.SW.ModeAuto
+//                                  -|Error                   |
+//                                  -|Reset                   |
+//                                   +------------------------+
 
 //  +---------+
 //  | GNU GPL |
