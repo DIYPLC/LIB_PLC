@@ -9,46 +9,46 @@ MonitorArrayLimits    := 'y' ; //SCL: Следить за границами массивов.
 OptimizeObjectCode    := 'y'   //SCL: Оптимизация объектного кода.
 }
 
-//Бибилиотека блоков для ПЛК LibPlc.
-// LibPlc блоки из теории управления.
-FbPIDcontrol       //LibPlc Регулятор ПИД.
-FbScale            //LibPlc Линейное преобразование.
-FbFilterA          //LibPlc Апериодическое звено первого порядка.
-FbFilterM          //LibPlc Фильтр медианный.
-FbDeriveF          //LibPlc Производная с фильтрацией.
-FbDelayN           //LibPlc Задержка на N тактов.
-FbIntegrator       //LibPlc Интегратор W(s)=1/s.
-FbLimit            //LibPlc Амплитудный ограничитель.
-FbDeadBand         //LibPlc Зона нечувствительности.
-Fb2PosControl      //LibPlc Регулятор двухпозиционный.
-Fb3PosControl      //LibPlc Регулятор трехпозиционный.
-FbStpForPD         //LibPlc Аналоговый ПД- регулятор превращаем в дискретный ПИ.
-FbVirtualMotorGear //LibPlc Виртуальный МЭО для отладки шагового регулятора.
-// LibPlc Вспомогательные блоки для ПИД- регулятора.
-FbRamp             //LibPlc Рампа разгона торможения.
-FbGSS              //LibPlc Генератор сигналов и псевдослучайных чисел.
-FbAlarm            //LibPlc Сигнализатор аварийного уровня сигнала.
-FbFilterNaN        //LibPlc Фильтр NaN и Inf для чисел REAL.
-FbModeSelector     //LibPlc Переключатель режимов работы.
-FbSoftPWM          //LibPlc ШИМ генератор двухканальный.
-// LibPlc Базовые дискретные блоки.
-FbTriggerRS        //LibPlc Триггер RS.
-FbEdgeNeg          //LibPlc Детектор ниспадающего фронта.
-FbEdgePos          //LibPlc Детектор нарастающего фронта.
-FbTimerTof         //LibPlc Таймер TOF.
-FbTimerTon         //LibPlc Таймер TON.
-FbWordToBits       //LibPlc Преобразование слова в 16 бит.
-FbBitsToWord       //LibPlc Преобразование 16 бит в слово.
-FbBlink            //LibPlc Мигающий светодиод.
-// LibPlc Технологические блоки.
-FbMotor            //LibPlc Двигатель с частотником и контактором.
-FbValve            //LibPlc Пневмоцилиндр с коцевиками.
-FbPIDsteam         //LibPlc ПИД-регулятор давления пара быстромедленный.
-FbCounter          //LibPlc Счетчик импульсов.
-// LibPlc платформозависимые блоки SIEMENS.
-FbDriverAi420      //LibPlc Драйвер аналогово входа 4...20мА.
-FbDriverAo420      //LibPlc Драйвер аналогово выхода 4...20мА.
-FbDriverFRA        //LibPlc Управление приводом MITSUBISHI FR-A740, FR-A840 по PROFIBUS PD.
+//Бибилиотека блоков для ПЛК LIB_PLC.
+// LIB_PLC блоки из теории управления.
+FbPIDcontrol       //LIB_PLC Регулятор ПИД.
+FbScale            //LIB_PLC Линейное преобразование.
+FbFilterA          //LIB_PLC Апериодическое звено первого порядка.
+FbFilterM          //LIB_PLC Фильтр медианный.
+FbDeriveF          //LIB_PLC Производная с фильтрацией.
+FbDelayN           //LIB_PLC Задержка на N тактов.
+FbIntegrator       //LIB_PLC Интегратор W(s)=1/s.
+FbLimit            //LIB_PLC Амплитудный ограничитель.
+FbDeadBand         //LIB_PLC Зона нечувствительности.
+Fb2PosControl      //LIB_PLC Регулятор двухпозиционный.
+Fb3PosControl      //LIB_PLC Регулятор трехпозиционный.
+FbStpForPD         //LIB_PLC Аналоговый ПД- регулятор превращаем в дискретный ПИ.
+FbVirtualMotorGear //LIB_PLC Виртуальный МЭО для отладки шагового регулятора.
+// LIB_PLC Вспомогательные блоки для ПИД- регулятора.
+FbRamp             //LIB_PLC Рампа разгона торможения.
+FbGSS              //LIB_PLC Генератор сигналов и псевдослучайных чисел.
+FbAlarm            //LIB_PLC Сигнализатор аварийного уровня сигнала.
+FbFilterNaN        //LIB_PLC Фильтр NaN и Inf для чисел REAL.
+FbModeSelector     //LIB_PLC Переключатель режимов работы.
+FbSoftPWM          //LIB_PLC ШИМ генератор двухканальный.
+// LIB_PLC Базовые дискретные блоки.
+FbTriggerRS        //LIB_PLC Триггер RS.
+FbEdgeNeg          //LIB_PLC Детектор ниспадающего фронта.
+FbEdgePos          //LIB_PLC Детектор нарастающего фронта.
+FbTimerTof         //LIB_PLC Таймер TOF.
+FbTimerTon         //LIB_PLC Таймер TON.
+FbWordToBits       //LIB_PLC Преобразование слова в 16 бит.
+FbBitsToWord       //LIB_PLC Преобразование 16 бит в слово.
+FbBlink            //LIB_PLC Мигающий светодиод.
+// LIB_PLC Технологические блоки.
+FbMotor            //LIB_PLC Двигатель с частотником и контактором.
+FbValve            //LIB_PLC Пневмоцилиндр с коцевиками.
+FbPIDsteam         //LIB_PLC ПИД-регулятор давления пара быстромедленный.
+FbCounter          //LIB_PLC Счетчик импульсов.
+// LIB_PLC платформозависимые блоки SIEMENS.
+FbDriverAi420      //LIB_PLC Драйвер аналогово входа 4...20мА.
+FbDriverAo420      //LIB_PLC Драйвер аналогово выхода 4...20мА.
+FbDriverFRA        //LIB_PLC Управление приводом MITSUBISHI FR-A740, FR-A840 по PROFIBUS PD.
 
 //Блоки данных для сопряжения с SCADA HMI.
 //При компиляции блоков данных возможна потеря технологических значений переменных в блоках данных.

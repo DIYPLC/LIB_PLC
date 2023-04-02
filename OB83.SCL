@@ -4,7 +4,7 @@ ORGANIZATION_BLOCK OB83 //Вызывается если вытаскиваем модули: DI DO AI.
 TITLE   = 'Вызывается если вытаскиваем модули: DI DO AI.'
 VERSION : '2.0'
 AUTHOR  : 'VA'
-FAMILY  : 'SIMATIC'
+FAMILY  : 'LIB_PLC'
 
 VAR_TEMP
 OB83_EV_CLASS   :BYTE         ; //16#38/39, Event class 3, module inserted/removed (8/9)

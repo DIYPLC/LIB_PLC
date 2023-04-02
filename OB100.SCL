@@ -4,7 +4,7 @@ ORGANIZATION_BLOCK OB100 //Программа первого скана.
 TITLE   = 'Программа первого скана.'
 VERSION : '2.0'
 AUTHOR  : 'VA'
-FAMILY  : 'SIMATIC'
+FAMILY  : 'LIB_PLC'
 
 VAR_TEMP
 OB100_EV_CLASS   :BYTE         ; //16#13, Event class 1, Entering event state, Event logged in diagnostic buffer

@@ -18,7 +18,7 @@ FUNCTION_BLOCK FbValve //ѕневмоцилиндр с коцевиками.
 TITLE   = 'ѕневмоцилиндр с коцевиками.'
 VERSION : '2.0'
 AUTHOR  : 'VA'
-FAMILY  : 'Device'
+FAMILY  : 'LIB_PLC'
 {//јтрибуты дл€ PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен дл€ прототипов DB.
 S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
