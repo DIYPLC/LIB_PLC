@@ -13,7 +13,8 @@ FUNCTION_BLOCK FbRunTimeMeter //Измерение времени выполнения участка программы.
 TITLE   = 'Измерение времени выполнения участка программы.'
 VERSION : '2.0'
 AUTHOR  : 'VA'
-FAMILY  : 'SIMATIC'
+FAMILY  : 'LIB_PLC'
+
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
 S7_blockview := 'big'  ; //CFC: отображение блока мелнькое или большое.

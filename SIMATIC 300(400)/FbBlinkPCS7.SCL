@@ -4,6 +4,8 @@ FUNCTION_BLOCK FbBlinkPCS7 //Пример программы для PCS7.
 TITLE   = 'Blink for PCS7.'
 AUTHOR  : 'VA'
 VERSION : '1.1'
+FAMILY  : 'LIB_PLC'
+
 {//Атрибуты FB для PCS7.
 S7_tasklist           := 'OB100'; //Список вызывающих OB
 S7_m_c                := 'true' ; //Блок может управляться или наблюдаться из OS.
