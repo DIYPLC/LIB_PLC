@@ -1,0 +1,131 @@
+FUNCTION_BLOCK "FbS7Con1"
+TITLE =Связь с удаленным ПЛК через S7 connection в NetPro.
+//VA 06-04-2023
+//Вызывать Данный FB из OB1.
+//Блок сомместим с CFC PCS7 но поддерживается не всеми типами CPU/CP.
+//NetPro необходимо прогружать отдельно.
+//На SCL данный блок написать не получилось тк тип ANY урезанный.
+//Данный блок написан на LAD потом для его перемещения сгенерирован STL.
+//При использовании надо сначала сгенерировать DB для обмена потом компилить FB.
+//
+//Три блока работают совместно.
+//FbTxS7con1 FbS7Con1 FbRxS7con1
+//
+//Для максимальной скорости обмена убрать SFB4 TON таймер и написать:
+//PulseGen := NOT(PulseGen);
+//
+//SFB14 GET Прием данных из удаленного ПЛК.
+//GET.ADDR_1 - Адрес и размер DB в удаленном ПЛК.
+//GET.RD_1 - Адрес и размер DB этом ПЛК (FbRxS7con1).
+//
+//SFB15 PUT Передача данных в удаленный ПЛК.
+//PUT.ADDR_1 - Адрес и размер DB в удаленном ПЛК.
+//PUT.SD_1 - Адрес и размер DB этом ПЛК (FbTxS7con1).
+AUTHOR : VA
+VERSION : 3.0
+
+
+VAR_INPUT
+  START : BOOL  := TRUE;	//Включить обмен данными.
+END_VAR
+VAR_OUTPUT
+  RxError : BOOL ;	//Ошибка при приеме данных.
+  TxError : BOOL ;	//Ошибка при передаче данных.
+END_VAR
+VAR
+  PulseGen : BOOL ;	//Генератор импульсов задает темп обмена.
+  GET_NDR : BOOL ;	
+  GET_ERROR : BOOL ;	
+  GET_REQ : BOOL ;	
+  GET_STAUS : WORD ;	
+  PUT_DONE : BOOL ;	
+  PUT_ERROR : BOOL ;	
+  PUT_REQ : BOOL ;	
+  PUT_STATUS : WORD ;	
+  DbGET : "GET";	//Принять данные.
+  DbPUT : "PUT";	//Отправить данные.
+  DbTON : "TON";	//Генератор импульсов задает темп обмена.
+END_VAR
+BEGIN
+NETWORK
+TITLE =Генератор импульсов задает темп обмена.
+
+      AN    #PulseGen; 
+      =     L      0.0; 
+      BLD   103; 
+      CALL #DbTON (
+           IN                       := L      0.0,
+           PT                       := T#100MS,
+           Q                        := #PulseGen);
+
+      NOP   0; 
+NETWORK
+TITLE =Прием данных от удаленного ПЛК через S7 connection в NetPro.
+
+      A     #GET_REQ; 
+      =     L      0.0; 
+      BLD   103; 
+      A     #START; 
+      JNB   _001; 
+      CALL #DbGET (
+           REQ                      := L      0.0,
+           ID                       := W#16#1,
+           NDR                      := #GET_NDR,
+           ERROR                    := #GET_ERROR,
+           STATUS                   := #GET_STAUS,
+           ADDR_1                   := P#DB4.DBX 0.0 BYTE 64,
+           RD_1                     := P#DB30.DBX0.0 BYTE 64);
+
+_001: NOP   0; 
+NETWORK
+TITLE =Запрос на прием если статус блока не занято.
+
+      A     #PulseGen; 
+      A(    ; 
+      L     25; 
+      L     #GET_STAUS; 
+      <>I   ; 
+      )     ; 
+      =     #GET_REQ; 
+NETWORK
+TITLE =Ошибка при приеме данных.
+
+      O     #GET_ERROR; 
+      ON    #START; 
+      =     #RxError; 
+NETWORK
+TITLE =Передача данных в удаленный ПЛК через S7 connection в NetPro.
+
+      A     #PUT_REQ; 
+      =     L      0.0; 
+      BLD   103; 
+      A     #START; 
+      JNB   _002; 
+      CALL #DbPUT (
+           REQ                      := L      0.0,
+           ID                       := W#16#1,
+           DONE                     := #PUT_DONE,
+           ERROR                    := #PUT_ERROR,
+           STATUS                   := #PUT_STATUS,
+           ADDR_1                   := P#DB3.DBX 0.0 BYTE 64,
+           SD_1                     := P#DB40.DBX0.0 BYTE 64);
+
+_002: NOP   0; 
+NETWORK
+TITLE =Запрос на передачу если статус блока не занято.
+
+      A     #PulseGen; 
+      A(    ; 
+      L     25; 
+      L     #PUT_STATUS; 
+      <>I   ; 
+      )     ; 
+      =     #PUT_REQ; 
+NETWORK
+TITLE =Ошибка при передаче данных.
+
+      O     #PUT_ERROR; 
+      ON    #START; 
+      =     #TxError; 
+END_FUNCTION_BLOCK
+
