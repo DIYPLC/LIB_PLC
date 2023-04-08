@@ -1,4 +1,5 @@
 FUNCTION_BLOCK FbTimerTon //TON - Таймер с задержкой на включение.
+TITLE = 'TON - Таймер с задержкой на включение.'
 
 //        DbTimerTon
 //    +----------------+
@@ -8,15 +9,15 @@ FUNCTION_BLOCK FbTimerTon //TON - Таймер с задержкой на включение.
 //   -|Ts_ms           |
 //    +----------------+
 
-//Атрибуты для STEP7.
-TITLE   = 'TON - Таймер с задержкой на включение.'
-VERSION : '2.0'
-AUTHOR  : 'VA'
-FAMILY  : 'LIB_PLC'
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
 S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
 }
+
+//Атрибуты для STEP7.
+VERSION : '2.1'
+AUTHOR  : VA
+FAMILY  : LIB_PLC
 
 VAR_INPUT //Входные переменные, сохраняемые.
 In          :BOOL := FALSE; //Вход таймера.

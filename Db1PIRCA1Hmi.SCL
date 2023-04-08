@@ -39,7 +39,7 @@ S7_m_c     := 'true'   ; //CFC: Ѕлок может управл€тьс€ или наблюдатьс€ из OS.
 S7_tag     := 'true'     //CFC: Ѕлок входит в писок тегов OS. 
 }
 
-AUTHOR : 'VA'
+AUTHOR : VA
 FAMILY : '1PIRCA1'
 
 STRUCT //ќбъ€вление переменных.

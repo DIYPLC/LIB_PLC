@@ -1,4 +1,5 @@
 FUNCTION_BLOCK FbVirtualMotorGear //Виртуальный МЭО для отладки шагового регулятора.
+TITLE = 'Виртуальный МЭО для отладки шагового регулятора.'
 
 //         DbVirtualMotorGear
 //    +--------------------------+
@@ -11,15 +12,15 @@ FUNCTION_BLOCK FbVirtualMotorGear //Виртуальный МЭО для отладки шагового регулят
 //   -|Reset                     |
 //    +--------------------------+
 
-//Атрибуты для STEP7.
-TITLE   = 'Виртуальный МЭО для отладки шагового регулятора.'
-VERSION : '0.1'
-AUTHOR  : 'VA'
-FAMILY  : 'LIB_PLC'
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
 S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
 }
+
+//Атрибуты для STEP7.
+VERSION : '0.2'
+AUTHOR  : VA
+FAMILY  : LIB_PLC
 
 VAR_INPUT //Входные переменные, сохраняемые.
 CmdOpen   :BOOL := FALSE; //Команда на открытие +.

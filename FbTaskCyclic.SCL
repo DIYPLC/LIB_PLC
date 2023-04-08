@@ -1,4 +1,5 @@
 FUNCTION_BLOCK FbTaskCyclic //Задача вызывается циклически.
+TITLE = 'Задача вызывается циклически.'
 
 //      DbTaskCyclic
 //    +--------------+
@@ -7,15 +8,15 @@ FUNCTION_BLOCK FbTaskCyclic //Задача вызывается циклически.
 // ->-|Reset         |
 //    +--------------+
 
-//Атрибуты для STEP7.
-TITLE   = 'Задача вызывается циклически.'
-VERSION : '2.0'
-AUTHOR  : 'VA'
-FAMILY  : 'LIB_PLC'
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
 S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
 }
+
+//Атрибуты для STEP7.
+VERSION : '2.1'
+AUTHOR  : VA
+FAMILY  : LIB_PLC
 
 VAR_INPUT //Входные переменные, не сохраняемые.
 Ts_ms :DINT := 100  ; //Шаг дискретизации по времени [мс].

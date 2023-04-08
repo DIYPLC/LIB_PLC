@@ -1,4 +1,5 @@
 FUNCTION_BLOCK FbPIDsteam //ПИД-регулятор давления пара быстромедленный.
+TITLE = 'ПИД-регулятор давления пара быстромедленный.'
 
 //          DbPIDsteam
 //    +--------------------+
@@ -22,15 +23,15 @@ FUNCTION_BLOCK FbPIDsteam //ПИД-регулятор давления пара быстромедленный.
 //   -|OutRampTDec         |
 //    +--------------------+
 
-//Атрибуты для STEP7.
-TITLE   = 'ПИД-регулятор давления пара быстромедленный.'
-VERSION : '1.0'
-AUTHOR  : 'VA'
-FAMILY  : 'LIB_PLC'
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
 S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
 }
+
+//Атрибуты для STEP7.
+VERSION : '1.1'
+AUTHOR  : VA
+FAMILY  : LIB_PLC
 
 VAR_INPUT //Входные переменные, сохраняемые.
 Pressure :REAL := 0.0   ; //Измеренное давление пара [Bar].
