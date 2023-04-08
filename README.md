@@ -8,4 +8,8 @@
 Так же блоки легко портируются на C/C++ для применения в Arduino и STM32.
 Не нашел то что хотел поэтому сделал сам.
 Файлы открываются в блокноте notepad windows.
-Конкуренты: http://oscat.de/ , SIMATIC PCS7 APL.
+Смотрите так же:
+http://oscat.de/
+SIMATIC PCS7 APL
+https://web.archive.org/web/20220322174546/http://plc4good.org.ua/view_post.php?id=256
+
