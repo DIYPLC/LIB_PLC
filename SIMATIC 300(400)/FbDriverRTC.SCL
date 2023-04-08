@@ -1,4 +1,5 @@
 FUNCTION_BLOCK FbDriverRTC //Блок чтения часов реального времени.
+TITLE = 'Блок чтения часов реального времени.'
 
 //         DbDriverRTC
 //     +-----------------+
@@ -17,12 +18,6 @@ FUNCTION_BLOCK FbDriverRTC //Блок чтения часов реального времени.
 //     |          Blink1s|->-
 //     +-----------------+
 
-//Атрибуты для STEP7.
-TITLE   = 'Блок чтения часов реального времени.'
-VERSION : '3.0'
-AUTHOR  : 'VA'
-FAMILY  : 'LIB_PLC'
-
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
 S7_blockview := 'big'  ; //CFC: отображение блока маленькое или большое.
@@ -33,6 +28,11 @@ SetOKFlag             := 'y' ; //SCL: ENO = 1
 MonitorArrayLimits    := 'y' ; //SCL: Следить за границами массивов.
 OptimizeObjectCode    := 'y'   //SCL: Оптимизация объектного кода.
 }
+
+//Атрибуты для STEP7.
+VERSION : '3.1'
+AUTHOR  : VA
+FAMILY  : LIB_PLC
 
 VAR_INPUT //Входные переменные, сохраняемые.
 Reset       :BOOL := FALSE; //Сброс при перезагрузке.

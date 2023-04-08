@@ -7,6 +7,7 @@ TITLE =Связь с удаленным ПЛК через S7 connection в NetPro.
 //На SCL данный блок написать не получилось тк тип ANY урезанный.
 //Данный блок написан на LAD потом для его перемещения сгенерирован STL.
 //При использовании надо сначала сгенерировать DB для обмена потом компилить FB.
+//https://web.archive.org/web/20220322171539/http://plc4good.org.ua/view_post.php?id=303
 //
 //Три блока работают совместно.
 //FbTxS7con1 FbS7Con1 FbRxS7con1
@@ -42,9 +43,9 @@ VAR
   PUT_ERROR : BOOL ;	
   PUT_REQ : BOOL ;	
   PUT_STATUS : WORD ;	
-  DbGET : "GET";	//Принять данные.
-  DbPUT : "PUT";	//Отправить данные.
-  DbTON : "TON";	//Генератор импульсов задает темп обмена.
+  DbGET : SFB14; //Принять данные.
+  DbPUT : SFB15; //Отправить данные.
+  DbTON : SFB4; //Генератор импульсов задает темп обмена.
 END_VAR
 BEGIN
 NETWORK

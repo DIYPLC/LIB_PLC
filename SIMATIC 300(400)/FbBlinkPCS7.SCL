@@ -1,10 +1,8 @@
 FUNCTION_BLOCK FbBlinkPCS7 //Пример программы для PCS7.
+TITLE = 'Blink for PCS7.'
+
 //Пользовательские блоки PCS7 должны иметь номера FB4000 и более чтобы не конфликтовать с библиотеками.
 //Блок использует SFC6 для формирования сигнала Reset.
-TITLE   = 'Blink for PCS7.'
-AUTHOR  : 'VA'
-VERSION : '1.1'
-FAMILY  : 'LIB_PLC'
 
 {//Атрибуты FB для PCS7.
 S7_tasklist           := 'OB100'; //Список вызывающих OB
@@ -16,6 +14,10 @@ SCL_CreateDebugInfo   := 'y'    ; //Опции компилятора
 SetOKFlag             := 'y'    ; //Опции компилятора
 OptimizeObjectCode    := 'y'      //Опции компилятора
 }
+
+VERSION : '1.2'
+AUTHOR  : VA
+FAMILY  : LIB_PLC
 
 VAR_INPUT //Входные переменные, сохраняемые.
 //Переменные для WinCC
