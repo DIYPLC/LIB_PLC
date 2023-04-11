@@ -9,9 +9,10 @@ MonitorArrayLimits    := 'y' ; //SCL: Следить за границами массивов.
 OptimizeObjectCode    := 'y'   //SCL: Оптимизация объектного кода.
 }
 
+
 FbRxS7con1
 FbTxS7con1
-//FbS7Con1 //Асемблер компилировать вручную!
+FbS7Con1 
 
 DbInstance
 

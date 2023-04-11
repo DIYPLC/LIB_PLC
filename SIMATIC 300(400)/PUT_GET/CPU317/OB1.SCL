@@ -2,9 +2,9 @@ ORGANIZATION_BLOCK OB1 //Циклическая программа.
 
 //Атрибуты для STEP7.
 TITLE   = 'Циклическая программа.'
-VERSION : '2.0'
-AUTHOR  : 'VA'
-FAMILY  : 'SIMATIC'
+VERSION : '2.1'
+AUTHOR  : VA
+FAMILY  : LIB_PLC
 
 VAR_TEMP
 OB1_EV_CLASS   :BYTE         ; //Bits 0-3 = 1 (Coming event), Bits 4-7 = 1 (Event class 1)
