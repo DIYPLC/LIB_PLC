@@ -1,0 +1,68 @@
+FUNCTION_BLOCK FbDispersion //Дисперсия.
+
+//       DbDispersion
+//     +--------------+
+//     | FbDispersion |
+//  ->-|In    Variance|->-
+//     |     Deviation|->-
+//     |          Mean|->-
+//     +--------------+
+
+VAR_INPUT //Входные переменные, сохраняемые.
+In:REAL := 0.0; //Вход измерения.
+END_VAR
+
+VAR_OUTPUT //Выходные переменные, сохраняемые.
+Variance  :REAL := 0.0; //Дисперсия.
+Deviation :REAL := 0.0; //Среднеквадратическое отклонение.
+Mean      :REAL := 0.0; //Математическое ожидание (Среднее арифметическое).
+END_VAR
+
+CONST //Константы.
+NUMBER := 99; //Размер массива 100.
+END_CONST
+
+VAR //Внутренние переменные, сохраняемые.
+Buffer1: ARRAY [0..NUMBER] OF REAL; //Буфер.
+COUNTER1:INT := 0; //Счетчик.
+Summator:REAL := 0.0; //Сумматор.
+END_VAR
+
+//Обновление массива.
+FOR COUNTER1 := NUMBER TO 1 BY -1 DO
+Buffer1[COUNTER1] := Buffer1[COUNTER1 - 1];
+END_FOR;
+Buffer1[0] := In;
+//Расчет математического ожидания (среднего арифметического).
+Summator := 0.0;
+FOR COUNTER1 := 0 TO NUMBER BY 1 DO
+Summator := Summator + Buffer1[COUNTER1];
+END_FOR;
+Mean := Summator /(INT_TO_REAL(NUMBER + 1));
+//Рассчет дисперсии.
+Summator := 0.0;
+FOR COUNTER1 := 0 TO NUMBER BY 1 DO
+Summator := Summator + ((Buffer1[COUNTER1] - Mean) * (Buffer1[COUNTER1] - Mean));
+END_FOR;
+Variance := Summator / (INT_TO_REAL(NUMBER + 1));
+//Рассчет среднеквадратического отклонения.
+Deviation := SQRT(Variance);
+
+END_FUNCTION_BLOCK
+
+//  +---------+
+//  | GNU GPL |
+//  +---------+
+//  |
+//  |
+//  .= .-_-. =.
+// ((_/)o o(\_))
+//  `-'(. .)`-'
+//  |/| \_/ |\
+//  ( |     | )
+//  /"\_____/"\
+//  \__)   (__/
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// License: GNU GPL v2

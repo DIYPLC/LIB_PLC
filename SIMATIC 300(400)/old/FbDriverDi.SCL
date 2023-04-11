@@ -1,0 +1,48 @@
+FUNCTION_BLOCK FbDriverDi //Драйвер дискретного входа.
+
+//          FbDriverDi
+//    +--------------------+
+//    |     FbDriverDi     |
+// ->-|In               Out|->-
+//   -|SimulationValue     |
+//   -|SimulationOn        |
+//    +--------------------+
+
+VAR_INPUT //Входные переменные, сохраняемые.
+In              :BOOL := FALSE; //Дискретный вход ПЛК.
+SimulationValue :BOOL := FALSE; //Значение для Out при симуляции.
+SimulationOn    :BOOL := FALSE; //Включить симуляцию.
+END_VAR
+
+VAR_OUTPUT //Выходные переменные, сохраняемые.
+Out :BOOL := FALSE; //Выход дискретного сигнала.
+END_VAR
+
+IF (SimulationOn) THEN
+//Симуляция включена.
+//Режим используется для отладки и при нештатной работе.
+Out := SimulationValue;
+ELSE
+//Симуляция выключена.
+//Штатный режим работы.
+Out := In;
+END_IF;
+
+END_FUNCTION_BLOCK
+
+//  +---------+
+//  | GNU GPL |
+//  +---------+
+//  |
+//  |
+//  .= .-_-. =.
+// ((_/)o o(\_))
+//  `-'(. .)`-'
+//  |/| \_/ |\
+//  ( |     | )
+//  /"\_____/"\
+//  \__)   (__/
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// License: GNU GPL v2

@@ -1,5 +1,5 @@
 FUNCTION_BLOCK FbStepControl //ПИД- регулятор с двумя дискретными выходами.
-TITLE ="ПИД- регулятор с двумя дискретными выходами."
+TITLE = 'ПИД- регулятор с двумя дискретными выходами.'
 
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
@@ -250,3 +250,55 @@ ELSE
 END_IF;
 
 END_FUNCTION_BLOCK
+
+(*
+Добавлен: 1exan    Дата: 2020-04-26
+
+В этом месте есть отличия от TCONT и там похоже реализация более правильная:
+Здесь:
+IF iImpEin=0
+THEN
+IF stImpDauer<=T#0MS
+THEN
+siImpAus:=0;
+stPausDauer:=BREAK_TM;
+END_IF;
+ELSE
+siImpAus:=iImpEin;
+stImpDauer:=PULSE_TM;
+END_IF;
+В TCONT:
+IF iImpEin = 0 THEN
+IF stImpDauer <= 0.0 THEN
+siImpAus := 0 ; stPausDauer := BREAK_TM ;
+END_IF ;
+ELSIF stPausDauer <= 0.0 THEN
+siImpAus := iImpEin ; stImpDauer := PULSE_TM ; END_IF ;
+
+Добавлен: 1exan    Дата: 2020-04-26
+
+Конкретно вот эта строка:
+ELSIF stPausDauer <= 0.0 (или T#0s) THEN
+должна быть вместо простого
+ELSE
+
+Добавлен: Roman    Дата: 2021-12-02
+
+Правильные строки:
+sThrOn:=ABS(AdapIn1);
+sThrOn:=ABS(AdapIn2);
+
+IF iImpEin=0
+THEN
+IF stImpDauer<=T#0MS
+THEN
+siImpAus:=0;
+stPausDauer:=BREAK_TM;
+END_IF;
+ELSE IF stPausDauer<=T#0MS
+THEN
+siImpAus:=iImpEin;
+stImpDauer:=PULSE_TM;
+END_IF; END_IF;
+
+*)

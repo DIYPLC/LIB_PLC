@@ -1,0 +1,93 @@
+FUNCTION_BLOCK FbPIcontrol //ПИ- регулятор.
+
+VAR_INPUT //Входные переменные, сохраняемые.
+PV:REAL:=0.0; //Present Value - Фактическое значение регулируемого параметра.
+SP:REAL:=50.0; //Set Point - Заданное значение регулируемого параметра.
+Kp:REAL:=0.001; //Коэффициент усиления пропорциональный.
+Ki:REAL:=0.001; //Коэффициент усиления интегральный.
+DBMAX:REAL:=0.001; //dead band - Зона нечувствительности к ошибке регулирования, верхняя граница.
+DBMIN:REAL:=-0.001; //dead band - Зона нечувствительности к ошибке регулирования, нижняя граница.
+OPMAX:REAL:=100.0; //Максимальное значение сигнала управления.
+OPMIN:REAL:=0.0; //Минимальное значение сигнала управления.
+Ts:REAL:=0.1; //Sampling Time - Шаг дискретизации по времени в секундах.
+MANUAL:REAL:=25.0; //(Manual) Сигнал управления в ручном режиме работы.
+MAN_ON:BOOL:=FALSE; //(Manual on) Включить ручной режим работы регулятора.
+END_VAR 
+
+VAR_OUTPUT //Выходные переменные, сохраняемые.
+OP:REAL:=0.0; //Output Power Сигнал управления на исполнительный механизм.
+END_VAR
+
+VAR //Внутренние переменные, сохраняемые.
+I_PART:REAL:=0.0; //Интегральная составляющая ПИ- регулятора.
+END_VAR
+
+VAR_TEMP  //Временные переменные, не сохраняемые.
+ER:REAL; //Ошибка регулирования.
+P_PART:REAL; //Пропорциональная составляющая ПИ- регулятора.
+PI:REAL; //Выход ПИ- алгоритма.
+SW:REAL; //Выход с переключателя режимов работы.
+END_VAR
+
+//Ошибка регулирования.
+ER:=SP-PV;
+
+//Зона нечувствительности к ошибке.
+IF ((DBMIN<ER)AND(ER<DBMAX)) THEN
+ER:=0.0;
+END_IF;
+
+//ПИ-алгоритм.
+P_PART:=Kp*ER;
+
+IF (Ki=0.0) THEN
+I_PART:=0.0;
+ELSE
+I_PART:=I_PART+Ki*ER*Ts;
+END_IF;
+
+PI:=P_PART+I_PART;
+
+//Переключение режима работы "Ручной / Автоматический".
+IF (MAN_ON) THEN
+SW:=MANUAL;
+ELSE
+SW:=PI;
+END_IF;
+
+//Амплитудный ограничитель с безударным переходом.
+IF (SW>=OPMAX) THEN
+OP:=OPMAX;
+I_PART:=OP-P_PART;
+END_IF;
+
+IF (SW<=OPMIN) THEN
+OP:=OPMIN;
+I_PART:=OP-P_PART;
+END_IF;
+
+IF ((OPMIN<SW)AND(SW<OPMAX)) THEN
+OP:=SW;
+    IF (MAN_ON) THEN
+    I_PART:=OP-P_PART;
+    END_IF;
+END_IF;
+
+END_FUNCTION_BLOCK
+
+//  +---------+
+//  | GNU GPL |
+//  +---------+
+//  |
+//  |
+//  .= .-_-. =.
+// ((_/)o o(\_))
+//  `-'(. .)`-'
+//  |/| \_/ |\
+//  ( |     | )
+//  /"\_____/"\
+//  \__)   (__/
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// License: GNU GPL v2
