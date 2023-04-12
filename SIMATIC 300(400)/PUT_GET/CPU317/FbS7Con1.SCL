@@ -118,7 +118,7 @@ ELSE
 DbTON.IN := NOT(PulseGen);
 DbTON.PT := DINT_TO_TIME(Cucle_ms);
 DbTON();
-PulseGen:= DbTON.Q;
+PulseGen := DbTON.Q;
 END_IF;
 
 //-----------------------------------------------------------------------
@@ -204,3 +204,25 @@ END_FUNCTION_BLOCK
 // Author: VA
 // Contacts: DIY.PLC.314@gmail.com
 // License: GNU GPL v2
+
+(*
+Пример вызова на ассемблере.
+
+      CALL #DbGET (
+           REQ                      := L      0.0,
+           ID                       := W#16#1,
+           NDR                      := #GET_NDR,
+           ERROR                    := #GET_ERROR,
+           STATUS                   := #GET_STAUS,
+           ADDR_1                   := P#DB4.DBX 0.0 BYTE 64,
+           RD_1                     := P#DB30.DBX0.0 BYTE 64);
+
+      CALL #DbPUT (
+           REQ                      := L      0.0,
+           ID                       := W#16#1,
+           DONE                     := #PUT_DONE,
+           ERROR                    := #PUT_ERROR,
+           STATUS                   := #PUT_STATUS,
+           ADDR_1                   := P#DB3.DBX 0.0 BYTE 64,
+           SD_1                     := P#DB40.DBX0.0 BYTE 64);
+*)
