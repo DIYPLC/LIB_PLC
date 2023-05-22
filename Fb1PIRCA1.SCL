@@ -425,20 +425,22 @@ DbPIDcontrol1()                              ; //ПИД-регулятор.
 //                   := DbPIDcontrol1.MV     ; //Сигнал управления на исполнительный механизм.
 
 //Ограничение величины ускорения / замедления привода 0...50[Гц].
-//        DbRamp
-//    +------------+
-//    |   FbRamp   |
-// ->-|In       Out|->-
-//   -|TAcc        |
-//   -|TDec        |
-//   -|Ts          |
-//    +------------+
-DbRamp_MV.In   := DbPIDcontrol1.MV       ; //Входной сигнал.
-DbRamp_MV.TAcc := "Db1PIRCA1Hmi".RampTAcc; //Время разгона на единицу [с].
-DbRamp_MV.TDec := "Db1PIRCA1Hmi".RampTDec; //Время торможения на единицу [c].
-DbRamp_MV.Ts   := Ts                     ; //Шаг дискретизации по времени [с].
-DbRamp_MV()                              ; //Рампа разгона / торможения.
-MV             := DbRamp_MV.Out          ; //Выходной сигнал.
+//         DbRamp
+//    +--------------+
+//    |    FbRamp    |
+// ->-|In         Out|->-
+//   -|Scale         |
+//   -|TAcc          |
+//   -|TDec          |
+//   -|Ts            |
+//    +--------------+
+DbRamp_MV.In    := DbPIDcontrol1.MV       ; //Входной сигнал.
+DbRamp_MV.Scale := 50.0                   ; //Диапазон времени разгона и торможения.
+DbRamp_MV.TAcc  := "Db1PIRCA1Hmi".RampTAcc; //Время разгона от 0 до Scale [с].
+DbRamp_MV.TDec  := "Db1PIRCA1Hmi".RampTDec; //Время торможения от Scale до 0 [c].
+DbRamp_MV.Ts    := Ts                     ; //Шаг дискретизации по времени [с].
+DbRamp_MV()                               ; //Рампа разгона / торможения.
+MV              := DbRamp_MV.Out          ; //Выходной сигнал.
 
 //Сигнал управления отображение на SADA/HMI.
 "Db1PIRCA1Hmi".MV := MV;

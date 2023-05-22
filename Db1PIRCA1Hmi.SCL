@@ -43,7 +43,7 @@ AUTHOR : VA
 FAMILY : '1PIRCA1'
 
 STRUCT //Объявление переменных.
-SP {S7_m_c := 'true'} :REAL := 5.0   ; //1PIRCA1 Заданное значение давления [Бар] SCADA/HMI -> PLC.
+SP {S7_m_c := 'true'} :REAL := 4.5   ; //1PIRCA1 Заданное значение давления [Бар] SCADA/HMI -> PLC.
 PV {S7_m_c := 'true'} :REAL := 4.9   ; //1PIRCA1 Измеренное значение давления [Бар] PLC -> SCADA/HMI.
 MV {S7_m_c := 'true'} :REAL := 25.0  ; //1PIRCA1 Сигнал управления приводом [Гц] PLC -> SCADA/HMI.
 CW {S7_m_c := 'true'} :WORD := W#16#0; //1PIRCA1 Слово управления SCADA/HMI -> PLC.
