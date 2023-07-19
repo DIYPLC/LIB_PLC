@@ -1,5 +1,5 @@
-FUNCTION_BLOCK FbAsToOsBool
-TITLE = 'FbAsToOsBool'
+FUNCTION_BLOCK FbAsToOsInt
+TITLE = 'FbAsToOsInt'
 
 //WinCC interface.
 
@@ -19,7 +19,7 @@ InOsTag
 S7_m_c     := 'true' ; //FB can be controlled or monitored from the OS.
 S7_dynamic := 'true'   //Tag view in CFC
 }
-:BOOL := FALSE; //WinCC Tag.
+:INT := 0; //WinCC Tag.
 END_VAR
 
 ;
@@ -29,7 +29,7 @@ END_FUNCTION_BLOCK
 //Блок автоматически передает одну переменную из PLC в SCADA WinCC.
 //AS == PLC
 //OS == SCADA WinCC
-//Блок спроектирован под PCS7 v5.
+//Блок спроектированн под PCS7 v5.
 
 //  +---------+
 //  | GNU GPL |

@@ -1,5 +1,5 @@
-FUNCTION_BLOCK FbAsToOsBool
-TITLE = 'FbAsToOsBool'
+FUNCTION_BLOCK FbOsToAsWord
+TITLE = 'FbOsToAsWord'
 
 //WinCC interface.
 
@@ -13,20 +13,20 @@ VERSION : '1.1'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
 
-VAR_INPUT
-InOsTag
+VAR_OUTPUT
+OutOsTag
 {//Attributes for PCS7.
 S7_m_c     := 'true' ; //FB can be controlled or monitored from the OS.
 S7_dynamic := 'true'   //Tag view in CFC
 }
-:BOOL := FALSE; //WinCC Tag.
+:WORD := 0; //WinCC Tag.
 END_VAR
 
 ;
 
 END_FUNCTION_BLOCK
 
-//Блок автоматически передает одну переменную из PLC в SCADA WinCC.
+//Блок автоматически передает одну переменную из SCADA WinCC в PLC.
 //AS == PLC
 //OS == SCADA WinCC
 //Блок спроектирован под PCS7 v5.
