@@ -400,8 +400,8 @@ MV := "Db1PIRCA1Hmi".MV;
 //   -|Ki                  |
 //   -|Kd                  |
 //   -|Kdf                 |
-//   -|DBMAX               |
-//   -|DBMIN               |
+//   -|ERMAX               |
+//   -|ERMIN               |
 //   -|MVMAX               |
 //   -|MVMIN               |
 //   -|Ts                  |
@@ -414,8 +414,8 @@ DbPIDcontrol1.Kp     := "Db1PIRCA1Hmi".Kp    ; //Коэффициент усиления пропорцион
 DbPIDcontrol1.Ki     := "Db1PIRCA1Hmi".Ki    ; //Коэффициент усиления интегральный.
 DbPIDcontrol1.Kd     := "Db1PIRCA1Hmi".Kd    ; //Коэффициент усиления дифференциальный.
 DbPIDcontrol1.Kdf    := "Db1PIRCA1Hmi".Kdf   ; //Коэффициент фильтрации дифференциальный Kdf=1/Tdf.
-DbPIDcontrol1.DBMAX  := "Db1PIRCA1Hmi".DBMAX ; //Зона нечувствительности к ошибке регулирования, максимум.
-DbPIDcontrol1.DBMIN  := "Db1PIRCA1Hmi".DBMIN ; //Зона нечувствительности к ошибке регулирования, минимум.
+DbPIDcontrol1.ERMAX  := "Db1PIRCA1Hmi".ERMAX ; //Зона нечувствительности к ошибке регулирования, максимум.
+DbPIDcontrol1.ERMIN  := "Db1PIRCA1Hmi".ERMIN ; //Зона нечувствительности к ошибке регулирования, минимум.
 DbPIDcontrol1.MVMAX  := "Db1PIRCA1Hmi".MVMAX ; //Максимальное значение сигнала управления.
 DbPIDcontrol1.MVMIN  := "Db1PIRCA1Hmi".MVMIN ; //Минимальное значение сигнала управления.
 DbPIDcontrol1.Ts     := Ts                   ; //Шаг дискретизации по времени в секундах.
@@ -546,8 +546,8 @@ END_FUNCTION_BLOCK
 // | SP       |-----------------+   -|Ki                  |    -|Ts          |              
 // +----------+                     -|Kd                  |     +------------+              
 //                                  -|Kdf                 |                                 
-//                                  -|DBMAX               |                                 
-// +---------------+                -|DBMIN               |                                 
+//                                  -|ERMAX               |                                 
+// +---------------+                -|ERMIN               |                                 
 // | MV            |------------+   -|MVMAX               |                                 
 // +---------------+            |   -|MVMIN               |                                 
 //                              |   -|Ts                  |                                 
