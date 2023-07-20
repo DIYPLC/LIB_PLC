@@ -58,7 +58,7 @@ ERROR_RD_SINFO := SFC6(TOP_SI := TOP_SI, START_UP_SI := START_UP_SI); //RD_SINFO
 RST := (TOP_SI.NUM = 100); //Call in OB100
 
 //Задержка выключен. импульса первого скана.
-IF (TimeDelayOff = 0) THEN
+IF (TimeDelayOff <= 0) THEN
 TOF1.IN := FALSE;
 TOF1.PT := T#0ms;
 TOF1();
