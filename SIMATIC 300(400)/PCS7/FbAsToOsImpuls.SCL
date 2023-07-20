@@ -1,0 +1,88 @@
+FUNCTION_BLOCK FbAsToOsImpuls
+TITLE = 'FbAsToOsImpuls'
+
+//WinCC interface.
+
+{//FB attributes for PCS7.
+S7_m_c       := 'true'; //FB can be controlled or monitored from the OS.
+S7_tag       := 'true'; //FB is included in the list of OS tags.
+S7_read_back := 'true'  //Chart>Readback for DB.
+}
+
+VERSION : '1.0'
+AUTHOR  : VA
+FAMILY  : LIB_PLC
+
+VAR_INPUT
+TimeDelayOff 
+{//Атрибуты переменных PCS7.
+S7_link    := 'false'; //'false' запрет CFC соединений.
+S7_dynamic := 'true'   //'true' просмотр в CFC.
+} : DINT := 1000; //Задержка выключениЯ импульса ms.
+END_VAR
+
+VAR_OUTPUT
+ButtonImpuls
+{//Attributes for PCS7.
+S7_m_c     := 'true' ; //FB can be controlled or monitored from the OS.
+S7_dynamic := 'true'   //Tag view in CFC
+}
+:BOOL := FALSE; //WinCC Tag.
+END_VAR
+
+VAR
+TON1 : SFB4; //TON timer.
+EdgePos_In :BOOL := FALSE; //Вход.
+EdgePos_In_previos :BOOL := FALSE; //Предыдущее сост. входа.
+EdgePos_Out :BOOL := FALSE; //Выход.
+END_VAR 
+
+//Формируем длительность импульса если оператор нажал кнопку.
+//Таймер задержки включениЯ.
+TON1.IN := ButtonImpuls;
+TON1.PT := DINT_TO_TIME(TimeDelayOff);
+TON1(); 
+EdgePos_In := TON1.Q;
+
+//Находим момент когда импульс пора выключать.
+//Детектор нарастающего фронта.
+EdgePos_Out := EdgePos_In AND NOT(EdgePos_In_previos);
+//Запомнить предыдущее сост. входа.
+EdgePos_In_previos := EdgePos_In;
+
+//Гашение импульса от оператора.
+IF (EdgePos_Out) THEN
+ButtonImpuls := FALSE;
+END_IF;
+
+END_FUNCTION_BLOCK
+
+//Получаем от WinCC нормально открытую кнопку без фиксации.
+//Блок автоматически передает одну переменную из PLC в SCADA WinCC.
+//WinCC записывает в тег ButtonImpuls=1, а данный блок через время TimeDelayOff сбрасывает тег ButtonImpuls=0.
+//Таким образом мы по нажатию кнопки в WinCC получаем короткий единичный импульс на ButtonImpuls.
+//Плюс такого подхода в том что на WinCC не надо сбрасывать в 0 тег ButtonImpuls.
+//Используем системный таймер TON чтобы данный алгоритм одинаково работал из OB1, OB35 итд.
+//AS == PLC
+//OS == SCADA WinCC
+//Блок спроектирован под PCS7 v5.
+
+//  +---------+
+//  | GNU GPL |
+//  +---------+
+//  |
+//  |
+//  .= .-_-. =.
+// ((_/)o o(\_))
+//  `-'(. .)`-'
+//  |/| \_/ |\
+//  ( |     | )
+//  /"\_____/"\
+//  \__)   (__/
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// License: GNU GPL v2
+//
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC
