@@ -1,0 +1,68 @@
+FUNCTION_BLOCK FbModelValve // Модель пневмоцилиндра с коцевиками.
+
+VAR_INPUT //Входные переменные, сохраняемые.
+CmdOpen        :BOOL := FALSE; //Команда выдвинуть шток пневмоцилиндра.
+CmdClose       :BOOL := FALSE; //Команда втянуть шток пневмоцилиндра.
+SpdOpen        :REAL := 50.0;  //Скорость вывижения штока [мм/с].
+SpdClose       :REAL := 40.0;  //Скорость втягивания штока [мм/с].
+LengthCylinder :REAL := 300.0; //Длинна пневмоцилиндра [мм].
+Ts             :REAL := 0.1;   //Шаг дискретизации по времени [с].
+END_VAR
+
+VAR_OUTPUT //Выходные переменные, сохраняемые.
+SensorOpen      :BOOL := FALSE; //Датчик шток пневмоцилиндра выдвинут.
+SensorClose     :BOOL := FALSE; //Датчик шток пневмоцилиндра втянут.
+CurrentPosition :REAL := 0.0;   //Текущее положение штока.
+END_VAR
+
+IF (SpdOpen>0.0 AND SpdClose>0.0 AND SpdOpen>SpdClose) THEN
+
+    //Втянуть шток.
+    IF (CmdClose) THEN
+    CurrentPosition:=CurrentPosition-SpdClose*Ts;
+    END_IF;
+
+    //Выдвинуть шток.
+    IF (CmdOpen) THEN
+    CurrentPosition:=CurrentPosition+SpdOpen*Ts;
+    END_IF;
+
+    //Шток втянут.
+    IF (CurrentPosition<=0.0) THEN
+    CurrentPosition:=0.0;
+    SensorClose:=TRUE;
+    ELSE
+    SensorClose:=FALSE;
+    END_IF;
+
+    //Шток выдвинут.
+    IF (CurrentPosition>=LengthCylinder) THEN
+    CurrentPosition:=LengthCylinder;
+    SensorOpen:=TRUE;
+    ELSE
+    SensorOpen:=FALSE;
+    END_IF;
+
+END_IF;
+
+END_FUNCTION_BLOCK
+
+//  +---------+
+//  | GNU GPL |
+//  +---------+
+//  |
+//  |
+//  .= .-_-. =.
+// ((_/)o o(\_))
+//  `-'(. .)`-'
+//  |/| \_/ |\
+//  ( |     | )
+//  /"\_____/"\
+//  \__)   (__/
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// License: GNU GPL v2
+//
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC

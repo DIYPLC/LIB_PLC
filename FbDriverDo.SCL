@@ -1,0 +1,62 @@
+FUNCTION_BLOCK FbDriverDo //ƒрайвер дискретного выхода.
+TITLE = 'FbDriverDo'
+
+//          FbDriverDo
+//    +--------------------+
+//    |     FbDriverDo     |
+// ->-|In               Out|->-
+//   -|SimValue            |
+//   -|SimOn               |
+//    +--------------------+
+
+{//јтрибуты дл€ PCS7.
+S7_read_back := 'true' ; //CFC: Chart>Readback активен дл€ прототипов DB.
+S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
+}
+
+//јтрибуты дл€ STEP7.
+VERSION : '0.2'
+AUTHOR  : VA
+FAMILY  : LIB_PLC
+
+VAR_INPUT //¬ходные переменные, сохран€емые.
+In              :BOOL := FALSE; //¬ход дискретного сигнала.
+SimValue :BOOL := FALSE; //«начение дл€ Out при симул€ции.
+SimOn    :BOOL := FALSE; //¬ключить симул€цию.
+END_VAR
+
+VAR_OUTPUT //¬ыходные переменные, сохран€емые.
+Out :BOOL := FALSE; //ƒискретный выход ѕЋ .
+END_VAR
+
+IF (SimOn) THEN
+//—имул€ци€ включена.
+//–ежим используетс€ дл€ отладки и при нештатной работе.
+Out := SimValue;
+ELSE
+//—имул€ци€ выключена.
+//Ўтатный режим работы.
+Out := In;
+END_IF;
+
+END_FUNCTION_BLOCK
+
+//  +---------+
+//  | GNU GPL |
+//  +---------+
+//  |
+//  |
+//  .= .-_-. =.
+// ((_/)o o(\_))
+//  `-'(. .)`-'
+//  |/| \_/ |\
+//  ( |     | )
+//  /"\_____/"\
+//  \__)   (__/
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// License: GNU GPL v2
+//
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC

@@ -9,6 +9,8 @@ MonitorArrayLimits    := 'y' ; //SCL: Следить за границами массивов.
 OptimizeObjectCode    := 'y'   //SCL: Оптимизация объектного кода.
 }
 
+// Сначала необходимо вручную скомпилировать FbGenSfbSfc.AWL
+
 //Бибилиотека блоков для ПЛК LIB_PLC.
 // LIB_PLC блоки из теории управления.
 FbPIDcontrol       //LIB_PLC Регулятор ПИД.
@@ -48,7 +50,25 @@ FbCounter          //LIB_PLC Счетчик импульсов.
 // LIB_PLC платформозависимые блоки SIEMENS.
 FbDriverAi420      //LIB_PLC Драйвер аналогово входа 4...20мА.
 FbDriverAo420      //LIB_PLC Драйвер аналогово выхода 4...20мА.
+FbDriverDi         //LIB_PLC Драйвер дискретного входа.
+FbDriverDo         //LIB_PLC Драйвер дискретного выхода.
 FbDriverFRA        //LIB_PLC Управление приводом MITSUBISHI FR-A740, FR-A840 по PROFIBUS PD.
+// CFC PCS7.
+FbAsToOsImpuls     //LIB_PLC WinCC interface CFC PCS7.
+FbAsToOsBool       //LIB_PLC WinCC interface CFC PCS7.
+FbAsToOsReal       //LIB_PLC WinCC interface CFC PCS7.
+FbAsToOsInt        //LIB_PLC WinCC interface CFC PCS7.
+FbAsToOsDint       //LIB_PLC WinCC interface CFC PCS7.
+FbAsToOsWord       //LIB_PLC WinCC interface CFC PCS7.
+FbAsToOsDword      //LIB_PLC WinCC interface CFC PCS7.
+FbOsToAsBool       //LIB_PLC WinCC interface CFC PCS7.
+FbOsToAsReal       //LIB_PLC WinCC interface CFC PCS7.
+FbOsToAsInt        //LIB_PLC WinCC interface CFC PCS7.
+FbOsToAsDint       //LIB_PLC WinCC interface CFC PCS7.
+FbOsToAsWord       //LIB_PLC WinCC interface CFC PCS7.
+FbOsToAsDword      //LIB_PLC WinCC interface CFC PCS7.
+FbReset            //LIB_PLC Флаг первого скана с TOF задержкой CFC PCS7.
+FbSampleTime       //LIB_PLC Шаг дискретизации по времени CFC PCS7.
 
 //Блоки данных для сопряжения с SCADA HMI.
 //При компиляции блоков данных возможна потеря технологических значений переменных в блоках данных.

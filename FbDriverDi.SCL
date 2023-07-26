@@ -1,0 +1,62 @@
+FUNCTION_BLOCK FbDriverDi //Драйвер дискретного входа.
+TITLE = 'FbDriverDi'
+
+//          FbDriverDi
+//    +--------------------+
+//    |     FbDriverDi     |
+// ->-|In               Out|->-
+//   -|SimValue            |
+//   -|SimOn               |
+//    +--------------------+
+
+{//Атрибуты для PCS7.
+S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
+S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
+}
+
+//Атрибуты для STEP7.
+VERSION : '0.2'
+AUTHOR  : VA
+FAMILY  : LIB_PLC
+
+VAR_INPUT //Входные переменные, сохраняемые.
+In       :BOOL := FALSE; //Дискретный вход ПЛК.
+SimValue :BOOL := FALSE; //Значение для Out при симуляции.
+SimOn    :BOOL := FALSE; //Включить симуляцию.
+END_VAR
+
+VAR_OUTPUT //Выходные переменные, сохраняемые.
+Out :BOOL := FALSE; //Выход дискретного сигнала.
+END_VAR
+
+IF (SimOn) THEN
+//Симуляция включена.
+//Режим используется для отладки и при нештатной работе.
+Out := SimValue;
+ELSE
+//Симуляция выключена.
+//Штатный режим работы.
+Out := In;
+END_IF;
+
+END_FUNCTION_BLOCK
+
+//  +---------+
+//  | GNU GPL |
+//  +---------+
+//  |
+//  |
+//  .= .-_-. =.
+// ((_/)o o(\_))
+//  `-'(. .)`-'
+//  |/| \_/ |\
+//  ( |     | )
+//  /"\_____/"\
+//  \__)   (__/
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// License: GNU GPL v2
+//
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC

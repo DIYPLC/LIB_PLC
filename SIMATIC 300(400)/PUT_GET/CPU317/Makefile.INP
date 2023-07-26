@@ -1,0 +1,40 @@
+//Порядок компиляции всех файлов в проекте имеет огромное значение и описан в данном файле.
+
+{//Опции компилятора SCL.
+//Данные опции почему то не работают в исходниках, а тут работают.
+GenerateReferenceData := 'y' ; //SCL: Генерировать перекрестные ссылки.
+CreateDebugInfo       := 'y' ; //SCL: Генерировать оладочную информацию.
+SetOKFlag             := 'y' ; //SCL: ENO = 1
+MonitorArrayLimits    := 'y' ; //SCL: Следить за границами массивов.
+OptimizeObjectCode    := 'y'   //SCL: Оптимизация объектного кода.
+}
+
+
+FbRxS7con1
+FbTxS7con1
+FbS7Con1 
+
+DbInstance
+
+//Системные call back.
+OB1   //Cycle Execution
+
+//  +---------+
+//  | GNU GPL |
+//  +---------+
+//  |
+//  |
+//  .= .-_-. =.
+// ((_/)o o(\_))
+//  `-'(. .)`-'
+//  |/| \_/ |\
+//  ( |     | )
+//  /"\_____/"\
+//  \__)   (__/
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// License: GNU GPL v2
+//
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC
