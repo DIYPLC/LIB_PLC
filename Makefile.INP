@@ -25,7 +25,7 @@ FbDeadBand         //LIB_PLC Зона нечувствительности.
 Fb2PosControl      //LIB_PLC Регулятор двухпозиционный.
 Fb3PosControl      //LIB_PLC Регулятор трехпозиционный.
 FbStpForPD         //LIB_PLC Аналоговый ПД- регулятор превращаем в дискретный ПИ.
-FbVirtualMotorGear //LIB_PLC Виртуальный МЭО для отладки шагового регулятора.
+FbSimMotorGear     //LIB_PLC Виртуальный МЭО для отладки шагового регулятора.
 // LIB_PLC Вспомогательные блоки для ПИД- регулятора.
 FbRamp             //LIB_PLC Рампа разгона торможения.
 FbGSS              //LIB_PLC Генератор сигналов и псевдослучайных чисел.
@@ -69,6 +69,12 @@ FbOsToAsWord       //LIB_PLC WinCC interface CFC PCS7.
 FbOsToAsDword      //LIB_PLC WinCC interface CFC PCS7.
 FbReset            //LIB_PLC Флаг первого скана с TOF задержкой CFC PCS7.
 FbSampleTime       //LIB_PLC Шаг дискретизации по времени CFC PCS7.
+FbSubstReal        //LIB_PLC Замещение аналогово сигнала для PCS7.
+FbBlinkPCS7        //Пример программы для PCS7.
+//
+FbStepControl      //ПИД- регулятор с двумя дискретными выходами.
+FbDriverRTC        //Блок чтения часов реального времени.
+FbRunTimeMeter     //Измерение времени выполнения участка программы.
 
 //Блоки данных для сопряжения с SCADA HMI.
 //При компиляции блоков данных возможна потеря технологических значений переменных в блоках данных.

@@ -24,9 +24,6 @@ Reset :BOOL := FALSE; //Сброс при перезагрузке.
 END_VAR
 
 VAR //Внутренние переменные, сохраняемые.
-DbPIDcontrol       :FbPIDcontrol;
-DbStpForPD         :FbStpForPD;
-DbVirtualMotorGear :FbVirtualMotorGear;
 END_VAR
 
 VAR_TEMP  //Временные переменные, не сохраняемые.
