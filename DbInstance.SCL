@@ -1,6 +1,6 @@
 //Файл генерирует блоки данных к функциональным блокам.
 
-DATA_BLOCK Db1PIRCA1 Fb1PIRCA1 //Instance data block.
+DATA_BLOCK Db1PC1 Fb1PC1 //Instance data block.
 BEGIN
 END_DATA_BLOCK
 

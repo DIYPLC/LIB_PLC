@@ -35,10 +35,10 @@ END_VAR
 Ts := DINT_TO_REAL(Ts_ms) * 0.001;
 
 //---------------------------------------------------------------------------------------------------------
-// 1PIRCA1 ПИД- регулятор давления.
-//                 Db1PIRCA1
+// 1PC1 ПИД- регулятор давления.
+//                   Db1PC1
 //    +---------------------------------+
-//    |            Fb1PIRCA1            |
+//    |              Fb1PC1             |
 // ->-|ADC_Pressure        DAC_Frequency|->-
 //   -|RemoteStartButton         MotorOn|-
 //   -|RemoteStopButton      ContactorOn|-
@@ -56,30 +56,30 @@ Ts := DINT_TO_REAL(Ts_ms) * 0.001;
 //                    v
 //    +---------------------------------+
 //    |                                 |
-//    |          Db1PIRCA1Hmi           |
+//    |            Db1PC1Hmi            |
 //    |                                 |
 //    |      SCADA / HMI interface      |
 //    |                                 |
 //    +---------------------------------+
 //Входы выходы ПЛК Di Do Ai Ao подключаем здесь.
-//Db1PIRCA1.SensorPressure  := Ai1PIRCA1PT            ; //Датчик давления 0...27648[АЦП].
-Db1PIRCA1.ADC_Pressure      := Db1PIRCA1.DAC_Frequency; //Датчик давления 0...27648[АЦП].
-Db1PIRCA1.RemoteStartButton := TRUE                   ; //Кнопка без фиксации NO "ПУСК" на пульте местного управления.
-Db1PIRCA1.RemoteStopButton  := TRUE                   ; //Кнопка без фиксации NC "СТОП" на пульте местного управления.
-Db1PIRCA1.VoltageOk         := TRUE                   ; //Схема собрана (вводной автомат 380VAC включен).
-Db1PIRCA1.DriveOk           := TRUE                   ; //Частотный привод: Готовность к работе (нет ошибок).
-//Db1PIRCA1.ContactorOk     := TRUE                   ; //Контактор включился NO контакт.
-Db1PIRCA1.ContactorOk       := Db1PIRCA1.ContactorOn  ; //Контактор включился NO контакт.
-Db1PIRCA1.InterlockOn       := FALSE                  ; //Включена технологическая блокировка регулятора.
-Db1PIRCA1.GroupStart        := FALSE                  ; //Групповой пуск (подать импульс).
-Db1PIRCA1.GroupStop         := FALSE                  ; //Групповой стоп (подать импульс).
-Db1PIRCA1.Ts_ms             := Ts_ms                  ; //Шаг дискретизации по времени [мс].
-Db1PIRCA1.Reset             := Reset                  ; //Сброс при перезагрузке.
-Fb1PIRCA1.Db1PIRCA1()                                 ; //1PIRCA1 ПИД- регулятор давления.
-//Ao1PIRCA1FR               := Db1PIRCA1.DAC_Frequency; //Частотный привод: Сигнал задания частоты 0...27648[ЦАП].
-//                          := Db1PIRCA1.MotorOn      ; //Частотный привод: Включить привод.
-//                          := Db1PIRCA1.ContactorOn  ; //Включить контактор между частотным приводом и двигателем.
-//                          := Db1PIRCA1.Error        ; //Флаг ошибки.
+//Db1PC1.SensorPressure  := Ai1PC1PT            ; //Датчик давления 0...27648[АЦП].
+Db1PC1.ADC_Pressure      := Db1PC1.DAC_Frequency; //Датчик давления 0...27648[АЦП].
+Db1PC1.RemoteStartButton := TRUE                ; //Кнопка без фиксации NO "ПУСК" на пульте местного управления.
+Db1PC1.RemoteStopButton  := TRUE                ; //Кнопка без фиксации NC "СТОП" на пульте местного управления.
+Db1PC1.VoltageOk         := TRUE                ; //Схема собрана (вводной автомат 380VAC включен).
+Db1PC1.DriveOk           := TRUE                ; //Частотный привод: Готовность к работе (нет ошибок).
+//Db1PC1.ContactorOk     := TRUE                ; //Контактор включился NO контакт.
+Db1PC1.ContactorOk       := Db1PC1.ContactorOn  ; //Контактор включился NO контакт.
+Db1PC1.InterlockOn       := FALSE               ; //Включена технологическая блокировка регулятора.
+Db1PC1.GroupStart        := FALSE               ; //Групповой пуск (подать импульс).
+Db1PC1.GroupStop         := FALSE               ; //Групповой стоп (подать импульс).
+Db1PC1.Ts_ms             := Ts_ms               ; //Шаг дискретизации по времени [мс].
+Db1PC1.Reset             := Reset               ; //Сброс при перезагрузке.
+Fb1PC1.Db1PC1()                                 ; //1PC1 ПИД- регулятор давления.
+//Ao1PC1FR               := Db1PC1.DAC_Frequency; //Частотный привод: Сигнал задания частоты 0...27648[ЦАП].
+//                       := Db1PC1.MotorOn      ; //Частотный привод: Включить привод.
+//                       := Db1PC1.ContactorOn  ; //Включить контактор между частотным приводом и двигателем.
+//                       := Db1PC1.Error        ; //Флаг ошибки.
 
 END_FUNCTION_BLOCK
 
