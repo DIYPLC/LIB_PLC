@@ -72,13 +72,19 @@ FbSampleTime       //LIB_PLC Шаг дискретизации по времени CFC PCS7.
 FbSubstReal        //LIB_PLC Замещение аналогово сигнала для PCS7.
 FbBlinkPCS7        //Пример программы для PCS7.
 //
-FbPIDstep          //ПИД- регулятор с двумя дискретными выходами.
-FbDriverRTC        //Блок чтения часов реального времени.
-FbRunTimeMeter     //Измерение времени выполнения участка программы.
+FbPIDstep          //LIB_PLC ПИД- регулятор с двумя дискретными выходами.
+FbDriverRTC        //LIB_PLC Блок чтения часов реального времени.
+FbRunTimeMeter     //LIB_PLC Измерение времени выполнения участка программы.
 //
-FbS7con   //Обмен данными между двумя ПЛК S7-300(400).
-FbS7conRx //Данные принятые через S7 connection в NetPro.
-FbS7conTx //Данные отправленные через S7 connection в NetPro.
+FbS7con   //LIB_PLC Обмен данными между двумя ПЛК S7-300(400).
+FbS7conRx //LIB_PLC Данные принятые через S7 connection в NetPro.
+FbS7conTx //LIB_PLC Данные отправленные через S7 connection в NetPro.
+//
+FbDispersion   //LIB_PLC Дисперсия PV.
+FbMonoVibr     //LIB_PLC Одновибратор.
+FbSum1bit      //LIB_PLC Сумматор 1бит.
+FbTriggerT     //LIB_PLC T- Триггер.
+FbS5TimeToReal //LIB_PLC Конвертор S5TIME в милисекунды.
 
 //Блоки данных для сопряжения с SCADA HMI.
 //При компиляции блоков данных возможна потеря технологических значений переменных в блоках данных.
