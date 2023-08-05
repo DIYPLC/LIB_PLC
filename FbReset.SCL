@@ -15,7 +15,7 @@ TimeDelayOff
 {//Атрибуты переменных PCS7.
 S7_link    := 'false'; //'false' запрет CFC соединений.
 S7_dynamic := 'true'   //'true' просмотр в CFC.
-} : DINT := 1000; //Задержка выключен. импульса сброса ms.
+} : DINT := 2000; //Задержка выключен. импульса сброса ms.
 END_VAR
 
 VAR_OUTPUT

@@ -54,19 +54,13 @@ FbDriverDi         //LIB_PLC Драйвер дискретного входа.
 FbDriverDo         //LIB_PLC Драйвер дискретного выхода.
 FbDriverFRA        //LIB_PLC Управление приводом MITSUBISHI FR-A740, FR-A840 по PROFIBUS PD.
 // CFC PCS7.
-FbAsToOsImpuls     //LIB_PLC WinCC interface CFC PCS7.
-FbAsToOsBool       //LIB_PLC WinCC interface CFC PCS7.
-FbAsToOsReal       //LIB_PLC WinCC interface CFC PCS7.
-FbAsToOsInt        //LIB_PLC WinCC interface CFC PCS7.
-FbAsToOsDint       //LIB_PLC WinCC interface CFC PCS7.
-FbAsToOsWord       //LIB_PLC WinCC interface CFC PCS7.
-FbAsToOsDword      //LIB_PLC WinCC interface CFC PCS7.
-FbOsToAsBool       //LIB_PLC WinCC interface CFC PCS7.
-FbOsToAsReal       //LIB_PLC WinCC interface CFC PCS7.
-FbOsToAsInt        //LIB_PLC WinCC interface CFC PCS7.
-FbOsToAsDint       //LIB_PLC WinCC interface CFC PCS7.
-FbOsToAsWord       //LIB_PLC WinCC interface CFC PCS7.
-FbOsToAsDword      //LIB_PLC WinCC interface CFC PCS7.
+FbOsBoolPls        //LIB_PLC WinCC interface CFC PCS7.
+FbOsBool           //LIB_PLC WinCC interface CFC PCS7.
+FbOsReal           //LIB_PLC WinCC interface CFC PCS7.
+FbOsInt            //LIB_PLC WinCC interface CFC PCS7.
+FbOsDint           //LIB_PLC WinCC interface CFC PCS7.
+FbOsWord           //LIB_PLC WinCC interface CFC PCS7.
+FbOsDword          //LIB_PLC WinCC interface CFC PCS7.
 FbReset            //LIB_PLC Флаг первого скана с TOF задержкой CFC PCS7.
 FbSampleTime       //LIB_PLC Шаг дискретизации по времени CFC PCS7.
 FbSubstReal        //LIB_PLC Замещение аналогово сигнала для PCS7.

@@ -1,0 +1,60 @@
+FUNCTION_BLOCK FbOsDint
+TITLE = 'FbOsDint'
+
+//WinCC interface CFC PCS7.
+
+{//FB attributes for PCS7.
+S7_m_c       := 'true'; //FB can be controlled or monitored from the OS.
+S7_tag       := 'true'; //FB is included in the list of OS tags.
+S7_read_back := 'true'  //Chart>Readback for DB.
+}
+
+VERSION : '2.0'
+AUTHOR  : VA
+FAMILY  : LIB_PLC
+
+VAR_INPUT
+InTag
+{//Attributes for PCS7.
+S7_m_c     := 'true' ; //FB can be controlled or monitored from the OS.
+S7_dynamic := 'true'   //Tag view in CFC
+}
+:DINT := 0; //WinCC Tag.
+END_VAR
+
+VAR_OUTPUT
+OutTag
+{//Attributes for PCS7.
+S7_dynamic := 'true'   //Tag view in CFC
+}
+:DINT := 0; //OutTag := InTag;
+END_VAR
+
+OutTag := InTag;
+
+END_FUNCTION_BLOCK
+
+//Блок автоматически передает одну переменную PLC <-> SCADA WinCC.
+//AS == PLC
+//OS == SCADA WinCC
+//Блок спроектирован под PCS7 v5.
+
+//  +---------+
+//  | GNU GPL |
+//  +---------+
+//  |
+//  |
+//  .= .-_-. =.
+// ((_/)o o(\_))
+//  `-'(. .)`-'
+//  |/| \_/ |\
+//  ( |     | )
+//  /"\_____/"\
+//  \__)   (__/
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// License: GNU GPL v2
+//
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC
