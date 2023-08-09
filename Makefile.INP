@@ -74,9 +74,7 @@ FbS7conRx //LIB_PLC Данные принятые через S7 connection в NetPro.
 FbS7conTx //LIB_PLC Данные отправленные через S7 connection в NetPro.
 //
 FbDispersion   //LIB_PLC Дисперсия PV.
-FbMonoVibr     //LIB_PLC Одновибратор.
 FbSum1bit      //LIB_PLC Сумматор 1бит.
-FbTriggerT     //LIB_PLC T- Триггер.
 FbS5TimeToReal //LIB_PLC Конвертор S5TIME в милисекунды.
 
 //Блоки данных для сопряжения с SCADA HMI.
