@@ -324,23 +324,23 @@ END_IF;
 //            DbDriverAi420
 //    +---------------------------+
 //    |       FbDriverAi420       |
-// ->-|ADC             SensorValue|->-
-//   -|SensorMaxValue      Current|-
-//   -|SensorMinValue        Error|-
-//   -|ErrorValue                 |
-//   -|SimulationValue            |
-//   -|SimulationOn               |
+// ->-|ADC               SensValue|->-
+//   -|SensMax             Current|-
+//   -|SensMin               Error|-
+//   -|ErrValue                   |
+//   -|SimValue                   |
+//   -|SimOn                      |
 //    +---------------------------+
-DbDriverAi420_PV.ADC             := ADC_Pressure                ; //АЦП Сигнал от датчика 0...27648.
-DbDriverAi420_PV.SensorMaxValue  := "Db1PC1Hmi".PressureMaxAi   ; //Диаппазон датчика максимум.
-DbDriverAi420_PV.SensorMinValue  := "Db1PC1Hmi".PressureMinAi   ; //Диаппазон датчика минимум.
-DbDriverAi420_PV.ErrorValue      := 0.0                         ; //Значение для SensorValue при ошибке датчика.
-DbDriverAi420_PV.SimulationValue := "Db1PC1Hmi".SimulationAi    ; //Значение для SensorValue при симуляции.
-DbDriverAi420_PV.SimulationOn    := "Db1PC1Hmi".SimulationAiOn  ; //Включить симуляцию.
-DbDriverAi420_PV()                                              ; //Драйвер аналогово входа 4...20мА.
-//                               := DbDriverAi420_PV.SensorValue; //Выход в единицах датчика.
-//                               := DbDriverAi420_PV.Current    ; //Ток на аналоговом входе 4...20мА.
-//                               := DbDriverAi420_PV.Error      ; //Ошибка аналогово входа или датчика.
+DbDriverAi420_PV.ADC      := ADC_Pressure              ; //АЦП Сигнал от датчика 0...27648.
+DbDriverAi420_PV.SensMax  := "Db1PC1Hmi".PressureMaxAi ; //Диаппазон датчика максимум.
+DbDriverAi420_PV.SensMin  := "Db1PC1Hmi".PressureMinAi ; //Диаппазон датчика минимум.
+DbDriverAi420_PV.ErrValue := 0.0                       ; //Значение для SensorValue при ошибке датчика.
+DbDriverAi420_PV.SimValue := "Db1PC1Hmi".SimulationAi  ; //Значение для SensorValue при симуляции.
+DbDriverAi420_PV.SimOn    := "Db1PC1Hmi".SimulationAiOn; //Включить симуляцию.
+DbDriverAi420_PV()                                     ; //Драйвер аналогово входа 4...20мА.
+//                        := DbDriverAi420_PV.SensValue; //Выход в единицах датчика.
+//                        := DbDriverAi420_PV.Current  ; //Ток на аналоговом входе 4...20мА.
+//                        := DbDriverAi420_PV.Error    ; //Ошибка аналогово входа или датчика.
 
 //Фильтрация сигнала с датчика давления 0...10[Бар].
 //      DbFilterA
@@ -350,11 +350,11 @@ DbDriverAi420_PV()                                              ; //Драйвер анал
 //   -|Tf         |
 //   -|Ts         |
 //    +-----------+
-DbFilterA_PV.In := DbDriverAi420_PV.SensorValue     ; //Входной сигнал до фильтрации.
-DbFilterA_PV.Tf := "Db1PC1Hmi".PressureFilterTime   ; //Постоянная времени фильтра [с].
-DbFilterA_PV.Ts := Ts                               ; //Шаг дискретизации по времени [с].
-DbFilterA_PV()                                      ; //Фильтр апериодический.
-//              := DbFilterA_PV.Out                 ; //Выходной сигнал после фильтрации.
+DbFilterA_PV.In := DbDriverAi420_PV.SensValue    ; //Входной сигнал до фильтрации.
+DbFilterA_PV.Tf := "Db1PC1Hmi".PressureFilterTime; //Постоянная времени фильтра [с].
+DbFilterA_PV.Ts := Ts                            ; //Шаг дискретизации по времени [с].
+DbFilterA_PV()                                   ; //Фильтр апериодический.
+//              := DbFilterA_PV.Out              ; //Выходной сигнал после фильтрации.
 
 //Ограничение измеренного значения давления 0...10[Бар].
 //       DbLimit
@@ -452,17 +452,17 @@ MV              := DbRamp_MV.Out       ; //Выходной сигнал.
 // ->-|In                  DAC|->-
 //   -|InMax           Current|-
 //   -|InMin                  |
-//   -|SimulationValue        |
-//   -|SimulationOn           |
+//   -|SimValue               |
+//   -|SimOn                  |
 //    +-----------------------+
-DbDriverAo420_MV.In              := MV                        ; //Вход сигнала на исполнительный механизм.
-DbDriverAo420_MV.InMax           := "Db1PC1Hmi".MotorMaxAo    ; //Исполнительный механизм максимум.
-DbDriverAo420_MV.InMin           := "Db1PC1Hmi".MotorMinAo    ; //Исполнительный механизм минимум.
-DbDriverAo420_MV.SimulationValue := "Db1PC1Hmi".SimulationAo  ; //Значение для исполнительного механизма при симуляции.
-DbDriverAo420_MV.SimulationOn    := "Db1PC1Hmi".SimulationAoOn; //Включить симуляцию.
-DbDriverAo420_MV()                                            ; //Драйвер аналогово выхода 4...20мА.
-DAC_Frequency                    := DbDriverAo420_MV.DAC      ; //ЦАП Сигнал на исполнительный механизм 0...27648.
-//                               := DbDriverAo420_MV.Current  ; //Ток на аналоговом выходе 4...20мА.
+DbDriverAo420_MV.In       := MV                        ; //Вход сигнала на исполнительный механизм.
+DbDriverAo420_MV.InMax    := "Db1PC1Hmi".MotorMaxAo    ; //Исполнительный механизм максимум.
+DbDriverAo420_MV.InMin    := "Db1PC1Hmi".MotorMinAo    ; //Исполнительный механизм минимум.
+DbDriverAo420_MV.SimValue := "Db1PC1Hmi".SimulationAo  ; //Значение для исполнительного механизма при симуляции.
+DbDriverAo420_MV.SimOn    := "Db1PC1Hmi".SimulationAoOn; //Включить симуляцию.
+DbDriverAo420_MV()                                     ; //Драйвер аналогово выхода 4...20мА.
+DAC_Frequency             := DbDriverAo420_MV.DAC      ; //ЦАП Сигнал на исполнительный механизм 0...27648.
+//                        := DbDriverAo420_MV.Current  ; //Ток на аналоговом выходе 4...20мА.
 
 //Предупреждение о выходе за допустимые пределы измеренного значения.
 //          DbAlarm

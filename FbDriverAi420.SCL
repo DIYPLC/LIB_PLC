@@ -4,12 +4,12 @@ TITLE = 'Драйвер аналогово входа 4...20мА.'
 //            DbDriverAi420
 //    +---------------------------+
 //    |       FbDriverAi420       |
-// ->-|ADC             SensorValue|->-
-//   -|SensorMaxValue      Current|-
-//   -|SensorMinValue        Error|-
-//   -|ErrorValue                 |
-//   -|SimulationValue            |
-//   -|SimulationOn               |
+// ->-|ADC               SensValue|->-
+//   -|SensMax             Current|-
+//   -|SensMin               Error|-
+//   -|ErrValue                   |
+//   -|SimValue                   |
+//   -|SimOn                      |
 //    +---------------------------+
 
 {//Атрибуты для PCS7.
@@ -23,18 +23,18 @@ AUTHOR  : VA
 FAMILY  : LIB_PLC
 
 VAR_INPUT //Входные переменные, сохраняемые.
-ADC             :WORD := 0    ; //АЦП Сигнал от датчика 0...27648.
-SensorMaxValue  :REAL := 100.0; //Диаппазон датчика максимум.
-SensorMinValue  :REAL := 0.0  ; //Диаппазон датчика минимум.
-ErrorValue      :REAL := 0.0  ; //Значение для SensorValue при ошибке датчика.
-SimulationValue :REAL := 0.0  ; //Значение для SensorValue при симуляции.
-SimulationOn    :BOOL := FALSE; //Включить симуляцию.
+ADC      :WORD := 0    ; //АЦП Сигнал от датчика 0...27648.
+SensMax  :REAL := 100.0; //Диаппазон датчика максимум.
+SensMin  :REAL := 0.0  ; //Диаппазон датчика минимум.
+ErrValue :REAL := 0.0  ; //Значение для SensValue при ошибке датчика.
+SimValue :REAL := 0.0  ; //Значение для SensValue при симуляции.
+SimOn    :BOOL := FALSE; //Включить симуляцию.
 END_VAR
 
 VAR_OUTPUT //Выходные переменные, сохраняемые.
-SensorValue :REAL := 0.0  ; //Выход в единицах датчика.
-Current     :REAL := 0.0  ; //Ток на аналоговом входе 4...20мА.
-Error       :BOOL := FALSE; //Ошибка аналогово входа или датчика.
+SensValue :REAL := 0.0  ; //Выход в единицах датчика.
+Current   :REAL := 0.0  ; //Ток на аналоговом входе 4...20мА.
+Error     :BOOL := FALSE; //Ошибка аналогово входа или датчика.
 END_VAR
 
 //Ошибка аналогово входа или датчика.
@@ -48,26 +48,26 @@ ELSE
 Current := ((INT_TO_REAL(WORD_TO_INT(ADC)) * 16.0 ) / 27648.0) + 4.0;
 END_IF;
 
-IF (SimulationOn) THEN //Включена симуляция.
-SensorValue := SimulationValue; //Значение для SensorValue при симуляции.
+IF (SimOn) THEN //Включена симуляция.
+SensValue := SimValue; //Значение для SensValue при симуляции.
 ELSE
     IF (Error) THEN //Ошибка аналогово входа или датчика.
-    SensorValue := ErrorValue; //Значение для SensorValue при ошибке датчика.
+    SensValue := ErrValue; //Значение для SensValue при ошибке датчика.
     ELSE
-    //Масштабирование 4...20[мА] -> SensorMinValue...SensorMaxValue
-    SensorValue := (SensorMaxValue - SensorMinValue) * ((Current - 4.0) / 16.0) + SensorMinValue;
+    //Масштабирование 4...20[мА] -> SensMin...SensMax
+    SensValue := (SensMax - SensMin) * ((Current - 4.0) / 16.0) + SensMin;
     END_IF;
 END_IF;
 
-//Амплитудный ограничитель диапазона датчика SensorMinValue...SensorMaxValue
-IF (SensorValue >= SensorMaxValue) THEN //Ограничение выхода сверху.
-SensorValue := SensorMaxValue; 
+//Амплитудный ограничитель диапазона датчика SensMin...SensMax
+IF (SensValue >= SensMax) THEN //Ограничение выхода сверху.
+SensValue := SensMax; 
 ELSE
-    IF (SensorValue <= SensorMinValue) THEN //Ограничение выхода снизу.
-    SensorValue := SensorMinValue;
+    IF (SensValue <= SensMin) THEN //Ограничение выхода снизу.
+    SensValue := SensMin;
     ELSE
     //Выход без ограничений.
-    SensorValue := SensorValue;
+    SensValue := SensValue;
     END_IF;
 END_IF;
 
@@ -75,8 +75,8 @@ END_FUNCTION_BLOCK
 
 //Описание работы драйвера аналогово входа 4...20мА.
 //1.Сначала сигнал с АЦП 0...27648 преобразуется в токовый сигна 4...20мА.
-//2.Если не включена симуляция и нет ошибок сигнал 4...20мА преобразуется в сигнал датчика SensorMinValue...SensorMaxValue.
-//3.Сигнал датчика ограничивается в пределах его диаппазона измерения SensorMinValue...SensorMaxValue.
+//2.Если не включена симуляция и нет ошибок сигнал 4...20мА преобразуется в сигнал датчика SensMin...SensMax.
+//3.Сигнал датчика ограничивается в пределах его диаппазона измерения SensMin...SensMax.
 
 //  +---------+
 //  | GNU GPL |
