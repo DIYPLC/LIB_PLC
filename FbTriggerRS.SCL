@@ -4,8 +4,8 @@ TITLE = 'RS- Триггер с приоритетом на сброс.'
 //       DbTriggerRS
 //     +-------------+
 //     | FbTriggerRS |
-//  ->-|S           Q|->-
-//  ->-|R            |
+//  ->-|Set       Out|->-
+//  ->-|Rst          |
 //     +-------------+
 
 {//Атрибуты для PCS7.
@@ -19,24 +19,24 @@ AUTHOR  : VA
 FAMILY  : LIB_PLC
 
 VAR_INPUT //Входные переменные, сохраняемые.
-S:BOOL:=FALSE; //Set — установить единицу.
-R:BOOL:=FALSE; //Reset — сбросить на ноль.
+Set :BOOL := FALSE; //Set — установить единицу.
+Rst :BOOL := FALSE; //Reset — сбросить на ноль.
 END_VAR
 
 VAR_OUTPUT //Выходные переменные, сохраняемые.
-Q:BOOL:=FALSE; //Выход триггера.
+Out :BOOL := FALSE; //Выход триггера.
 END_VAR
 
 //RS- Триггер.
-Q:=(Q OR S) AND (NOT(R));
+Out := (Out OR Set) AND (NOT(Rst));
 END_FUNCTION_BLOCK
 
 //   Релейная интерпритация. 
 //  |                       |
-//  |   R       S       Q   |
+//  |  Rst     Set     Out  |
 //  +--|/|--+--| |--+--( )--+
 //  |       |       |       |
-//  |       |   Q   |       |
+//  |       |  Out  |       |
 //  |       +--| |--+       |
 //  |                       |
 

@@ -57,8 +57,7 @@ END_CONST
 Sine   := Amplitude*SIN(2*PI*(1.0/Period)*CurrentTime+Phase) + Offset; //Синус.
 Cosine := Amplitude*COS(2*PI*(1.0/Period)*CurrentTime+Phase) + Offset; //Косинус.
 
-IF (CurrentTime < PulseTime) //Прямоугольные импульсы.
-THEN
+IF (CurrentTime < PulseTime) THEN //Прямоугольные импульсы.
 RectangleR := Amplitude + Offset;
 RectangleB := TRUE;
 ELSE
@@ -66,14 +65,12 @@ RectangleR := Offset;
 RectangleB := FALSE;
 END_IF;
 
-IF (CurrentTime <= (Period * 0.5)) //Треугольные импульсы.
-THEN
+IF (CurrentTime <= (Period * 0.5)) THEN //Треугольные импульсы.
 IntegratorTriangle := IntegratorTriangle + Ts;
 ELSE
 IntegratorTriangle := IntegratorTriangle - Ts;
 END_IF;
-IF (Period <> 0.0)
-THEN
+IF (Period <> 0.0) THEN
 Triangle := (((IntegratorTriangle*2.0)/Period)*Amplitude) + Offset;
 END_IF;
 
@@ -87,8 +84,7 @@ Tmp := SHR(IN := Tmp, N := 16);
 Prnd := (DINT_TO_REAL(DWORD_TO_DINT(Tmp))/32767.0)*Amplitude+Offset;
 
 CurrentTime := CurrentTime+Ts; //Формирование периода.
-IF (CurrentTime >= Period)
-THEN
+IF (CurrentTime >= Period) THEN
 CurrentTime := 0.0;
 IntegratorTriangle := 0.0;
 END_IF;

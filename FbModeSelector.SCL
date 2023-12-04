@@ -36,8 +36,8 @@ LampAuto   :BOOL := FALSE; //Флаг "Активен АВТОМАТИЧЕСКИЙ режим.
 END_VAR
 
 VAR //Внутренние переменные, сохраняемые.
-State1     :INT  := 0; //Локальный граф состояний.
-StateTaboo :BOOL := FALSE; //Флаг запрещенного состояния входов.
+State1    :INT  := 0; //Локальный граф состояний.
+FlagError :BOOL := FALSE; //Флаг запрещенного состояния входов.
 END_VAR
 
 CONST //Константы.
@@ -47,14 +47,14 @@ STATE_AUTO   := 2; //Состояние "АВТОМАТИЧЕСКИЙ РЕЖИМ".
 END_CONST
 
 //Запрещенное состояние: нажата может быть только одна кнопка.
-StateTaboo:=
+FlagError:=
 ((ButtonStop AND ButtonManual AND ButtonAuto) OR
 (NOT(ButtonStop) AND ButtonManual AND ButtonAuto) OR
 (ButtonStop AND NOT(ButtonManual) AND ButtonAuto) OR
 (ButtonStop AND ButtonManual AND NOT(ButtonAuto)) );
 
 //При перезагрузке контроллера режим СТОП.
-IF (Reset OR StateTaboo) THEN
+IF (Reset OR FlagError) THEN
     State1     := STATE_STOP;
     LampStop   := TRUE;
     LampManual := FALSE;
@@ -124,7 +124,7 @@ ELSE
     State1 := STATE_STOP;
     END_CASE;
 
-END_IF;//IF (Reset OR StateTaboo) THEN
+END_IF;//IF (Reset OR FlagError) THEN
 
 END_FUNCTION_BLOCK
 
@@ -134,7 +134,7 @@ END_FUNCTION_BLOCK
 // Reset должен срабатывать при перезагрузке или включении питания.
 //
 //                                  |
-//                                 -+-Reset OR StateTaboo
+//                                 -+-Reset OR FlagError
 //                                  |
 //                                  V
 //                        +-------------------+

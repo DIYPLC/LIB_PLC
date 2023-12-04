@@ -30,12 +30,10 @@ Out :REAL := 0.0; //Выход амплитудного ограничителя.
 END_VAR
 
 //Амплитудный ограничитель.
-IF (In >= OutMax)
-THEN
+IF (In >= OutMax) THEN
 Out := OutMax; //Ограничение выхода сверху.
 ELSE
-    IF (In <= OutMin)
-    THEN
+    IF (In <= OutMin) THEN
     Out := OutMin; //Ограничение выхода снизу.
     ELSE
     Out := In; //Выход без ограничений.
