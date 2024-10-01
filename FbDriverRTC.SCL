@@ -30,7 +30,7 @@ OptimizeObjectCode    := 'y'   //SCL: Оптимизация объектного кода.
 }
 
 //Атрибуты для STEP7.
-VERSION : '3.1'
+VERSION : '3.2'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
 
@@ -80,7 +80,7 @@ Time_ms_current :DINT; //RTC 0...59999ms.
 END_VAR
 
 //Чтение RTC.
-ErrorCode := SFC1(CDT:=DateAndTime); //READ_CLK();
+ErrorCode := READ_CLK(CDT:=DateAndTime); //SFC1();
 IF (ErrorCode = 0) THEN
 
 //Расшифровка BCD формата времени- год.

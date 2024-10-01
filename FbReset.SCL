@@ -6,7 +6,7 @@ TITLE = 'FbReset'
 S7_tasklist := 'OB100' //Call in OB100
 }
 
-VERSION : '1.0'
+VERSION : '1.1'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
 
@@ -24,7 +24,7 @@ END_VAR
 
 VAR
 RST :BOOL := FALSE; //Сброс алгоритма локальный.
-TOF1 : SFB5; //TOF timer.
+TOF1 : TOF; //TOF timer.
 END_VAR 
 
 VAR_TEMP
@@ -54,7 +54,7 @@ END_VAR
 //Анализ из какого OB произошел вызов.
 //Штатно вызов из OB35 или другой цикличный.
 //При перезагрузке вызов из OB100.
-ERROR_RD_SINFO := SFC6(TOP_SI := TOP_SI, START_UP_SI := START_UP_SI); //RD_SINFO
+ERROR_RD_SINFO := RD_SINFO(TOP_SI := TOP_SI, START_UP_SI := START_UP_SI); //RD_SINFO
 RST := (TOP_SI.NUM = 100); //Call in OB100
 
 //Задержка выключен. импульса первого скана.
