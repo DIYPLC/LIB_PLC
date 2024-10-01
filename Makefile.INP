@@ -58,7 +58,7 @@ FbDriverAo420      //LIB_PLC ƒрайвер аналогово выхода 4...20мј.
 FbDriverDi         //LIB_PLC ƒрайвер дискретного входа.
 FbDriverDo         //LIB_PLC ƒрайвер дискретного выхода.
 FbDriverFRA        //LIB_PLC ”правление приводом MITSUBISHI FR-A740, FR-A840 по PROFIBUS PD.
-FbDriverMM440PPO3  //”правление приводом SIEMENS MICROMASTER 440 по PROFIBUS PD.
+FbDriverMM440PPO3  //LIB_PLC ”правление приводом SIEMENS MICROMASTER 440 по PROFIBUS PD.
 
 //Ѕлоки зависимые от компил€тора CFC PCS7.
 FbOsBoolPls        //LIB_PLC WinCC interface CFC PCS7.
