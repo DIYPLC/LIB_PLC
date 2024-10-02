@@ -475,8 +475,8 @@ DAC_Frequency             := DbDriverAo420_MV.DAC      ; //ЦАП Сигнал на исполни
 //   -|Ts_ms            |
 //    +-----------------+
 DbAlarm_PV.In        := PV                        ; //Входной сигнал.
-//DbAlarm_PV.LevelHi := "Db1PC1Hmi".AlarmPV_Hi    ; //Верхняя граница предупреждения.
-//DbAlarm_PV.LevelLo := "Db1PC1Hmi".AlarmPV_Lo    ; //Нижняя граница предупреждения.
+DbAlarm_PV.LevelHi   := "Db1PC1Hmi".AlarmPV_Hi    ; //Верхняя граница предупреждения.
+DbAlarm_PV.LevelLo   := "Db1PC1Hmi".AlarmPV_Lo    ; //Нижняя граница предупреждения.
 DbAlarm_PV.TimeDelay := "Db1PC1Hmi".AlarmDelayTime; //Время задержки включения [мс].
 DbAlarm_PV.Ts_ms     := Ts_ms                     ; //Шаг дискретизации по времени [мс].
 DbAlarm_PV()                                      ; //Блок предупреждений.
