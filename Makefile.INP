@@ -59,6 +59,7 @@ FbDriverDi         //LIB_PLC Драйвер дискретного входа.
 FbDriverDo         //LIB_PLC Драйвер дискретного выхода.
 FbDriverFRA        //LIB_PLC Управление приводом MITSUBISHI FR-A740, FR-A840 по PROFIBUS PD.
 FbDriverMM440PPO3  //LIB_PLC Управление приводом SIEMENS MICROMASTER 440 по PROFIBUS PD.
+FbDriverAD800PPO3  //LIB_PLC Управление приводом OPTUMUS DRIVE AD800 по PROFIBUS PD.
 
 //Блоки зависимые от компилятора CFC PCS7.
 FbOsBoolPls        //LIB_PLC WinCC interface CFC PCS7.

@@ -250,8 +250,8 @@ END_FUNCTION_BLOCK
 // src CONT_S FB42
 // reversed by komatic
 // cross platforms by VA
-//https://web.archive.org/web/20220322202418/http://plc4good.org.ua/view_post.php?id=65
-//https://github.com/komatic1/SCL_regulation_control/blob/main/CONT_S.scl
+// https://web.archive.org/web/20220322202418/http://plc4good.org.ua/view_post.php?id=65
+// https://github.com/komatic1/SCL_regulation_control/blob/main/CONT_S.scl
 
 (*
 Добавлен: 1exan    Дата: 2020-04-26
