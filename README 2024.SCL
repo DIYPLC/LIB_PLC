@@ -1,0 +1,50 @@
+(*
+
+Библиотека функциональных блоков для ПЛК S7-300,400,1200,1500 STEP7 / PCS7.
+Библиотека функциональных блоков для ПЛК LIB_PLC разрабатана для контроллеров симатик.
+Самый первый блок FbPIDcontrol.SCL (2014 год) остальное появилось как надстройка вокруг него.
+Блоки входят в сотав готового проекта.
+На проекте показан вариант использования блоков.
+Пример применения библиотеки в файле Fb1PC1.SCL
+Данный проект используется как заготовка для других проектов, при этом лишние файлы необходимо удалить.
+Данная библиотека разрабатывалась как кросс платформенная.
+Блоки можно использовать на ПЛК других производителей.
+Так же блоки легко портируются на C/C++ для применения в Arduino и STM32.
+Не нашел то что хотел поэтому сделал сам.
+Файлы открываются в блокноте notepad windows.
+
+Другие библиотеки для PLC:
+http://oscat.de/
+https://github.com/simsum/oscat
+SIMATIC PCS7 APL
+https://web.archive.org/web/20220322174546/http://plc4good.org.ua/view_post.php?id=256
+https://github.com/komatic1/SCL_PCS7_AdvLib
+
+//  +---------+
+//  | GNU GPL |
+//  +---------+
+//  |
+//  |
+//  .= .-_-. =.
+// ((_/)o o(\_))
+//  `-'(. .)`-'
+//  |/| \_/ |\
+//  ( |     | )
+//  /"\_____/"\
+//  \__)   (__/
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// Date: 2014 - 2024
+// License: GNU GPL-2.0-or-later
+// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+// https://www.youtube.com/watch?v=n1F_MfLRlX0
+//
+// See also:
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC
+// https://oshwlab.com/diy.plc.314?tab=project&page=1
+// https://3dtoday.ru/blogs/diy-plc
+// https://t.me/DIY_PLC
+
+*)
