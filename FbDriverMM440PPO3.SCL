@@ -135,7 +135,7 @@ qSTW1 := W#16#047F;
 END_IF;
 
 // ¬ключить вращение назад.
-IF (REV AND NOT(FWD)) THEN//при подаче STF=1 и STR=1 выполнитс€ STF
+IF (REV AND NOT(FWD)) THEN
 qSTW1 := W#16#0C7F;
 END_IF;
 
