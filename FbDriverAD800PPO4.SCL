@@ -1,0 +1,352 @@
+FUNCTION_BLOCK FbDriverAD800PPO4 //Управление приводом OPTUMUS DRIVE AD800 по PROFIBUS PD.
+TITLE = 'Управление приводом OPTUMUS DRIVE AD800 по PROFIBUS PD.'
+//PROFIDRIVE profile PPO4.
+
+//      DbDriverAD800PPO4
+//    +-------------------+
+//    | FbDriverAD800PPO4 |
+//   -|ADR_I           FPV|-
+//   -|ADR_Q           IPV|-
+// ->-|FSP             UPV|-
+// ->-|FWD             ERR|->-
+//   -|REV             ALM|-
+//   -|RST             RUN|-
+//    +-------------------+
+
+{// Атрибуты для PCS7.
+S7_read_back := 'true' ; // CFC: Chart>Readback активен для прототипов DB.
+S7_blockview := 'big'    // CFC: отображение блока маленькое или большое.
+}
+
+// Атрибуты для STEP7.
+VERSION : '2.0'
+AUTHOR  : VA
+FAMILY  : LIB_PLC
+
+VAR_INPUT // Входные переменные.
+ADR_I :DINT := 256;   //Стартовый адрес IW256? в HardWare.
+ADR_Q :DINT := 256;   //Стартовый адрес QW256? в HardWare.
+FSP   :REAL := 25.0;  //Заданое значение частоты [Гц].
+FWD   :BOOL := FALSE; //Вкл вперед.
+REV   :BOOL := FALSE; //Вкл назад.
+RST   :BOOL := FALSE; //Сброс ошибки привода импусьсом или перезагрузка по питанию привода.
+END_VAR
+
+VAR_OUTPUT // Выходные переменные.
+FPV  :REAL := 0.0;   //Измереное значение частоты [Гц].
+IPV  :REAL := 0.0;   //Ток двигателя [A].
+UPV  :REAL := 0.0;   //Напряжене звена пост. тока [В].
+ERR  :BOOL := FALSE; //Ошибка привода.
+ALM  :BOOL := FALSE; //Предупреждение от привода.
+RUN  :BOOL := FALSE; //Привод в работе.
+END_VAR
+
+VAR // Внутренние сохраняемые переменные.
+
+StatusWord        :WORD := W#16#0000; //Слово состояния.
+FrequencyMeasured :WORD := W#16#0000; //Фактическая скорость [F*10].
+MotorCurrent      :WORD := W#16#0000; //Ток двигателя [A*10].
+VoltageRectifier  :WORD := W#16#0000; //Напряжене звена пост. тока [В].
+
+ControlWord  :WORD := W#16#0000; //Слово управления.
+FrequencySet :WORD := W#16#0000; //Заданая скорость.
+
+ControlWord_B00 :BOOL := FALSE; //Вращение вперед.
+ControlWord_B01 :BOOL := FALSE; //Вращение назад. 
+ControlWord_B02 :BOOL := FALSE; //Толчковый режим вперед.
+ControlWord_B03 :BOOL := FALSE; //Толчковый режим назад.
+ControlWord_B04 :BOOL := FALSE; //Стоп.
+ControlWord_B05 :BOOL := FALSE; //Останов выбегом.
+ControlWord_B06 :BOOL := FALSE; //Сброс.
+ControlWord_B07 :BOOL := FALSE; //Снятие всех команд пуска / останова.
+ControlWord_B08 :BOOL := FALSE; //Предустановленное задание 0.
+ControlWord_B09 :BOOL := FALSE; //Предустановленное задание 1.
+ControlWord_B10 :BOOL := FALSE; //Предустановленное задание 2.
+ControlWord_B11 :BOOL := FALSE; //Предустановленное задание 3.
+ControlWord_B12 :BOOL := FALSE; //Разгон / замедление 1.
+ControlWord_B13 :BOOL := FALSE; //Разгон / замедление 2.
+ControlWord_B14 :BOOL := FALSE; //Резерв.
+ControlWord_B15 :BOOL := FALSE; //Включить биты 8...13.
+
+StatusWord_B00 :BOOL := FALSE; //Готовность управления.
+StatusWord_B01 :BOOL := FALSE; //Готовность управления.
+StatusWord_B02 :BOOL := FALSE; //Работа.
+StatusWord_B03 :BOOL := FALSE; //Отключение по ошибке.
+StatusWord_B04 :BOOL := FALSE; //Ошибка без отключения.
+StatusWord_B05 :BOOL := FALSE; //Резерв.
+StatusWord_B06 :BOOL := FALSE; //Отключение по ошибке.
+StatusWord_B07 :BOOL := FALSE; //Предупреждение.
+StatusWord_B08 :BOOL := FALSE; //Работа по заданию.
+StatusWord_B09 :BOOL := FALSE; //Удаленный режим.
+StatusWord_B10 :BOOL := FALSE; //Частота в допустимом диапазоне.
+StatusWord_B11 :BOOL := FALSE; //Работа.
+StatusWord_B12 :BOOL := FALSE; //Резерв.
+StatusWord_B13 :BOOL := FALSE; //Недопустимое напряжение.
+StatusWord_B14 :BOOL := FALSE; //Резерв.
+StatusWord_B15 :BOOL := FALSE; //Предупреждение перегрев.
+
+DbTON :TON; //Таймер для сигнала сброса.
+END_VAR
+
+// Читать слова из сети.
+StatusWord        := PIW[ADR_I + 0]; // PZD1 Слово состояния.
+FrequencyMeasured := PIW[ADR_I + 2]; // PZD2 Фактическая скорость [F*10].
+MotorCurrent      := PIW[ADR_I + 4]; // PZD3 Ток двигателя [A*10].
+VoltageRectifier  := PIW[ADR_I + 6]; // PZD4 Напряжене звена пост. тока [В].
+
+// Измеренное значение частоты FVD [Гц].
+FPV := INT_TO_REAL(WORD_TO_INT(FrequencyMeasured)) / 10.0;
+
+// Ток двигателя [A].
+IPV := INT_TO_REAL(WORD_TO_INT(MotorCurrent)) / 100.0;
+
+// Напряжене звена пост. тока [В].
+UPV := INT_TO_REAL(WORD_TO_INT(VoltageRectifier));
+
+// Декодирование слова состояния StatusWord.
+StatusWord_B00 := ((StatusWord AND W#2#0000_0000_0000_0001) = W#2#0000_0000_0000_0001);
+StatusWord_B01 := ((StatusWord AND W#2#0000_0000_0000_0010) = W#2#0000_0000_0000_0010);
+StatusWord_B02 := ((StatusWord AND W#2#0000_0000_0000_0100) = W#2#0000_0000_0000_0100);
+StatusWord_B03 := ((StatusWord AND W#2#0000_0000_0000_1000) = W#2#0000_0000_0000_1000);
+StatusWord_B04 := ((StatusWord AND W#2#0000_0000_0001_0000) = W#2#0000_0000_0001_0000);
+StatusWord_B05 := ((StatusWord AND W#2#0000_0000_0010_0000) = W#2#0000_0000_0010_0000);
+StatusWord_B06 := ((StatusWord AND W#2#0000_0000_0100_0000) = W#2#0000_0000_0100_0000);
+StatusWord_B07 := ((StatusWord AND W#2#0000_0000_1000_0000) = W#2#0000_0000_1000_0000);
+StatusWord_B08 := ((StatusWord AND W#2#0000_0001_0000_0000) = W#2#0000_0001_0000_0000);
+StatusWord_B09 := ((StatusWord AND W#2#0000_0010_0000_0000) = W#2#0000_0010_0000_0000);
+StatusWord_B10 := ((StatusWord AND W#2#0000_0100_0000_0000) = W#2#0000_0100_0000_0000);
+StatusWord_B11 := ((StatusWord AND W#2#0000_1000_0000_0000) = W#2#0000_1000_0000_0000);
+StatusWord_B12 := ((StatusWord AND W#2#0001_0000_0000_0000) = W#2#0001_0000_0000_0000);
+StatusWord_B13 := ((StatusWord AND W#2#0010_0000_0000_0000) = W#2#0010_0000_0000_0000);
+StatusWord_B14 := ((StatusWord AND W#2#0100_0000_0000_0000) = W#2#0100_0000_0000_0000);
+StatusWord_B15 := ((StatusWord AND W#2#1000_0000_0000_0000) = W#2#1000_0000_0000_0000);
+
+// Привод в работе.
+RUN := StatusWord_B02 AND StatusWord_B11;
+
+// Ошибка привода.
+ERR := StatusWord_B03 OR StatusWord_B06 OR StatusWord_B13;
+
+// Предупреждение от привода.
+ALM := StatusWord_B07 OR StatusWord_B15;
+
+// Заданное значение частоты FVD.
+// 0...P0-16 [Гц].
+FrequencySet := INT_TO_WORD(REAL_TO_INT(FSP * 10.0));
+
+// Кодирование слова управления.
+// Останов привода.
+ControlWord := 2#0000_0000_0001_0000;
+
+// Включить вращение вперед.
+IF (FWD  AND NOT(REV)) THEN
+ControlWord := 2#0000_0000_0000_0001;
+END_IF;
+
+// Включить вращение назад.
+IF (REV AND NOT(FWD)) THEN
+ControlWord := 2#0000_0000_0000_0010;
+END_IF;
+
+// Сброс ошибки.
+// WinCC RST=1 manual, PLC RST=0 auto timer 5s.
+DbTON.IN := RST;
+DbTON.PT := T#5S;
+DbTON();
+IF (RST) THEN
+ControlWord := 2#0000_0000_0100_0000;
+END_IF;
+IF (DbTON.Q) THEN
+RST := FALSE;
+END_IF;
+
+// Декодирование слова управления.
+ControlWord_B00 := ((ControlWord AND W#2#0000_0000_0000_0001) = W#2#0000_0000_0000_0001);
+ControlWord_B01 := ((ControlWord AND W#2#0000_0000_0000_0010) = W#2#0000_0000_0000_0010);
+ControlWord_B02 := ((ControlWord AND W#2#0000_0000_0000_0100) = W#2#0000_0000_0000_0100);
+ControlWord_B03 := ((ControlWord AND W#2#0000_0000_0000_1000) = W#2#0000_0000_0000_1000);
+ControlWord_B04 := ((ControlWord AND W#2#0000_0000_0001_0000) = W#2#0000_0000_0001_0000);
+ControlWord_B05 := ((ControlWord AND W#2#0000_0000_0010_0000) = W#2#0000_0000_0010_0000);
+ControlWord_B06 := ((ControlWord AND W#2#0000_0000_0100_0000) = W#2#0000_0000_0100_0000);
+ControlWord_B07 := ((ControlWord AND W#2#0000_0000_1000_0000) = W#2#0000_0000_1000_0000);
+ControlWord_B08 := ((ControlWord AND W#2#0000_0001_0000_0000) = W#2#0000_0001_0000_0000);
+ControlWord_B09 := ((ControlWord AND W#2#0000_0010_0000_0000) = W#2#0000_0010_0000_0000);
+ControlWord_B10 := ((ControlWord AND W#2#0000_0100_0000_0000) = W#2#0000_0100_0000_0000);
+ControlWord_B11 := ((ControlWord AND W#2#0000_1000_0000_0000) = W#2#0000_1000_0000_0000);
+ControlWord_B12 := ((ControlWord AND W#2#0001_0000_0000_0000) = W#2#0001_0000_0000_0000);
+ControlWord_B13 := ((ControlWord AND W#2#0010_0000_0000_0000) = W#2#0010_0000_0000_0000);
+ControlWord_B14 := ((ControlWord AND W#2#0100_0000_0000_0000) = W#2#0100_0000_0000_0000);
+ControlWord_B15 := ((ControlWord AND W#2#1000_0000_0000_0000) = W#2#1000_0000_0000_0000);
+
+// Записать слов по сети.
+PQW[ADR_Q + 0] := ControlWord ; // PZD1 Слово управления.
+PQW[ADR_Q + 2] := FrequencySet; // PZD2 Заданая скорость.
+PQW[ADR_Q + 4] := 0           ; // PZD3.
+PQW[ADR_Q + 6] := 0           ; // PZD4.
+
+END_FUNCTION_BLOCK
+
+(*
+
+Частотный привод OPTIMUS DRIVE AD800-2SD75-PU00CU04 с платой расширения DP01 (версия прошивки частотника 1.50 и выше).
+Питание 1 фаза 220VAC 9.3А
+
+PROFIDRIVE profile PPO Type 4.
+
+Настройки частотника отличные от заводских:
+P7-00 -Сброс преобразователя на заводские настройки.
+P0-09 = 0/1 поменять если перепутали фазировку двигателя.
+P0-10 = 0 Выбрать основной источник задания скорости.
+P0-11 = 20 Задание скорости по PROFIBUS DP.
+P0-16 = 60 Максимальная частота [Гц].
+P0-17 = 2 Пуск по сети PROFIBUS DP.
+P0-18 = 2 Пуск по сети PROFIBUS DP.
+P0-51 = 8 Время ускорения [с].
+P0-52 = 5 Время замедления [с].
+P0-80 = 7 Адрес PROFIBUS DP.
+P1-03 = 0.25 Двигатель [КВт].
+P1-04 = 220  Двигатель [В].
+P1-05 = 50   Двигатель [Гц].
+P1-06 = 1.6  Двигатель [А].
+P1-07 = 1340 Двигатель [rpm].
+P10-30 = 908 PZD3 Ток двигателя 80Ед=0.8A [А*10].
+P10-31 = 911 PZD4 Напряжение в звене постоянного тока [В].
+
+Литература:
+https://optimusdrive.ru/imagesod/files/ad800/20240815-ad800-cu04-1.50.pdf
+https://optimusdrive.ru/imagesod/files/ad800/20240724-profibus-dp01-um-ru-web.pdf
+https://optimusdrive.ru/imagesod/files/ad800/ad800-pd.zip
+
+TODO:
+Останов на выбеге.
+Задание частоты по профибасу с точность до 0,01 Гц. Фактически PZD2=500 -> 50Hz
+
+---Начало файла AD800_PD.GSD (эту строчку не копировать)---
+;
+;
+;================================================================
+; GSD-File for:        ABC Drivers
+;                        AD800 Option 
+; 
+; File name:        AD800_PD
+;
+; Revision:            2017.10.27: Rev.1.00 for ABC AD800 Option 
+;
+; Freeze_Mode_supp, Sync_mode_supp 
+;================================================================
+;
+;
+#Profibus_DP
+GSD_Revision = 1;
+Vendor_Name = "ABC DRIVES"
+Model_Name = "AD800_PD_V1"
+Revision = "Rev.1.00"
+Ident_Number = 0x0008
+Protocol_Ident = 0
+Station_Type = 0
+FMS_supp = 0
+Hardware_Release = "Rev.1.00"
+Software_Release = "Rev.1.00"
+9.6_supp = 1
+19.2_supp = 1
+93.75_supp = 1
+187.5_supp = 1
+500_supp = 1
+1.5M_supp = 1
+3M_supp = 1;
+6M_supp = 1;
+12M_supp = 1;
+MaxTsdr_9.6 = 60
+MaxTsdr_19.2 = 60
+MaxTsdr_93.75 = 60
+MaxTsdr_187.5 = 60
+MaxTsdr_500 = 100
+MaxTsdr_1.5M = 150
+MaxTsdr_3M = 300
+MaxTsdr_6M = 600
+MaxTsdr_12M = 1200
+Redundancy = 0
+Repeater_Ctrl_Sig = 2
+24V_Pins = 0
+;
+;--Slave spezifische Werte-----
+;
+Freeze_Mode_supp = 1
+Sync_Mode_supp = 1
+Auto_Baud_supp = 1
+Set_Slave_Add_supp = 0
+User_Prm_Data_Len = 05
+User_Prm_Data = 0x80, 0x00, 0x00, 0x00, 0x00
+Min_Slave_Intervall = 20
+Modular_Station = 1
+Max_Module = 32
+Max_Input_Len = 32
+Max_Output_Len = 32
+Max_Data_Len = 64
+Max_Diag_Data_Len = 38
+Fail_Safe = 1;
+DPV1_Slave = 1;
+Ident_Maintenance_supp=1;
+
+;DPV1 specific
+
+C1_Read_Write_supp = 1
+C2_Read_Write_supp = 1
+C1_Max_Data_Len = 240
+C2_Max_Data_Len = 240
+C1_Response_Timeout = 100
+C2_Response_Timeout = 100
+C1_Read_Write_required = 0  
+C2_Read_Write_required = 0  
+C2_Max_Count_Channels = 3
+Max_Initiate_PDU_Length = 52
+DPV1_Data_Types = 0
+WD_Base_1ms_supp = 1
+Check_Cfg_Mode = 0
+Publisher_supp = 1
+
+
+Module = "PPO Type 3 Module consistent PCD" 0xF1;
+1
+EndModule;
+Module = "PPO Type 4 Module consistent PCD" 0xF3;
+2
+EndModule;
+Module = "PPO Type 6 Module consistent PCD" 0xF5;
+3
+EndModule;
+Module = "PPO Type 7 Module consistent PCD" 0xF7;
+4
+EndModule;
+Module = "PPO Type 8 Module consistent PCD" 0xF9;
+5
+EndModule;
+---Конец файла AD800_PD.GSD (эту строчку не копировать)---
+*)
+
+//  +---------+
+//  | GNU GPL |
+//  +---------+
+//  |
+//  |
+//  .= .-_-. =.
+// ((_/)o o(\_))
+//  `-'(. .)`-'
+//  |/| \_/ |\
+//  ( |     | )
+//  /"\_____/"\
+//  \__)   (__/
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// Date: 2014 - 2024
+// License: GNU GPL-2.0-or-later
+// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+// https://www.youtube.com/watch?v=n1F_MfLRlX0
+//
+// See also:
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC
+// https://oshwlab.com/diy.plc.314?tab=project&page=1
+// https://3dtoday.ru/blogs/diy-plc
+// https://t.me/DIY_PLC
