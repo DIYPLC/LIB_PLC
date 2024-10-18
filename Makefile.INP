@@ -38,8 +38,8 @@ FbModeSelector     //LIB_PLC Переключатель режимов работы.
 FbTriggerRS        //LIB_PLC Триггер RS.
 FbEdgeNeg          //LIB_PLC Детектор ниспадающего фронта.
 FbEdgePos          //LIB_PLC Детектор нарастающего фронта.
-FbTimerTof         //LIB_PLC Таймер TOF.
-FbTimerTon         //LIB_PLC Таймер TON.
+FbTON              //LIB_PLC Таймер TON.
+FbTOF              //LIB_PLC Таймер TOF.
 FbWordToBits       //LIB_PLC Преобразование слова в 16 бит.
 FbBitsToWord       //LIB_PLC Преобразование 16 бит в слово.
 FbBlink            //LIB_PLC Мигающий светодиод.
