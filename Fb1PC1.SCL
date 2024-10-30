@@ -63,8 +63,8 @@ ContactorOn   :BOOL := FALSE; //Включить контактор между частотным приводом и дв
 Error         :BOOL := FALSE; //Флаг ошибки.
 END_VAR
 
-VAR //Внутренние переменные, сохраняемые.
-//Промежуточные переменные для быстрой диагностики.
+VAR // Внутренние переменные, сохраняемые.
+// Промежуточные переменные для быстрой диагностики.
 PV              :REAL := 0.0  ; //Измеренное значение регулируемого параметра [Бар].
 SP              :REAL := 0.0  ; //Заданное значение регулируемого параметра [Бар].
 MV              :REAL := 0.0  ; //Сигнал управления на исполнительный механизм [Гц].
@@ -76,7 +76,7 @@ HmiButtonAuto   :BOOL := FALSE; //Кнопка без фиксации "АВТО"   в окне управления
 HmiButtonManual :BOOL := FALSE; //Кнопка без фиксации "РУЧНОЙ" в окне управления двигателем.
 HmiButtonStop   :BOOL := FALSE; //Кнопка без фиксации "СТОП"   в окне управления двигателем.
 ErrorButtonStop :BOOL := FALSE; //Ошибка: Нажата кнопка СТОП на пульте местного управления.
-//Блоки данных подпрограмм в порядке их вызова.
+// Блоки данных подпрограмм в порядке их вызова.
 DbWordToBits_CW  :FbWordToBits  ; //Преобразование слова в 16 бит.
 DbModeSelector1  :FbModeSelector; //Переключатель режимов работы.
 DbBitsToWord_SW  :FbBitsToWord  ; //Преобразование 16 бит в слово.
@@ -91,6 +91,39 @@ DbRamp_MV        :FbRamp        ; //Рампа разгона / торможения.
 DbDriverAo420_MV :FbDriverAo420 ; //Драйвер аналогово выхода 4...20мА.
 DbAlarm_PV       :FbAlarm       ; //Блок предупреждений.
 DbAlarm_MV       :FbAlarm       ; //Блок предупреждений.
+// Резервные переменные для правки программы на лету без остановки ПЛК.
+ReserveBool0        :BOOL          := FALSE         ; // Резерв 1 бит.
+ReserveBool1        :BOOL          := FALSE         ; // Резерв 1 бит.
+ReserveBool2        :BOOL          := FALSE         ; // Резерв 1 бит.
+ReserveBool3        :BOOL          := FALSE         ; // Резерв 1 бит.
+ReserveBool4        :BOOL          := FALSE         ; // Резерв 1 бит.
+ReserveBool5        :BOOL          := FALSE         ; // Резерв 1 бит.
+ReserveBool6        :BOOL          := FALSE         ; // Резерв 1 бит.
+ReserveBool7        :BOOL          := FALSE         ; // Резерв 1 бит.
+ReserveByte0        :BYTE          := B#16#00       ; // Резерв 8 бит.
+ReserveByte1        :BYTE          := B#16#00       ; // Резерв 8 бит.
+ReserveByte2        :BYTE          := B#16#00       ; // Резерв 8 бит.
+ReserveByte3        :BYTE          := B#16#00       ; // Резерв 8 бит.
+ReserveWord0        :WORD          := W#16#0000     ; // Резерв 16 бит.
+ReserveWord1        :WORD          := W#16#0000     ; // Резерв 16 бит.
+ReserveWord2        :WORD          := W#16#0000     ; // Резерв 16 бит.
+ReserveWord3        :WORD          := W#16#0000     ; // Резерв 16 бит.
+ReserveDword0       :DWORD         := DW#16#00000000; // Резерв 32 бит.
+ReserveDword1       :DWORD         := DW#16#00000000; // Резерв 32 бит.
+ReserveDword2       :DWORD         := DW#16#00000000; // Резерв 32 бит.
+ReserveDword3       :DWORD         := DW#16#00000000; // Резерв 32 бит.
+ReserveReal0        :REAL          := 0.0           ; // Резерв 32 бит.
+ReserveReal1        :REAL          := 0.0           ; // Резерв 32 бит.
+ReserveReal2        :REAL          := 0.0           ; // Резерв 32 бит.
+ReserveReal3        :REAL          := 0.0           ; // Резерв 32 бит.
+ReserveInt0         :INT           := 0             ; // Резерв 16 бит.
+ReserveInt1         :INT           := 0             ; // Резерв 16 бит.
+ReserveInt2         :INT           := 0             ; // Резерв 16 бит.
+ReserveInt3         :INT           := 0             ; // Резерв 16 бит.
+ReserveDint0        :DINT          := L#0           ; // Резерв 32 бит.
+ReserveDint1        :DINT          := L#0           ; // Резерв 32 бит.
+ReserveDint2        :DINT          := L#0           ; // Резерв 32 бит.
+ReserveDint3        :DINT          := L#0           ; // Резерв 32 бит.
 END_VAR
 
 VAR_TEMP //Внутренние переменные, не сохраняемые.
