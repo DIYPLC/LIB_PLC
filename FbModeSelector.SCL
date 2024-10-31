@@ -46,12 +46,11 @@ STATE_MANUAL := 1; //Состояние "РУЧНОЙ РЕЖИМ".
 STATE_AUTO   := 2; //Состояние "АВТОМАТИЧЕСКИЙ РЕЖИМ".
 END_CONST
 
-//Запрещенное состояние: нажата может быть только одна кнопка.
+// Запрещенное состояние:
+// Если вместе с кнопкой стоп одновременно нажали еще что-то.
 FlagError:=
-((ButtonStop AND ButtonManual AND ButtonAuto) OR
-(NOT(ButtonStop) AND ButtonManual AND ButtonAuto) OR
-(ButtonStop AND NOT(ButtonManual) AND ButtonAuto) OR
-(ButtonStop AND ButtonManual AND NOT(ButtonAuto)) );
+((ButtonStop AND ButtonAuto) OR
+( ButtonStop AND ButtonManual));
 
 //При перезагрузке контроллера режим СТОП.
 IF (Reset OR FlagError) THEN
