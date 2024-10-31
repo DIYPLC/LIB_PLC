@@ -179,7 +179,7 @@ HmiButtonAuto      := DbWordToBits_CW.Out2 ; //Выходной сигнал бит2.
 // Такой протокол взаимодействия проще с точки зрения реализации в WinCC, которая и без скриптов любит тупить.
 IF ("Db1PC1Hmi".CW <> 0) THEN
 TimerForCW := TimerForCW + Ts_ms;
-  // Таймер авто обнуления слова управления 500 ms.
+  // Таймер авто обнуления слова управления через 500 ms.
   IF (TimerForCW >= 500) THEN
   TimerForCW := 0;
   "Db1PC1Hmi".CW := 0;
