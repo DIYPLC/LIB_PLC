@@ -13,6 +13,15 @@
 Не нашел то что хотел поэтому сделал сам.
 Файлы открываются в блокноте notepad windows.
 
+Дерево вызовов.
+OB1.SCL + (OB100.SCL при перезагрузке) //Платформа зависимый уровень.
+  |
+  +-FbTaskCyclic.SCL //Уровень взаимодействия между частями технологического оборудования и I/O.
+    |
+    +-Fb1PC1.SCL + Db1PC1Hmi.SCL //Управление конкреным технологическим оборудованием.
+      |
+      +-FbPIDcontrol.SCL //LIB_PLC библиокека функциональных блоков для ПЛК.
+
 Другие библиотеки для PLC:
 http://oscat.de/
 https://github.com/simsum/oscat
@@ -20,18 +29,49 @@ SIMATIC PCS7 APL
 https://web.archive.org/web/20220322174546/http://plc4good.org.ua/view_post.php?id=256
 https://github.com/komatic1/SCL_PCS7_AdvLib
 
-//  +---------+
-//  | GNU GPL |
-//  +---------+
-//  |
-//  |
-//  .= .-_-. =.
-// ((_/)o o(\_))
-//  `-'(. .)`-'
-//  |/| \_/ |\
-//  ( |     | )
-//  /"\_____/"\
-//  \__)   (__/
+Мои источники информации отсортировал по приоритету:
+https://en.wikipedia.org/wiki/The_Story_of_Maths
+https://en.wikipedia.org/wiki/The_Mechanical_Universe
+https://www.youtube.com/@numberphile
+https://www.youtube.com/@MATLAB
+https://www.youtube.com/@Exponenta-tech
+https://www.youtube.com/@%D0%9C%D0%B0%D1%82%D0%BA%D1%83%D0%BB%D1%8C%D1%82-%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82%D0%90%D0%BB%D0%B5%D0%BA%D1%81%D0%B5%D0%B9%D0%A1%D0%B0%D0%B2%D0%B2%D0%B0%D1%82%D0%B5%D0%B5
+
+https://www.gnu.org/
+https://www.youtube.com/@UNEEX_MSU
+https://www.youtube.com/@tkhirianov
+https://www.youtube.com/@narodstream552
+https://www.youtube.com/@Zefar91
+https://www.youtube.com/@abglazov
+https://www.youtube.com/@VladimirMedintsev
+
+https://www.youtube.com/@AmperkaRuOfficial
+https://www.youtube.com/@AlexGyverShow
+https://www.youtube.com/@codius
+https://www.youtube.com/@ChipDipvideo
+https://www.youtube.com/@BachiloDmitry
+https://www.youtube.com/@AndreySozykin
+https://www.youtube.com/@alekssorokoletov
+https://www.youtube.com/@linkmeup-podcast
+https://www.youtube.com/@Plc4goodOrgUa
+https://web.archive.org/web/20220322173236/http://plc4good.org.ua/index.php?sub=1
+https://github.com/komatic1
+https://rutracker.net/forum/index.php
+
+  +---------+
+  | GNU GPL |
+  +---------+
+  |
+  |
+  .= .-_-. =.
+ ((_/)o o(\_))
+  `-'(. .)`-'
+  |/| \_/ |\
+  ( |     | )
+  /"\_____/"\
+  \__)   (__/
+
+*)
 
 // @COPYLEFT ALL WRONGS RESERVED :)
 // Author: VA
@@ -45,5 +85,3 @@ https://github.com/komatic1/SCL_PCS7_AdvLib
 // https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
 // https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
 // https://t.me/DIY_PLC
-
-*)
