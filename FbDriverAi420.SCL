@@ -78,27 +78,13 @@ END_FUNCTION_BLOCK
 //2.Если не включена симуляция и нет ошибок сигнал 4...20мА преобразуется в сигнал датчика SensMin...SensMax.
 //3.Сигнал датчика ограничивается в пределах его диаппазона измерения SensMin...SensMax.
 
-//  +---------+
-//  | GNU GPL |
-//  +---------+
-//  |
-//  |
-//  .= .-_-. =.
-// ((_/)o o(\_))
-//  `-'(. .)`-'
-//  |/| \_/ |\
-//  ( |     | )
-//  /"\_____/"\
-//  \__)   (__/
 // @COPYLEFT ALL WRONGS RESERVED :)
 // Author: VA
 // Contacts: DIY.PLC.314@gmail.com
-// Date: 2014 - 2024
+// Date start LIB_PLC: 2014
 // License: GNU GPL-2.0-or-later
 // https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 // https://www.youtube.com/watch?v=n1F_MfLRlX0
-//
-// See also:
 // https://www.youtube.com/@DIY_PLC
 // https://github.com/DIYPLC/LIB_PLC
 // https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
