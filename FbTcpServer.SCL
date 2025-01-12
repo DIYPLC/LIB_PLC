@@ -1,0 +1,185 @@
+FUNCTION_BLOCK FbTcpServer // TCP server echo.
+
+VAR_INPUT
+// SYSTEM
+Ts_ms : DINT := 0;      // Шаг дискретизации по времени [мс].
+Reset : BOOL := FALSE;  // Сброс при перезагрузке.
+// HW TCP SERVER
+ID    : INT  := 1;      // Connection ID 1..16
+LADDR : WORD := 16#100; // Module address in hardware configuration
+END_VAR
+
+VAR_OUTPUT
+Lamp : BOOL := FALSE; // Лампа.
+END_VAR
+
+VAR
+// FC6 AG_RECV
+AG_RECV_RX_BYTE : BYTE := 0;     // IN:  Buffer for received data
+AG_RECV_NDR     : BOOL := FALSE; // OUT: Indicates whether new data were received
+AG_RECV_ERR     : BOOL := FALSE; // OUT: ERROR code
+AG_RECV_STATUS  : WORD := 0;     // OUT: STATUS code
+AG_RECV_LEN     : INT  := 0;     // OUT: Number of received bytes
+// FC5 AG_SEND
+AG_SEND_ACT     : BOOL := FALSE; // IN:  Activate job
+AG_SEND_TX_BYTE : BYTE := 0;     // IN:  Data destination
+AG_SEND_LEN     : INT  := 0;     // IN:  Buffer for send data
+AG_SEND_DONE    : BOOL := FALSE; // OUT: Job done without errors
+AG_SEND_ERR     : BOOL := FALSE; // OUT: ERROR code
+AG_SEND_STATUS  : WORD := 0;     // OUT: STATUS code
+// INTERNAL LOGIC
+ByteCounter     : INT  := 0;     // Счетчик принятых байт
+Flag100ms       : BOOL := FALSE; // Флаг взводится на 1 скан раз в 100мс
+Timer100ms      : DINT := 0;     // Таймер для циклического вызова FC6 AG_RECV каждые 100мс
+TimerRxEnd      : DINT := 0;     // Таймер для определения конца пакета
+BufferRx        : ARRAY[0..32] OF BYTE; // Буфер для хранения последнего принятого TCP сообщения
+END_VAR
+
+CONST // Константы.
+MAX_RX_BYTE_SIZE   := 29;    // Максимальный размер в байтах принятого TCP сообщения
+TIMEOUT_RX_MESSAGE := 300;   // Если в течении этого времени [мс] не пришло новое сообщение значит сообщение закончилось
+ASCII_CODE_1       := 16#31; // ASCII код символа '1' 
+END_CONST
+
+BEGIN
+// Формирование импульсов в 1 скан раз в 100мс
+IF (Timer100ms >= 100) THEN
+Flag100ms := TRUE;
+Timer100ms := 0;
+ELSE
+Flag100ms := FALSE;
+Timer100ms := Timer100ms + Ts_ms;
+END_IF;
+
+// ---Данный код выполняется раз в 100 мс---
+IF (Flag100ms) THEN
+    // FC6 TCP SERVER читаем байт от клента
+    AG_RECV(ID     := ID              // IN:  INT
+           ,LADDR  := LADDR           // IN:  WORD
+           ,RECV   := AG_RECV_RX_BYTE // IN:  ANY
+           ,NDR    := AG_RECV_NDR     // OUT: BOOL
+           ,ERROR  := AG_RECV_ERR     // OUT: BOOL
+           ,STATUS := AG_RECV_STATUS  // OUT: WORD
+           ,LEN    := AG_RECV_LEN     // OUT: INT
+           );                         // VOID
+    // Эхо ответ приняли байт и тут же его отправили (для отладки по putty)
+    AG_SEND_ACT := AG_RECV_NDR;
+    AG_SEND_TX_BYTE := AG_RECV_RX_BYTE;
+    AG_SEND_LEN := AG_RECV_LEN;
+    // FC5 TCP SERVER передаем байт клиенту
+    AG_SEND(ACT    := AG_SEND_ACT     // IN:  BOOL
+           ,ID     := ID              // IN:  INT
+           ,LADDR  := LADDR           // IN:  WORD
+           ,SEND   := AG_SEND_TX_BYTE // IN:  ANY
+           ,LEN    := AG_SEND_LEN     // IN:  INT
+           ,DONE   := AG_SEND_DONE    // OUT: BOOL
+           ,ERROR  := AG_SEND_ERR     // OUT: BOOL
+           ,STATUS := AG_SEND_STATUS  // OUT: WORD
+           );
+    // Побайтно считываем приятое сообщение в буфер
+    IF (AG_RECV_NDR) THEN // Приняли 1 байт
+        BufferRx[ByteCounter] := AG_RECV_RX_BYTE;
+        // Ограничение количества принятых байт в пакете
+        IF (ByteCounter <= MAX_RX_BYTE_SIZE) THEN
+        ByteCounter := ByteCounter + 1;
+        ELSE
+        ByteCounter := 0;
+        END_IF;
+    END_IF;
+END_IF;
+// ---Данный код выполняется раз в 100 мс---
+
+// Если мы не приняли ни одного пакета в течении ~300 мс то считаем пакет принятым
+// Конец пакета определяем по таймауту
+IF (AG_RECV_STATUS = 16#8180) THEN // 16#8180 клиент подключился
+TimerRxEnd := TimerRxEnd + Ts_ms;
+    IF (TimerRxEnd >= TIMEOUT_RX_MESSAGE) THEN
+    ByteCounter := 0;
+    TimerRxEnd := 0;
+    END_IF;
+END_IF;
+
+// Если клиент не подключен сбрасываем счетчик принятых байт
+IF (AG_RECV_STATUS = 16#8183) THEN // 16#8183 клиент не подключился
+ByteCounter := 0;
+END_IF;
+
+// Команда от TCP клиента
+// Lamp=1 если прислали ASCII '1'.
+// Если нет связи или ASCII не равно '1' то Lamp=0.
+Lamp := (BufferRx[0] = ASCII_CODE_1) AND NOT(AG_RECV_ERR);
+END_FUNCTION_BLOCK
+
+DATA_BLOCK DbTcpServer FbTcpServer // Instance data block.
+BEGIN
+END_DATA_BLOCK
+
+(*
+
+Версия от: 12.01.2025
+Программа разработана для вызова из OB1.
+TCP сервер 172.30.64.202:2000
+
+TCP server работает с CP343-1 6GK7 343-1EX30-0XE0
+TCP server не удалось запустить на встроенной сети в CPU317-2 PN/DP 
+
+-Описание технической реализации
+Программа TCP сервера вызывает AG_RECV каждые 100мс и если есть сообщение от клиента принимает его побайтно.
+Признаком конца сообщения является отсутствие принятых сообщений в течении не менее 300мс.
+Конец сообщения по таймауту сделан потому что AG_RECV не знает длинну принятого сообщения.
+Принятое сообщение анализируенся и если его первый байт равен 1-ASCII 31-HEX то Lamp=1.
+В принятом пакете все байты кроме первого принятого игнорируются.
+TCP клиент может быть только один, два клиента одновременно подключиться не могут.
+
+-Формат TCP пакета:
+1ddMMyyyyHHmmss - Включить Lamp=1
+0ddMMyyyyHHmmss - Выключить Lamp=0
+
+-Информация по AG_RECV
+AG_RECV FC6 использую для чтения байт отправленных клиентом в наш сокет TCP сервера
+AG_RECV нормально работает если его вызывать раз в 100мс
+AG_RECV можно вызывать и чаше чем 100мс но тогда статус начинает на 1 скан менять свое значение если нет клиетна
+AG_RECV ничего не знает о длинне принятого пакета
+AG_RECV в редакторе SCL может принимать только 1 байт
+Большой пакет можно принять только в LAD и только точно зная сколько прийдет байт.
+RECV := P#DB201.DBX0.0 BYTE 16 примет 1 пакет в 16 байт или 16 пакетов в 1 байт.
+Если клиент закрывает сокет сразу после передачи пакета то сименс ничего не успевает принять надо делать паузу в клиенте.
+При вызове AG_RECV раз в 100мс актуальны статусы:
+AG_RECV_STATUS = 16#8183 клиент не подключился
+AG_RECV_STATUS = 16#8180 клиент подключился
+AG_RECV_STATUS = 16#0000 приняли 1 байт = AG_RECV_NDR
+
+---tcp_client.py---
+# Тест для проверки работоспособности
+import socket
+import struct
+def LampOn(IP_address = '172.30.64.202', TCP_port = 2000):
+    Client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    Client_socket.connect((IP_address, TCP_port))
+    print("PLC online")
+    input("Send 1 = Lamp On >")
+    Client_socket.send(struct.pack(">BB",49,255))
+    input("Send 0 = Lamp Off >")
+    Client_socket.send(struct.pack(">BB",48,254))
+    #print(Client_socket.recv(1500))
+    input("PLC offline >")
+    Client_socket.close()
+    print("exit")
+    return
+LampOn()
+---tcp_client.py---
+
+*)
+
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// Date start LIB_PLC: 2014
+// License: GNU GPL-2.0-or-later
+// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+// https://www.youtube.com/watch?v=n1F_MfLRlX0
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC/LIB_PLC
+// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+// https://t.me/DIY_PLC
