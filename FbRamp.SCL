@@ -76,8 +76,6 @@ ELSE //Штатный режим работы.
 
 END_IF;
 
-END_FUNCTION_BLOCK
-
 //Пример использования №1.
 //Скорость открытия парового клапана от 0 до 100 процентов за 90  секунд.
 //Скорость закрытия парового клапана от 100 до 0 процентов за 150 секунд.
@@ -157,3 +155,5 @@ END_FUNCTION_BLOCK
 // https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
 // https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
 // https://t.me/DIY_PLC
+
+END_FUNCTION_BLOCK

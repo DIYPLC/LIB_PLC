@@ -184,8 +184,6 @@ PQW[ADR_Q + 2] := FrequencySet; // PZD2 Заданая скорость.
 PQW[ADR_Q + 4] := 0           ; // PZD3.
 PQW[ADR_Q + 6] := 0           ; // PZD4.
 
-END_FUNCTION_BLOCK
-
 (*
 
 Частотный привод OPTIMUS DRIVE AD800-2SD75-PU00CU04 с платой расширения DP01 (версия прошивки частотника 1.50 и выше).
@@ -336,3 +334,5 @@ EndModule;
 // https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
 // https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
 // https://t.me/DIY_PLC
+
+END_FUNCTION_BLOCK

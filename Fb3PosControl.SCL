@@ -65,8 +65,6 @@ THEN
 OpNeg := FALSE;
 END_IF;
 
-END_FUNCTION_BLOCK
-
 //Применение.
 //
 //Трехпозиционный регулятор используется как простейший регулятор температуры или положения.
@@ -133,3 +131,5 @@ END_FUNCTION_BLOCK
 // https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
 // https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
 // https://t.me/DIY_PLC
+
+END_FUNCTION_BLOCK

@@ -32,8 +32,6 @@ DbTask100ms.Ts_ms := INT_TO_DINT(OB35_EXC_FREQ); //Шаг дискретизации по времени 
 DbTask100ms.Reset := FALSE                     ; //Сброс при перезагрузке.
 FbTask100ms.DbTask100ms()                      ; //Задача вызывается каждые 100ms.
 
-END_ORGANIZATION_BLOCK
-
 // @COPYLEFT ALL WRONGS RESERVED :)
 // Author: VA
 // Contacts: DIY.PLC.314@gmail.com
@@ -46,3 +44,5 @@ END_ORGANIZATION_BLOCK
 // https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
 // https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
 // https://t.me/DIY_PLC
+
+END_ORGANIZATION_BLOCK

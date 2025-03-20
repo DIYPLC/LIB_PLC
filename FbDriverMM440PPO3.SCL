@@ -173,8 +173,6 @@ qSTW1_B15 := ((qSTW1 AND W#2#1000_0000_0000_0000) = W#2#1000_0000_0000_0000);
 PQW[ADR_Q + 0]  := qSTW1;
 PQW[ADR_Q + 2]  := qHSW;
 
-END_FUNCTION_BLOCK
-
 (*
 
 Настройки SIEMENS MICROMASTER 440 отличные от заводских:
@@ -231,3 +229,5 @@ P0003=3 Экспертный доступ
 // https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
 // https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
 // https://t.me/DIY_PLC
+
+END_FUNCTION_BLOCK

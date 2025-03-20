@@ -32,8 +32,6 @@ END_VAR
 
 OutTag := InTag;
 
-END_FUNCTION_BLOCK
-
 //Ѕлок автоматически передает одну переменную PLC <-> SCADA WinCC.
 //AS == PLC
 //OS == SCADA WinCC
@@ -51,3 +49,5 @@ END_FUNCTION_BLOCK
 // https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
 // https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
 // https://t.me/DIY_PLC
+
+END_FUNCTION_BLOCK

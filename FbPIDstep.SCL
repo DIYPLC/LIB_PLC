@@ -245,8 +245,6 @@ ELSE
     END_IF;
 END_IF;
 
-END_FUNCTION_BLOCK
-
 // src CONT_S FB42
 // reversed by komatic
 // cross platforms by VA
@@ -317,3 +315,5 @@ END_IF; END_IF;
 // https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
 // https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
 // https://t.me/DIY_PLC
+
+END_FUNCTION_BLOCK

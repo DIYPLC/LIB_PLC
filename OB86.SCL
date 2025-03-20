@@ -20,7 +20,6 @@ END_VAR
 
 BEGIN
 "DbDebug".OB86_CNT_ERR := "DbDebug".OB86_CNT_ERR + 1 ;//—четчик вызовов обработчика ошибок OB86.
-END_ORGANIZATION_BLOCK
 
 // @COPYLEFT ALL WRONGS RESERVED :)
 // Author: VA
@@ -34,3 +33,5 @@ END_ORGANIZATION_BLOCK
 // https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
 // https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
 // https://t.me/DIY_PLC
+
+END_ORGANIZATION_BLOCK

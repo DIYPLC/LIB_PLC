@@ -48,8 +48,6 @@ OutTag := TRUE ;
 InTag  := FALSE;
 END_IF;
 
-END_FUNCTION_BLOCK
-
 //Блок автоматически передает одну переменную PLC <-> SCADA WinCC.
 //Блок генерирует импульс в один скан чтобы его увидень ставьте вы выходе TOF таймер.
 //WinCC взводит тег InTag = TRUE блок сам гасит входной импульс InTag = FALSE.
@@ -69,3 +67,5 @@ END_FUNCTION_BLOCK
 // https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
 // https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
 // https://t.me/DIY_PLC
+
+END_FUNCTION_BLOCK

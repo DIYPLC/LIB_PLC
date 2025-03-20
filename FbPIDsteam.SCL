@@ -155,8 +155,6 @@ DbLimit_min()                                                  ; //јмплитудный о
 DbPIDcontrol.MVMAX := DbLimit_max.Out ; //ћаксимальное значение сигнала управлени€.
 DbPIDcontrol.MVMIN := DbLimit_min.Out   ; //ћинимальное значение сигнала управлени€.
 
-END_FUNCTION_BLOCK
-
 // ѕостановка задачи:
 // —истема стабилизации давлени€ пара должна быстро реагировать на изменение давлени€ по каналу управлени€ и возмущени€.
 // — другой стороны паровой клапан нельз€ закрывать слишком быстро иначе избыток пара может взорвать котел.
@@ -273,3 +271,5 @@ END_FUNCTION_BLOCK
 // https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
 // https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
 // https://t.me/DIY_PLC
+
+END_FUNCTION_BLOCK

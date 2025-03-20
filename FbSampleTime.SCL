@@ -29,8 +29,6 @@ END_VAR
 Ts := SAMPLE_T;
 Ts_ms := REAL_TO_DINT(SAMPLE_T * 1000.0);
 
-END_FUNCTION_BLOCK
-
 //Блок спроектирован под PCS7 v5.
 
 // @COPYLEFT ALL WRONGS RESERVED :)
@@ -45,3 +43,5 @@ END_FUNCTION_BLOCK
 // https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
 // https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
 // https://t.me/DIY_PLC
+
+END_FUNCTION_BLOCK

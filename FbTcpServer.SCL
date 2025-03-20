@@ -108,11 +108,6 @@ END_IF;
 // Lamp=1 если прислали ASCII '1'.
 // ≈сли нет св€зи или ASCII не равно '1' то Lamp=0.
 Lamp := (BufferRx[0] = ASCII_CODE_1) AND NOT(AG_RECV_ERR);
-END_FUNCTION_BLOCK
-
-DATA_BLOCK DbTcpServer FbTcpServer // Instance data block.
-BEGIN
-END_DATA_BLOCK
 
 (*
 
@@ -183,3 +178,9 @@ LampOn()
 // https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
 // https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
 // https://t.me/DIY_PLC
+
+END_FUNCTION_BLOCK
+
+DATA_BLOCK DbTcpServer FbTcpServer // Instance data block.
+BEGIN
+END_DATA_BLOCK

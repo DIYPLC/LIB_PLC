@@ -71,8 +71,6 @@ ELSE
     END_IF;
 END_IF;
 
-END_FUNCTION_BLOCK
-
 //Описание работы драйвера аналогово входа 4...20мА.
 //1.Сначала сигнал с АЦП 0...27648 преобразуется в токовый сигна 4...20мА.
 //2.Если не включена симуляция и нет ошибок сигнал 4...20мА преобразуется в сигнал датчика SensMin...SensMax.
@@ -90,3 +88,5 @@ END_FUNCTION_BLOCK
 // https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
 // https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
 // https://t.me/DIY_PLC
+
+END_FUNCTION_BLOCK

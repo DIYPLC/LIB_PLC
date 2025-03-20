@@ -69,8 +69,6 @@ ELSE
 Current := (((InLim - InMin) / (InMax - InMin)) * 16.0) + 4.0;
 END_IF;
 
-END_FUNCTION_BLOCK
-
 //Описание работы драйвера аналогово входа 4...20мА.
 //1.Сигнал исполнительного механизма ограничивается в пределах его диаппазона измерения InMin...InMax.
 //2.Если не включена симуляция сигнал c входа In преобразуется в сигнал ЦАП.
@@ -89,3 +87,5 @@ END_FUNCTION_BLOCK
 // https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
 // https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
 // https://t.me/DIY_PLC
+
+END_FUNCTION_BLOCK

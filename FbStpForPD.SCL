@@ -103,8 +103,6 @@ IF(Pos <= Smin) THEN
 Pos := Smin;
 END_IF;
 
-END_FUNCTION_BLOCK
-
 //ќписание.
 //ƒанный блок это приставка к обычному аналоговому ѕ»ƒ- регул€тору котора€ превращает его в регул€тор с двум€ дискретными выходами.
 //ѕримен€ть данный блок можно на котлах с интегральными исполнительными механизмами.
@@ -221,3 +219,5 @@ END_FUNCTION_BLOCK
 // https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
 // https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
 // https://t.me/DIY_PLC
+
+END_FUNCTION_BLOCK

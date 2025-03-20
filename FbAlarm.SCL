@@ -91,8 +91,6 @@ AlarmLo := _AlarmLo;
 Timer2 := 0;
 END_IF;
 
-END_FUNCTION_BLOCK
-
 // @COPYLEFT ALL WRONGS RESERVED :)
 // Author: VA
 // Contacts: DIY.PLC.314@gmail.com
@@ -105,3 +103,5 @@ END_FUNCTION_BLOCK
 // https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
 // https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
 // https://t.me/DIY_PLC
+
+END_FUNCTION_BLOCK

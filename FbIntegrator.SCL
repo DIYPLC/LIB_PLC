@@ -58,8 +58,6 @@ IF (Out <= OutMin) THEN //Ограничение низ.
 Out := OutMin;
 END_IF;
 
-END_FUNCTION_BLOCK
-
 // Условное графическое обозначение (точное).
 //
 //    +----------+
@@ -189,3 +187,5 @@ END_FUNCTION_BLOCK
 // https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
 // https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
 // https://t.me/DIY_PLC
+
+END_FUNCTION_BLOCK
