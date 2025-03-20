@@ -1,34 +1,17 @@
-FUNCTION_BLOCK FbPIDcontrol //ПИД-регулятор.
+FUNCTION_BLOCK "FbPIDcontrol"
 TITLE = 'ПИД-регулятор.'
 
-//         DbPIDcontrol
-//    +--------------------+
-//    |    FbPIDcontrol    |
-// ->-|PV                MV|->-
-//   -|SP                  |
-//   -|Kp                  |
-//   -|Ki                  |
-//   -|Kd                  |
-//   -|Kdf                 |
-//   -|ERMAX               |
-//   -|ERMIN               |
-//   -|MVMAX               |
-//   -|MVMIN               |
-//   -|Ts                  |
-//   -|Manual              |
-//   -|OnMan               |
-//    +--------------------+
-
-{//Атрибуты для PCS7.
-S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
-S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
+{
+S7_Optimized_Access := 'TRUE' ;
+S7_read_back := 'true' ;
+S7_blockview := 'big'
 }
 
-//Атрибуты для STEP7.
-VERSION : '3.5'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
+VERSION : '3.6'
 
+//ПИД-регулятор.
 VAR_INPUT //Входные переменные, сохраняемые.
 PV     :REAL := 0.0   ; //Измеренное значение регулируемого параметра.
 SP     :REAL := 0.0   ; //Заданное значение регулируемого параметра.
@@ -61,6 +44,26 @@ VAR_TEMP //Временные переменные, не сохраняемые.
 Auto :REAL; //Выход ПИД- алгоритма и вход переключателя режимов работы.
 Sw   :REAL; //Выход с переключателя режимов работы.
 END_VAR
+
+BEGIN
+
+//         DbPIDcontrol
+//    +--------------------+
+//    |    FbPIDcontrol    |
+// ->-|PV                MV|->-
+//   -|SP                  |
+//   -|Kp                  |
+//   -|Ki                  |
+//   -|Kd                  |
+//   -|Kdf                 |
+//   -|ERMAX               |
+//   -|ERMIN               |
+//   -|MVMAX               |
+//   -|MVMIN               |
+//   -|Ts                  |
+//   -|Manual              |
+//   -|OnMan               |
+//    +--------------------+
 
 //Ошибка регулирования.
 ER := SP - PV;
@@ -121,8 +124,6 @@ MV := Sw;
   Ipart := MV - (Ppart + Dpart);
   END_IF;
 END_IF;
-
-END_FUNCTION_BLOCK
 
 // Передаточная функция регулятора (при Ts -> 0):
 //
@@ -468,3 +469,5 @@ END_FUNCTION_BLOCK
 // https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
 // https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
 // https://t.me/DIY_PLC
+
+END_FUNCTION_BLOCK
