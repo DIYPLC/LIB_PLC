@@ -81,6 +81,8 @@ dThrStIn :REAL ; //three - step element input
 LmnrSim  :REAL ; //simulierte Stellungsrückmeldung
 END_VAR
 
+BEGIN
+
 IF COM_RST
 THEN 
     LMNR_SIM    := LMNRSVAL;

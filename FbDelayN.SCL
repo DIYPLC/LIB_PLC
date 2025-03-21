@@ -34,6 +34,8 @@ Buffer1: ARRAY [0..NUMBER] OF REAL; //Буфер задержки сигнала.
 Counter1 :INT := 0; //Счетчик.
 END_VAR
 
+BEGIN
+
 //W(Z)=Z^(-N), N=NUMBER+2
 Out := Buffer1[NUMBER];
 FOR COUNTER1 := NUMBER TO 1 BY -1 DO

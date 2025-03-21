@@ -33,6 +33,8 @@ VAR //Внутренние переменные, сохраняемые.
 Timer1 :DINT := 0; //Текущее время таймер1 [мс].
 END_VAR
 
+BEGIN
+
 IF (TimeDelayOn > 0) THEN //Таймер включен.
   IF (In) THEN //На входе 1.
     IF (Out) THEN //На выходе 1.

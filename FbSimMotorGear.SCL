@@ -42,6 +42,8 @@ SpeedPos :REAL; //Скорость открытия.
 SpeedNeg :REAL; //Скорость закрытия.
 END_VAR
 
+BEGIN
+
 IF(Reset) THEN
 Position := 0.0;
 END_IF;

@@ -60,6 +60,8 @@ STATE_DRIVE_OFF     := 4; //Состояние "Выключение частотного привода".
 STATE_CONTACTOR_OFF := 5; //Состояние "Выключение контактора".
 END_CONST
 
+BEGIN
+
 //Схема разобрана нет 380VAC.
 ErrorVoltage := NOT(VoltageOk);
 

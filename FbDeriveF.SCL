@@ -33,6 +33,8 @@ VAR //Внутренние переменные, сохраняемые.
 Dintegral :REAL := 0.0; //Интегратор.
 END_VAR
 
+BEGIN
+
 //W(s)=s/(1+Tdf*s) при Tdf=1/Kdf и Ts->0.
 IF (Kdf <= 0.0) THEN
 Dintegral := 0.0;

@@ -54,6 +54,8 @@ CONST //Константы.
 PI := 3.14159265358979323846; //Число Пи.
 END_CONST
 
+BEGIN
+
 Sine   := Amplitude*SIN(2*PI*(1.0/Period)*CurrentTime+Phase) + Offset; //Синус.
 Cosine := Amplitude*COS(2*PI*(1.0/Period)*CurrentTime+Phase) + Offset; //Косинус.
 

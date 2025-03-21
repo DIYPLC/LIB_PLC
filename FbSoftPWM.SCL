@@ -47,6 +47,8 @@ TimePulsePositive :REAL; //Время импульса для положительного коэффициента заполн
 TimePulseNegative :REAL; //Время импульса для отрицательного коэффициента заполнения [с].
 END_VAR
 
+BEGIN
+
 //Зона нечувствительности для входного сигнала.
 IF ((DBMIN<DutyCucle)AND(DutyCucle<DBMAX)) THEN
 Percent:=0.0;

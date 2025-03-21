@@ -39,6 +39,8 @@ COUNTER1:INT := 0; //Счетчик.
 Summator:REAL := 0.0; //Сумматор.
 END_VAR
 
+BEGIN
+
 //Обновление массива.
 FOR COUNTER1 := NUMBER TO 1 BY -1 DO
 Buffer1[COUNTER1] := Buffer1[COUNTER1 - 1];

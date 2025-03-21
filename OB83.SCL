@@ -20,6 +20,7 @@ OB83_DATE_TIME  :DATE_AND_TIME; //Date and time OB83 started
 END_VAR
 
 BEGIN
+
 "DbDebug".OB83_CNT_ERR := "DbDebug".OB83_CNT_ERR + 1 ;//—четчик вызовов обработчика ошибок OB83.
 
 // @COPYLEFT ALL WRONGS RESERVED :)

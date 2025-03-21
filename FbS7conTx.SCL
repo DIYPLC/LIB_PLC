@@ -49,6 +49,8 @@ END_VAR
 VAR_OUTPUT //Выходные переменные, сохраняемые.
 END_VAR
 
+BEGIN
+
 //Три блока работают совместно.
 //FbS7con FbS7conTx FbS7conRx
 ;

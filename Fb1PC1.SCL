@@ -128,6 +128,8 @@ TempReal1 :REAL; //Временная переменная.
 TempReal2 :REAL; //Временная переменная.
 END_VAR
 
+BEGIN
+
 // Шаг дискретизации по времени [с].
 Ts := DINT_TO_REAL(Ts_ms) * 0.001;
 

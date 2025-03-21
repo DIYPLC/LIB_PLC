@@ -27,6 +27,8 @@ VAR_OUTPUT //Выходные переменные, сохраняемые.
 Out :BOOL := FALSE; //Выход триггера.
 END_VAR
 
+BEGIN
+
 //RS- Триггер.
 Out := (Out OR Set) AND (NOT(Rst));
 

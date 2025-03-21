@@ -30,6 +30,8 @@ S7_dynamic := 'true'   //Tag view in CFC
 :DINT := 0; //OutTag := InTag;
 END_VAR
 
+BEGIN
+
 OutTag := InTag;
 
 //Ѕлок автоматически передает одну переменную PLC <-> SCADA WinCC.

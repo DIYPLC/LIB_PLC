@@ -55,6 +55,8 @@ VAR_OUTPUT //Выходные переменные, сохраняемые.
 Out :WORD := 0; //Выходной сигнал.
 END_VAR
 
+BEGIN
+
 Out:=0;
 IF (In0 ) THEN Out:=(Out OR 2#0000000000000001); END_IF;
 IF (In1 ) THEN Out:=(Out OR 2#0000000000000010); END_IF;

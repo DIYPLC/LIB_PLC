@@ -26,6 +26,8 @@ Ts    :REAL := 0.1; //Шаг дискретизации по времени в секундах.
 Ts_ms :DINT := 100; //Шаг дискретизации по времени [мс].
 END_VAR
 
+BEGIN
+
 Ts := SAMPLE_T;
 Ts_ms := REAL_TO_DINT(SAMPLE_T * 1000.0);
 

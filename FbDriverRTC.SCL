@@ -79,6 +79,8 @@ ms_x1           :BYTE; //Временная переменная 3.
 Time_ms_current :DINT; //RTC 0...59999ms.
 END_VAR
 
+BEGIN
+
 //Чтение RTC.
 ErrorCode := READ_CLK(CDT:=DateAndTime); //SFC1();
 IF (ErrorCode = 0) THEN

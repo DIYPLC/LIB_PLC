@@ -30,6 +30,8 @@ S7_dynamic := 'true'   //Tag view in CFC
 :BOOL := FALSE; //IMPULSE(InTag);
 END_VAR
 
+BEGIN
+
 //2. Гасим выходной импульс на следующем цикле.
 IF ((InTag = FALSE) AND (OutTag = TRUE)) THEN
 OutTag := FALSE;

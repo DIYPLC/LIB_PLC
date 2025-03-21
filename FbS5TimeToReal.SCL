@@ -30,6 +30,8 @@ Digit100:INT:=0; //Сотни BCD.
 Base:INT:=0; //База 2 бита (BCD*10^(Base+1)).
 END_VAR
 
+BEGIN
+
 //Разбиваем BCD на части по 4 бита
 //Байты в слове поменяны местами из за архитектуры процессора.
 Digit1   :=BYTE_TO_INT(LocalStructTime.ArrayByte[1] AND 2#0000_1111);

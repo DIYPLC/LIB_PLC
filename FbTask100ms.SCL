@@ -30,6 +30,8 @@ VAR_TEMP  //Временные переменные, не сохраняемые.
 Ts :REAL; //Шаг дискретизации по времени в секундах.
 END_VAR
 
+BEGIN
+
 Ts := DINT_TO_REAL(Ts_ms) * 0.001; //Шаг дискретизации по времени в секундах.
 
 // @COPYLEFT ALL WRONGS RESERVED :)

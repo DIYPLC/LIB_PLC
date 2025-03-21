@@ -88,6 +88,8 @@ StatusWord_B15 :BOOL := FALSE; //Предупреждение перегрев.
 DbTON :TON; //Таймер для сигнала сброса.
 END_VAR
 
+BEGIN
+
 // Читать слова из сети.
 StatusWord        := PIW[ADR_I + 0]; // PZD1 Слово состояния.
 FrequencyMeasured := PIW[ADR_I + 2]; // PZD2 Фактическая скорость [F*10].

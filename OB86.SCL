@@ -19,6 +19,7 @@ OB86_DATE_TIME  : DATE_AND_TIME             ; //Date and time OB86 started
 END_VAR
 
 BEGIN
+
 "DbDebug".OB86_CNT_ERR := "DbDebug".OB86_CNT_ERR + 1 ;//—четчик вызовов обработчика ошибок OB86.
 
 // @COPYLEFT ALL WRONGS RESERVED :)

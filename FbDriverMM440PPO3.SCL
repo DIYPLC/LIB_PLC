@@ -85,6 +85,8 @@ iZSW1_B15 : BOOL := FALSE; //Не перегрузка I или t.
 DbTON :TON; //Таймер для сигнала сброса.
 END_VAR
 
+BEGIN
+
 //Читать слова из сети.
 iZSW1   := PIW[ADR_I + 0];
 iHIW    := PIW[ADR_I + 2];

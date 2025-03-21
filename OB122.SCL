@@ -20,6 +20,7 @@ OB122_DATE_TIME :DATE_AND_TIME; //Date and time OB1 started
 END_VAR
 
 BEGIN
+
 "DbDebug".OB122_CNT_ERR := "DbDebug".OB122_CNT_ERR + 1 ;//—четчик вызовов обработчика ошибок OB122.
 
 // @COPYLEFT ALL WRONGS RESERVED :)
