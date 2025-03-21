@@ -1,35 +1,6 @@
 FUNCTION_BLOCK Fb1PC1 //ПИД- регулятор давления.
 TITLE = '1PC1 ПИД- регулятор давления.'
 
-// Система стабилизации давления жидкости в баке.
-// Поддерживаем постоянное давление после насоса с частотных приводом.
-//
-//                   Db1PC1
-//    +---------------------------------+
-//    |              Fb1PC1             |
-// ->-|ADC_Pressure        DAC_Frequency|->-
-//   -|RemoteStartButton         MotorOn|-
-//   -|RemoteStopButton      ContactorOn|-
-//   -|VoltageOk                   Error|-
-//   -|DriveOk                          |
-//   -|ContactorOk                      |
-//   -|InterlockOn                      |
-//   -|GroupStart                       |
-//   -|GroupStop                        |
-//   -|Ts_ms                            |
-//   -|Reset                            |
-//    +---------------------------------+
-//                    ^
-//                    |
-//                    v
-//    +---------------------------------+
-//    |                                 |
-//    |            Db1PC1Hmi            |
-//    |                                 |
-//    |      SCADA / HMI interface      |
-//    |                                 |
-//    +---------------------------------+
-
 {// Атрибуты для PCS7.
 S7_m_c     := 'true'   ; //CFC: Блок может управляться или наблюдаться из OS.
 S7_tag     := 'true'   ; //CFC: Блок входит в писок тегов OS. 
@@ -129,6 +100,35 @@ TempReal2 :REAL; //Временная переменная.
 END_VAR
 
 BEGIN
+
+// Система стабилизации давления жидкости в баке.
+// Поддерживаем постоянное давление после насоса с частотных приводом.
+//
+//                   Db1PC1
+//    +---------------------------------+
+//    |              Fb1PC1             |
+// ->-|ADC_Pressure        DAC_Frequency|->-
+//   -|RemoteStartButton         MotorOn|-
+//   -|RemoteStopButton      ContactorOn|-
+//   -|VoltageOk                   Error|-
+//   -|DriveOk                          |
+//   -|ContactorOk                      |
+//   -|InterlockOn                      |
+//   -|GroupStart                       |
+//   -|GroupStop                        |
+//   -|Ts_ms                            |
+//   -|Reset                            |
+//    +---------------------------------+
+//                    ^
+//                    |
+//                    v
+//    +---------------------------------+
+//    |                                 |
+//    |            Db1PC1Hmi            |
+//    |                                 |
+//    |      SCADA / HMI interface      |
+//    |                                 |
+//    +---------------------------------+
 
 // Шаг дискретизации по времени [с].
 Ts := DINT_TO_REAL(Ts_ms) * 0.001;

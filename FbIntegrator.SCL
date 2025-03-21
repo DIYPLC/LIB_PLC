@@ -1,17 +1,6 @@
 FUNCTION_BLOCK FbIntegrator //Интегратор W(s)=1/s.
 TITLE = 'Интегратор W(s)=1/s.'
 
-//      DbIntegrator
-//    +--------------+
-//    | FbIntegrator |
-// ->-|In         Out|->-
-//   -|OutMax        |
-//   -|OutMin        |
-//   -|InitValue     |
-//   -|Ts            |
-//   -|Reset         |
-//    +--------------+
-
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
 S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
@@ -40,6 +29,17 @@ InPrevious : REAL := 0.0; //Предидущее значение входа только для трапециидальног
 END_VAR
 
 BEGIN
+
+//      DbIntegrator
+//    +--------------+
+//    | FbIntegrator |
+// ->-|In         Out|->-
+//   -|OutMax        |
+//   -|OutMin        |
+//   -|InitValue     |
+//   -|Ts            |
+//   -|Reset         |
+//    +--------------+
 
 IF (TRUE) THEN //Используем прямоугольный интегратор т.к. его обычно достаточно.
 Out := Out + In * Ts; //Прямоугольный интегратор

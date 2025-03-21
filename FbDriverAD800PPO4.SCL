@@ -2,17 +2,6 @@ FUNCTION_BLOCK FbDriverAD800PPO4 //Управление приводом OPTUMUS DRIVE AD800 по PR
 TITLE = 'Управление приводом OPTUMUS DRIVE AD800 по PROFIBUS PD.'
 //PROFIDRIVE profile PPO4.
 
-//      DbDriverAD800PPO4
-//    +-------------------+
-//    | FbDriverAD800PPO4 |
-//   -|ADR_I           FPV|-
-//   -|ADR_Q           IPV|-
-// ->-|FSP             UPV|-
-// ->-|FWD             ERR|->-
-//   -|REV             ALM|-
-//   -|RST             RUN|-
-//    +-------------------+
-
 {// Атрибуты для PCS7.
 S7_read_back := 'true' ; // CFC: Chart>Readback активен для прототипов DB.
 S7_blockview := 'big'    // CFC: отображение блока маленькое или большое.
@@ -89,6 +78,17 @@ DbTON :TON; //Таймер для сигнала сброса.
 END_VAR
 
 BEGIN
+
+//      DbDriverAD800PPO4
+//    +-------------------+
+//    | FbDriverAD800PPO4 |
+//   -|ADR_I           FPV|-
+//   -|ADR_Q           IPV|-
+// ->-|FSP             UPV|-
+// ->-|FWD             ERR|->-
+//   -|REV             ALM|-
+//   -|RST             RUN|-
+//    +-------------------+
 
 // Читать слова из сети.
 StatusWord        := PIW[ADR_I + 0]; // PZD1 Слово состояния.

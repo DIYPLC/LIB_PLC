@@ -1,16 +1,6 @@
 FUNCTION_BLOCK FbModeSelector //Переключатель режимов работы.
 TITLE = 'Переключатель режимов работы.'
 
-//          DbModeSelector
-//    +------------------------+
-//    |     FbModeSelector     |
-// ->-|ButtonStop      LampStop|->-
-// ->-|ButtonManual  LampManual|->-
-// ->-|ButtonAuto      LampAuto|->-
-//   -|Error                   |
-//   -|Reset                   |
-//    +------------------------+
-
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
 S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
@@ -47,6 +37,16 @@ STATE_AUTO   := 2; //Состояние "АВТОМАТИЧЕСКИЙ РЕЖИМ".
 END_CONST
 
 BEGIN
+
+//          DbModeSelector
+//    +------------------------+
+//    |     FbModeSelector     |
+// ->-|ButtonStop      LampStop|->-
+// ->-|ButtonManual  LampManual|->-
+// ->-|ButtonAuto      LampAuto|->-
+//   -|Error                   |
+//   -|Reset                   |
+//    +------------------------+
 
 // Запрещенное состояние:
 // Если вместе с кнопкой стоп одновременно нажали еще что-то.

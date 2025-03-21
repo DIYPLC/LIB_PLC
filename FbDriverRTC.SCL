@@ -1,23 +1,6 @@
 FUNCTION_BLOCK FbDriverRTC //Блок чтения часов реального времени.
 TITLE = 'Блок чтения часов реального времени.'
 
-//         DbDriverRTC
-//     +-----------------+
-//     |   FbDriverRTC   |
-//  ->-|Reset        Year|->-
-//     |            Month|->-
-//     |              Day|->-
-//     |             Hour|->-
-//     |          Minutes|->-
-//     |          Seconds|->-
-//     |      Millisecond|->-
-//     |          Weekday|->-
-//     |            Ts_ms|->-
-//     |               Ts|->-
-//     |           Ts_max|->-
-//     |          Blink1s|->-
-//     +-----------------+
-
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
 S7_blockview := 'big'  ; //CFC: отображение блока маленькое или большое.
@@ -80,6 +63,23 @@ Time_ms_current :DINT; //RTC 0...59999ms.
 END_VAR
 
 BEGIN
+
+//         DbDriverRTC
+//     +-----------------+
+//     |   FbDriverRTC   |
+//  ->-|Reset        Year|->-
+//     |            Month|->-
+//     |              Day|->-
+//     |             Hour|->-
+//     |          Minutes|->-
+//     |          Seconds|->-
+//     |      Millisecond|->-
+//     |          Weekday|->-
+//     |            Ts_ms|->-
+//     |               Ts|->-
+//     |           Ts_max|->-
+//     |          Blink1s|->-
+//     +-----------------+
 
 //Чтение RTC.
 ErrorCode := READ_CLK(CDT:=DateAndTime); //SFC1();

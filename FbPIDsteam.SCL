@@ -1,28 +1,6 @@
 FUNCTION_BLOCK FbPIDsteam //ПИД-регулятор давления пара быстромедленный.
 TITLE = 'ПИД-регулятор давления пара быстромедленный.'
 
-//          DbPIDsteam
-//    +--------------------+
-//    |     FbPIDsteam     |
-// ->-|Pressure       Valve|->-
-//   -|Setpoint            |
-//   -|Kp                  |
-//   -|Ki                  |
-//   -|Kd                  |
-//   -|Kdf                 |
-//   -|ERMAX               |
-//   -|ERMIN               |
-//   -|OutMax              |
-//   -|OutMin              |
-//   -|Ts                  |
-//   -|Manual              |
-//   -|OnMan               |
-//   -|OutLocalLimitMax    |
-//   -|OutLocalLimitMin    |
-//   -|OutRampTAcc         |
-//   -|OutRampTDec         |
-//    +--------------------+
-
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
 S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
@@ -65,6 +43,28 @@ DbLimit_min        :FbLimit     ; //Амплитудный ограничитель.
 END_VAR
 
 BEGIN
+
+//          DbPIDsteam
+//    +--------------------+
+//    |     FbPIDsteam     |
+// ->-|Pressure       Valve|->-
+//   -|Setpoint            |
+//   -|Kp                  |
+//   -|Ki                  |
+//   -|Kd                  |
+//   -|Kdf                 |
+//   -|ERMAX               |
+//   -|ERMIN               |
+//   -|OutMax              |
+//   -|OutMin              |
+//   -|Ts                  |
+//   -|Manual              |
+//   -|OnMan               |
+//   -|OutLocalLimitMax    |
+//   -|OutLocalLimitMin    |
+//   -|OutRampTAcc         |
+//   -|OutRampTDec         |
+//    +--------------------+
 
 //Берем обычный быстро настроенный ПИД- регулятор и делаем для него медленно плавающее окно ограничения амплитуды.
 //Выход регулятора в автоматическом режиме отправляем напрямую на управление паровым клапаном.

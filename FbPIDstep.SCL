@@ -1,27 +1,6 @@
 FUNCTION_BLOCK FbPIDstep //ПИД- регулятор с двумя дискретными выходами.
 TITLE = 'ПИД- регулятор с двумя дискретными выходами.'
 
-//             DbPIDstep
-//    +-------------------------+
-//    |        FbPIDstep        |
-// ->-|PV                 QLMNUP|->-
-//   -|SP                 QLMNDN|->-
-//   -|COM_RST                  |
-//   -|LMNR_HS                  |
-//   -|LMNR_LS                  |
-//   -|LMNS_ON                  |
-//   -|LMNUP                    |
-//   -|LMNDN                    |
-//   -|GAIN                     |
-//   -|TI                       |
-//   -|DEADB_W                  |
-//   -|PULSE_TM                 |
-//   -|BREAK_TM                 |
-//   -|MTR_TM                   |
-//   -|DISV                     |
-//   -|CYCLE                    |
-//    +-------------------------+
-
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
 S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
@@ -82,6 +61,27 @@ LmnrSim  :REAL ; //simulierte Stellungsrьckmeldung
 END_VAR
 
 BEGIN
+
+//             DbPIDstep
+//    +-------------------------+
+//    |        FbPIDstep        |
+// ->-|PV                 QLMNUP|->-
+//   -|SP                 QLMNDN|->-
+//   -|COM_RST                  |
+//   -|LMNR_HS                  |
+//   -|LMNR_LS                  |
+//   -|LMNS_ON                  |
+//   -|LMNUP                    |
+//   -|LMNDN                    |
+//   -|GAIN                     |
+//   -|TI                       |
+//   -|DEADB_W                  |
+//   -|PULSE_TM                 |
+//   -|BREAK_TM                 |
+//   -|MTR_TM                   |
+//   -|DISV                     |
+//   -|CYCLE                    |
+//    +-------------------------+
 
 IF COM_RST
 THEN 

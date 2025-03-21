@@ -1,16 +1,6 @@
 FUNCTION_BLOCK Fb3PosControl //Регулятор трехпозиционный.
 TITLE = 'Регулятор трехпозиционный.'
 
-//       Db3PosControl
-//     +---------------+
-//     | Fb3PosControl |
-//  ->-|PV        OpPos|->-
-//    -|SP        OpNeg|->-
-//    -|DBand          |
-//    -|HystPos        |
-//    -|HystNeg        |
-//     +---------------+
-
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
 S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
@@ -39,6 +29,16 @@ ER :REAL := 0.0; //Ошибка регулирования.
 END_VAR
 
 BEGIN
+
+//       Db3PosControl
+//     +---------------+
+//     | Fb3PosControl |
+//  ->-|PV        OpPos|->-
+//    -|SP        OpNeg|->-
+//    -|DBand          |
+//    -|HystPos        |
+//    -|HystNeg        |
+//     +---------------+
 
 //Ошибка регулирования.
 ER := SP - PV;

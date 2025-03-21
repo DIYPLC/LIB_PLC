@@ -1,14 +1,6 @@
 FUNCTION_BLOCK FbDriverDo //Драйвер дискретного выхода.
 TITLE = 'FbDriverDo'
 
-//          FbDriverDo
-//    +--------------------+
-//    |     FbDriverDo     |
-// ->-|In               Out|->-
-//   -|SimValue            |
-//   -|SimOn               |
-//    +--------------------+
-
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
 S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
@@ -30,6 +22,14 @@ Out :BOOL := FALSE; //Дискретный выход ПЛК.
 END_VAR
 
 BEGIN
+
+//          FbDriverDo
+//    +--------------------+
+//    |     FbDriverDo     |
+// ->-|In               Out|->-
+//   -|SimValue            |
+//   -|SimOn               |
+//    +--------------------+
 
 IF (SimOn) THEN
 //Симуляция включена.

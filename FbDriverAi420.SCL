@@ -1,17 +1,6 @@
 FUNCTION_BLOCK FbDriverAi420 //Драйвер аналогово входа 4...20мА.
 TITLE = 'Драйвер аналогово входа 4...20мА.'
 
-//            DbDriverAi420
-//    +---------------------------+
-//    |       FbDriverAi420       |
-// ->-|ADC               SensValue|->-
-//   -|SensMax             Current|-
-//   -|SensMin               Error|-
-//   -|ErrValue                   |
-//   -|SimValue                   |
-//   -|SimOn                      |
-//    +---------------------------+
-
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
 S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
@@ -38,6 +27,17 @@ Error     :BOOL := FALSE; //Ошибка аналогово входа или датчика.
 END_VAR
 
 BEGIN
+
+//            DbDriverAi420
+//    +---------------------------+
+//    |       FbDriverAi420       |
+// ->-|ADC               SensValue|->-
+//   -|SensMax             Current|-
+//   -|SensMin               Error|-
+//   -|ErrValue                   |
+//   -|SimValue                   |
+//   -|SimOn                      |
+//    +---------------------------+
 
 //Ошибка аналогово входа или датчика.
 Error := (ADC = W#16#7FFF) OR (ADC = W#16#8000); //32767,-32768

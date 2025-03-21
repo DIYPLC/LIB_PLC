@@ -1,20 +1,6 @@
 FUNCTION_BLOCK FbValve //Пневмоцилиндр с коцевиками.
 TITLE = 'Пневмоцилиндр с коцевиками.'
 
-//                DbValve
-//    +-----------------------------+
-//    |           FbValve           |
-// ->-|CommandOpen          CoilOpen|->-
-//   -|FeedbackOpen        StateOpen|-
-//   -|FeedbackClose      StateClose|-
-//   -|OnFeedbackOpen          Error|-
-//   -|OnFeedbackClose              |
-//   -|Reset                        |
-//   -|TimeOpen                     |
-//   -|TimeClose                    |
-//   -|Ts_ms                        |
-//    +-----------------------------+
-
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
 S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
@@ -60,6 +46,20 @@ STATE_ERROR_OPEN    := 6; //Клапан не открылся.
 END_CONST
 
 BEGIN
+
+//                DbValve
+//    +-----------------------------+
+//    |           FbValve           |
+// ->-|CommandOpen          CoilOpen|->-
+//   -|FeedbackOpen        StateOpen|-
+//   -|FeedbackClose      StateClose|-
+//   -|OnFeedbackOpen          Error|-
+//   -|OnFeedbackClose              |
+//   -|Reset                        |
+//   -|TimeOpen                     |
+//   -|TimeClose                    |
+//   -|Ts_ms                        |
+//    +-----------------------------+
 
 CoilOpen := CommandOpen; //Это основная часть блока все остальное нужно для удобства использования.
 

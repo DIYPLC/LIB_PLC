@@ -1,16 +1,6 @@
 FUNCTION_BLOCK FbScale //Масштабирование InMin...InMax -> OutMin...OutMax.
 TITLE = 'Масштабирование InMin...InMax -> OutMin...OutMax.'
 
-//       DbScale
-//    +-----------+
-//    |  FbScale  |
-// ->-|In      Out|->-
-//   -|InMax      |
-//   -|InMin      |
-//   -|OutMax     |
-//   -|OutMin     |
-//    +-----------+
-
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
 S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
@@ -34,6 +24,16 @@ Out :REAL := 0.0; //Выход после масштабирования.
 END_VAR
 
 BEGIN
+
+//       DbScale
+//    +-----------+
+//    |  FbScale  |
+// ->-|In      Out|->-
+//   -|InMax      |
+//   -|InMin      |
+//   -|OutMax     |
+//   -|OutMin     |
+//    +-----------+
 
 //Масштабирование сигнала.
 IF (InMax = InMin) THEN //Деление на 0 может остановить процессор.

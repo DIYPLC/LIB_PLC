@@ -1,14 +1,6 @@
 FUNCTION_BLOCK Fb2PosControl //Регулятор двухпозиционный.
 TITLE = 'Регулятор двухпозиционный.'
 
-//       Db2PosControl
-//     +---------------+
-//     | Fb2PosControl |
-//  ->-|PV           OP|->-
-//    -|SP             |
-//    -|HYST           |
-//     +---------------+
-
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
 S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
@@ -34,6 +26,14 @@ ER :REAL := 0.0; //Ошибка регулирования.
 END_VAR
 
 BEGIN
+
+//       Db2PosControl
+//     +---------------+
+//     | Fb2PosControl |
+//  ->-|PV           OP|->-
+//    -|SP             |
+//    -|HYST           |
+//     +---------------+
 
 //Ошибка регулирования.
 ER := SP - PV;

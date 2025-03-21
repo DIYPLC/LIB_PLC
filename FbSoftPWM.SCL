@@ -1,17 +1,6 @@
 FUNCTION_BLOCK FbSoftPWM //ШИМ генератор двухканальный.
 TITLE = 'ШИМ генератор двухканальный.'
 
-//            DbSoftPWM
-//     +---------------------+
-//     |      FbSoftPWM      |
-//  ->-|DutyCucle      PWMPOS|->-
-//    -|PeriodPositive PWMNEG|->-
-//    -|PeriodNegative       |
-//    -|DBMAX                |
-//    -|DBMIN                |
-//    -|Ts                   |
-//     +---------------------+
-
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
 S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
@@ -48,6 +37,17 @@ TimePulseNegative :REAL; //Время импульса для отрицательного коэффициента заполн
 END_VAR
 
 BEGIN
+
+//            DbSoftPWM
+//     +---------------------+
+//     |      FbSoftPWM      |
+//  ->-|DutyCucle      PWMPOS|->-
+//    -|PeriodPositive PWMNEG|->-
+//    -|PeriodNegative       |
+//    -|DBMAX                |
+//    -|DBMIN                |
+//    -|Ts                   |
+//     +---------------------+
 
 //Зона нечувствительности для входного сигнала.
 IF ((DBMIN<DutyCucle)AND(DutyCucle<DBMAX)) THEN

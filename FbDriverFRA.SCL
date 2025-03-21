@@ -2,33 +2,6 @@ FUNCTION_BLOCK FbDriverFRA //Управление приводом MITSUBISHI FR-A740, FR-A840 по 
 TITLE = 'Управление приводом MITSUBISHI FR-A740, FR-A840 по PROFIBUS PD.'
 //PROFIDRIVE profile PPO type1.
 
-//       DbDriverFRA
-//    +---------------+
-//    |  FbDriverFRA  |
-// ->-|ADR_I       FPV|-
-// ->-|ADR_Q       IPV|-
-// ->-|FSP         UPV|-
-// ->-|STF       Fault|->-
-//   -|STR       Alarm|-
-//   -|MRS         RUN|-
-//   -|RST_ER      FWD|-
-//    |            REW|-
-//    |            NET|-
-//    |          DiSTF|-
-//    |          DiSTR|-
-//    |           DiRL|-
-//    |           DiRM|-
-//    |           DiRH|-
-//    |           DiRT|-
-//    |          DiJOG|-
-//    |           DiCS|-
-//    |         DiSTOP|-
-//    |          DiRES|-
-//    |         Error1|-
-//    |         Error2|-
-//    |         Error3|-
-//    +---------------+
-
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
 S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
@@ -92,6 +65,33 @@ DIWORD     :WORD := W#16#0000; //Слово состояния дискретных входов
 END_VAR
 
 BEGIN
+
+//       DbDriverFRA
+//    +---------------+
+//    |  FbDriverFRA  |
+// ->-|ADR_I       FPV|-
+// ->-|ADR_Q       IPV|-
+// ->-|FSP         UPV|-
+// ->-|STF       Fault|->-
+//   -|STR       Alarm|-
+//   -|MRS         RUN|-
+//   -|RST_ER      FWD|-
+//    |            REW|-
+//    |            NET|-
+//    |          DiSTF|-
+//    |          DiSTR|-
+//    |           DiRL|-
+//    |           DiRM|-
+//    |           DiRH|-
+//    |           DiRT|-
+//    |          DiJOG|-
+//    |           DiCS|-
+//    |         DiSTOP|-
+//    |          DiRES|-
+//    |         Error1|-
+//    |         Error2|-
+//    |         Error3|-
+//    +---------------+
 
 //Читать слова из сети.
 //Если ADR=W#16#0200 то PIW512...PIW522.

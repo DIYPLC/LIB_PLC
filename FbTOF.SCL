@@ -1,14 +1,6 @@
 FUNCTION_BLOCK FbTOF //Таймер с задержкой на выключение.
 TITLE = 'TOF - Таймер с задержкой на выключение.'
 
-//          DbTOF
-//    +----------------+
-//    |     FbTOF      |
-// ->-|In           Out|->-
-//   -|TimeDelayOff    |
-//   -|Ts_ms           |
-//    +----------------+
-
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
 S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
@@ -34,6 +26,14 @@ Timer1 :DINT := 0; //Текущее время таймер1 [мс].
 END_VAR
 
 BEGIN
+
+//          DbTOF
+//    +----------------+
+//    |     FbTOF      |
+// ->-|In           Out|->-
+//   -|TimeDelayOff    |
+//   -|Ts_ms           |
+//    +----------------+
 
 IF (TimeDelayOff > 0) THEN //Таймер включен.
   IF (In) THEN //На входе 1 то на выходе тоже 1.

@@ -1,12 +1,6 @@
 FUNCTION_BLOCK FbEdgePos //Детектор нарастающего фронта.
 TITLE = 'Детектор нарастающего фронта.'
 
-//       DbEdgePos
-//     +-----------+
-//     | FbEdgePos |
-//  ->-|In      Out|->-
-//     +-----------+
-
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
 S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
@@ -30,6 +24,12 @@ In_previos :BOOL := FALSE; //Предыдущее состояние входа.
 END_VAR
 
 BEGIN
+
+//       DbEdgePos
+//     +-----------+
+//     | FbEdgePos |
+//  ->-|In      Out|->-
+//     +-----------+
 
 //Детектор нарастающего фронта.
 Out := In AND NOT(In_previos);

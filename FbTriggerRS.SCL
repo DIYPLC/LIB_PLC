@@ -1,13 +1,6 @@
 FUNCTION_BLOCK FbTriggerRS //RS- Триггер с приоритетом на сброс.
 TITLE = 'RS- Триггер с приоритетом на сброс.'
 
-//       DbTriggerRS
-//     +-------------+
-//     | FbTriggerRS |
-//  ->-|Set       Out|->-
-//  ->-|Rst          |
-//     +-------------+
-
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
 S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
@@ -28,6 +21,13 @@ Out :BOOL := FALSE; //Выход триггера.
 END_VAR
 
 BEGIN
+
+//       DbTriggerRS
+//     +-------------+
+//     | FbTriggerRS |
+//  ->-|Set       Out|->-
+//  ->-|Rst          |
+//     +-------------+
 
 //RS- Триггер.
 Out := (Out OR Set) AND (NOT(Rst));

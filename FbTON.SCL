@@ -1,14 +1,6 @@
 FUNCTION_BLOCK FbTON //Таймер с задержкой на включение.
 TITLE = 'TON - Таймер с задержкой на включение.'
 
-//          DbTON
-//    +----------------+
-//    |     FbTON      |
-// ->-|In           Out|->-
-//   -|TimeDelayOn     |
-//   -|Ts_ms           |
-//    +----------------+
-
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
 S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
@@ -34,6 +26,14 @@ Timer1 :DINT := 0; //Текущее время таймер1 [мс].
 END_VAR
 
 BEGIN
+
+//          DbTON
+//    +----------------+
+//    |     FbTON      |
+// ->-|In           Out|->-
+//   -|TimeDelayOn     |
+//   -|Ts_ms           |
+//    +----------------+
 
 IF (TimeDelayOn > 0) THEN //Таймер включен.
   IF (In) THEN //На входе 1.

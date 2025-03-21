@@ -1,16 +1,6 @@
 FUNCTION_BLOCK FbDriverAo420 //Драйвер аналогово выхода 4...20мА.
 TITLE = 'Драйвер аналогово выхода 4...20мА.'
 
-//          DbDriverAo420
-//    +-----------------------+
-//    |     FbDriverAo420     |
-// ->-|In                  DAC|->-
-//   -|InMax           Current|-
-//   -|InMin                  |
-//   -|SimValue               |
-//   -|SimOn                  |
-//    +-----------------------+
-
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
 S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
@@ -40,6 +30,16 @@ Switch1 :REAL := 0.0; //Переключатель.
 END_VAR
 
 BEGIN
+
+//          DbDriverAo420
+//    +-----------------------+
+//    |     FbDriverAo420     |
+// ->-|In                  DAC|->-
+//   -|InMax           Current|-
+//   -|InMin                  |
+//   -|SimValue               |
+//   -|SimOn                  |
+//    +-----------------------+
 
 //Амплитудный ограничитель диапазона исполнительного механизма InMin...InMax
 IF (In >= InMax) THEN //Ограничение выхода сверху.

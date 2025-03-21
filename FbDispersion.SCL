@@ -1,14 +1,6 @@
 FUNCTION_BLOCK FbDispersion //Дисперсия PV.
 TITLE = 'FbDispersion'
 
-//       DbDispersion
-//     +--------------+
-//     | FbDispersion |
-//  ->-|In    Variance|->-
-//     |     Deviation|->-
-//     |          Mean|->-
-//     +--------------+
-
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
 S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
@@ -40,6 +32,14 @@ Summator:REAL := 0.0; //Сумматор.
 END_VAR
 
 BEGIN
+
+//       DbDispersion
+//     +--------------+
+//     | FbDispersion |
+//  ->-|In    Variance|->-
+//     |     Deviation|->-
+//     |          Mean|->-
+//     +--------------+
 
 //Обновление массива.
 FOR COUNTER1 := NUMBER TO 1 BY -1 DO

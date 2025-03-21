@@ -1,14 +1,6 @@
 FUNCTION_BLOCK FbDeadBand //«она нечувствительности.
 TITLE = '«она нечувствительности.'
 
-//      DbDeadBand
-//    +------------+
-//    | FbDeadBand |
-// ->-|In       Out|->-
-//   -|ERMAX       |
-//   -|ERMIN       |
-//    +------------+
-
 {//јтрибуты дл€ PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен дл€ прототипов DB.
 S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
@@ -30,6 +22,14 @@ Out :REAL := 0.0; //¬ыход зоны нечувствительности.
 END_VAR
 
 BEGIN
+
+//      DbDeadBand
+//    +------------+
+//    | FbDeadBand |
+// ->-|In       Out|->-
+//   -|ERMAX       |
+//   -|ERMIN       |
+//    +------------+
 
 //«она нечувствительности.
 IF ((ERMIN < In) AND (In < ERMAX)) THEN

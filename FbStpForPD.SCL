@@ -1,21 +1,6 @@
 FUNCTION_BLOCK FbStpForPD //Аналоговый ПД- регулятор превращаем в дискретный ПИ.
 TITLE = 'Аналоговый ПД- регулятор превращаем в дискретный ПИ.'
 
-//           DbStpForPD
-//    +----------------------+
-//    |      FbStpForPD      |
-// ->-|InFromPD       CmdOpen|->-
-//   -|TimeOpen      CmdClose|->-
-//   -|TimeClose             |
-//   -|TimeMin               |
-//   -|Smax                  |
-//   -|Smin                  |
-//   -|SensorOpen            |
-//   -|SensorClose           |
-//   -|Ts                    |
-//   -|Reset                 |
-//    +----------------------+
-
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
 S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
@@ -57,6 +42,21 @@ ScloseMin  :REAL; //Минимальная дистанция доступная для перемещения на закрытие[
 END_VAR
 
 BEGIN
+
+//           DbStpForPD
+//    +----------------------+
+//    |      FbStpForPD      |
+// ->-|InFromPD       CmdOpen|->-
+//   -|TimeOpen      CmdClose|->-
+//   -|TimeClose             |
+//   -|TimeMin               |
+//   -|Smax                  |
+//   -|Smin                  |
+//   -|SensorOpen            |
+//   -|SensorClose           |
+//   -|Ts                    |
+//   -|Reset                 |
+//    +----------------------+
 
 //Вычисления основаны на том, что интегрирующий исполнительный механизм работает в пределах 0...100 [%].
 Vin := InFromPD; // [%/с].

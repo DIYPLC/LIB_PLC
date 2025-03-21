@@ -1,14 +1,6 @@
 FUNCTION_BLOCK FbDeriveF //Производная с фильтром.
 TITLE = 'Производная с фильтром.'
 
-//      DbDeriveF
-//    +-----------+
-//    | FbDeriveF |
-// ->-|In      Out|->-
-//   -|Kdf        |
-//   -|Ts         |
-//    +-----------+
-
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
 S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
@@ -34,6 +26,14 @@ Dintegral :REAL := 0.0; //Интегратор.
 END_VAR
 
 BEGIN
+
+//      DbDeriveF
+//    +-----------+
+//    | FbDeriveF |
+// ->-|In      Out|->-
+//   -|Kdf        |
+//   -|Ts         |
+//    +-----------+
 
 //W(s)=s/(1+Tdf*s) при Tdf=1/Kdf и Ts->0.
 IF (Kdf <= 0.0) THEN

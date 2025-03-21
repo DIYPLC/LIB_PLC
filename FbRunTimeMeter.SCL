@@ -1,15 +1,6 @@
 FUNCTION_BLOCK FbRunTimeMeter //Измерение времени выполнения участка программы.
 TITLE = 'Измерение времени выполнения участка программы.'
 
-//            DbRunTimeMeter
-//     +--------------------------+
-//     |      FbRunTimeMeter      |
-//  ->-|StartSeconds       RunTime|->-
-//  ->-|StartMillisecond          |
-//  ->-|StopSeconds               |
-//  ->-|StopMillisecond           |
-//     +--------------------------+
-
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
 S7_blockview := 'big'  ; //CFC: отображение блока мелнькое или большое.
@@ -43,6 +34,15 @@ Time_stop_ms  :DINT := 0; //Метка времени в конце измерения 0...59999ms
 END_VAR
 
 BEGIN
+
+//            DbRunTimeMeter
+//     +--------------------------+
+//     |      FbRunTimeMeter      |
+//  ->-|StartSeconds       RunTime|->-
+//  ->-|StartMillisecond          |
+//  ->-|StopSeconds               |
+//  ->-|StopMillisecond           |
+//     +--------------------------+
 
 //Начало измерения 00s000ms...59s999ms == 0...59999ms
 Time_start_ms := ( INT_TO_DINT(StartSeconds) * 1000 ) + INT_TO_DINT(StartMillisecond);

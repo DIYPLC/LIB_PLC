@@ -1,12 +1,6 @@
 FUNCTION_BLOCK FbDelayN //Блок задержки сигнала на 100 тактов.
 TITLE = 'Блок задержки сигнала на 100 тактов.'
 
-//      DbDelayN
-//    +----------+
-//    | FbDelayN |
-// ->-|In     Out|->-
-//    +----------+
-
 {//Атрибуты для PCS7.
 S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
 S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
@@ -35,6 +29,12 @@ Counter1 :INT := 0; //Счетчик.
 END_VAR
 
 BEGIN
+
+//      DbDelayN
+//    +----------+
+//    | FbDelayN |
+// ->-|In     Out|->-
+//    +----------+
 
 //W(Z)=Z^(-N), N=NUMBER+2
 Out := Buffer1[NUMBER];
