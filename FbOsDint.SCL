@@ -1,4 +1,4 @@
-FUNCTION_BLOCK FbOsDint
+FUNCTION_BLOCK "FbOsDint"
 TITLE = 'FbOsDint'
 
 //WinCC interface CFC PCS7.

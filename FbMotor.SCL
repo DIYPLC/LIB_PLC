@@ -1,4 +1,4 @@
-FUNCTION_BLOCK FbMotor //Двигатель с частотником и контактором.
+FUNCTION_BLOCK "FbMotor"
 TITLE = 'Двигатель с частотником и контактором.'
 
 {//Атрибуты для PCS7.
@@ -11,6 +11,7 @@ VERSION : '2.1'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
 
+//Двигатель с частотником и контактором.
 VAR_INPUT //Входные переменные, сохраняемые.
 MotorRun       :BOOL := FALSE; //Команда: включить двигатель.
 VoltageOk      :BOOL := FALSE; //Схема собрана 380VAC Ok.

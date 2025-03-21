@@ -1,4 +1,4 @@
-FUNCTION_BLOCK FbDriverRTC //Блок чтения часов реального времени.
+FUNCTION_BLOCK "FbDriverRTC"
 TITLE = 'Блок чтения часов реального времени.'
 
 {//Атрибуты для PCS7.
@@ -17,6 +17,7 @@ VERSION : '3.2'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
 
+//Блок чтения часов реального времени.
 VAR_INPUT //Входные переменные, сохраняемые.
 Reset       :BOOL := FALSE; //Сброс при перезагрузке.
 END_VAR

@@ -1,4 +1,4 @@
-FUNCTION_BLOCK FbS5TimeToReal //Конвертор S5TIME в милисекунды.
+FUNCTION_BLOCK "FbS5TimeToReal"
 TITLE = 'FbS5TimeToReal'
 
 {//Атрибуты для PCS7.
@@ -11,6 +11,7 @@ VERSION : '1.0'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
 
+//Конвертор S5TIME в милисекунды.
 VAR_INPUT //Входные переменные, сохраняемые.
 X:S5TIME:=T#0s; //Вход S5TIME 16 бит BCD.
 //Представим это слово как 2 байта...

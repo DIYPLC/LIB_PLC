@@ -1,4 +1,4 @@
-FUNCTION_BLOCK FbBitsToWord //Преобразование 16 бит в слово.
+FUNCTION_BLOCK "FbBitsToWord"
 TITLE = 'Преобразование 16 бит в слово.'
 
 {//Атрибуты для PCS7.
@@ -11,6 +11,7 @@ VERSION : '2.1'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
 
+//Преобразование 16 бит в слово.
 VAR_INPUT //Входные переменные, сохраняемые.
 In0  :BOOL := FALSE; //Входной сигнал бит0.
 In1  :BOOL := FALSE; //Входной сигнал бит1.

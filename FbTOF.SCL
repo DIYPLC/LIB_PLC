@@ -1,4 +1,4 @@
-FUNCTION_BLOCK FbTOF //Таймер с задержкой на выключение.
+FUNCTION_BLOCK "FbTOF"
 TITLE = 'TOF - Таймер с задержкой на выключение.'
 
 {//Атрибуты для PCS7.
@@ -11,6 +11,7 @@ VERSION : '2.2'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
 
+//Таймер с задержкой на выключение.
 VAR_INPUT //Входные переменные, сохраняемые.
 In           :BOOL := FALSE; //Вход таймера.
 TimeDelayOff :DINT := 5000 ; //Время задержки выключения [мс].

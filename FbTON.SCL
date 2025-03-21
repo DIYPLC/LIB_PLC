@@ -1,4 +1,4 @@
-FUNCTION_BLOCK FbTON //Таймер с задержкой на включение.
+FUNCTION_BLOCK "FbTON"
 TITLE = 'TON - Таймер с задержкой на включение.'
 
 {//Атрибуты для PCS7.
@@ -11,6 +11,7 @@ VERSION : '2.2'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
 
+//Таймер с задержкой на включение.
 VAR_INPUT //Входные переменные, сохраняемые.
 In          :BOOL := FALSE; //Вход таймера.
 TimeDelayOn :DINT := 5000 ; //Время задержки включения [мс].

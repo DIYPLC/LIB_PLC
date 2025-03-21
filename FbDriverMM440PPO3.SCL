@@ -1,4 +1,4 @@
-FUNCTION_BLOCK FbDriverMM440PPO3 //Управление приводом SIEMENS MICROMASTER 440 по PROFIBUS PD.
+FUNCTION_BLOCK "FbDriverMM440PPO3"
 TITLE = 'Управление приводом SIEMENS MICROMASTER 440 по PROFIBUS PD.'
 //PROFIDRIVE profile PPO 3.
 
@@ -12,6 +12,7 @@ VERSION : '1.1'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
 
+//Управление приводом SIEMENS MICROMASTER 440 по PROFIBUS PD.
 VAR_INPUT //Входные переменные.
 ADR_I :DINT := 256;   //Стартовый адрес IW256? в HardWare.
 ADR_Q :DINT := 256;   //Стартовый адрес QW256? в HardWare.

@@ -1,4 +1,4 @@
-FUNCTION_BLOCK FbOsReal
+FUNCTION_BLOCK "FbOsReal"
 TITLE = 'FbOsReal'
 
 //WinCC interface CFC PCS7.

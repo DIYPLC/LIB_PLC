@@ -1,4 +1,4 @@
-FUNCTION_BLOCK FbOsBool
+FUNCTION_BLOCK "FbOsBool"
 TITLE = 'FbOsBool'
 
 //WinCC interface CFC PCS7.

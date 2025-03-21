@@ -1,4 +1,4 @@
-FUNCTION_BLOCK FbDriverAD800PPO4 //Управление приводом OPTUMUS DRIVE AD800 по PROFIBUS PD.
+FUNCTION_BLOCK "FbDriverAD800PPO4"
 TITLE = 'Управление приводом OPTUMUS DRIVE AD800 по PROFIBUS PD.'
 //PROFIDRIVE profile PPO4.
 
@@ -12,6 +12,7 @@ VERSION : '2.0'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
 
+//Управление приводом OPTUMUS DRIVE AD800 по PROFIBUS PD.
 VAR_INPUT // Входные переменные.
 ADR_I :DINT := 256;   //Стартовый адрес IW256? в HardWare.
 ADR_Q :DINT := 256;   //Стартовый адрес QW256? в HardWare.

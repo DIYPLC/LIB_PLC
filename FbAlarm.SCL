@@ -1,4 +1,4 @@
-FUNCTION_BLOCK FbAlarm //Блок предупреждений.
+FUNCTION_BLOCK "FbAlarm"
 TITLE = 'Блок предупреждений.'
 
 {//Атрибуты для PCS7.
@@ -11,6 +11,7 @@ VERSION : '2.1'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
 
+//Блок предупреждений.
 VAR_INPUT //Входные переменные, сохраняемые.
 In        :REAL := 0.0 ; //Входной сигнал.
 LevelHi   :REAL := 90.0; //Верхняя граница предупреждения.

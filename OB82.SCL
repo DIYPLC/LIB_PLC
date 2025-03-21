@@ -1,11 +1,11 @@
-ORGANIZATION_BLOCK OB82 //I/O Point Fault 1
-
-//Атрибуты для STEP7.
+ORGANIZATION_BLOCK OB82
 TITLE   = 'I/O Point Fault 1'
+
 VERSION : '2.1'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
 
+//I/O Point Fault 1
 VAR_TEMP
 OB82_EV_CLASS       :BYTE         ; //16#39, Event class 3, Entering event state, Internal fault event
 OB82_FLT_ID         :BYTE         ; //16#XX, Fault identifcation code

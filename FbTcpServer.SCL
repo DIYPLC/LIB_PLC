@@ -1,5 +1,6 @@
-FUNCTION_BLOCK FbTcpServer // TCP server echo.
+FUNCTION_BLOCK "FbTcpServer"
 
+// TCP server echo.
 VAR_INPUT
 // SYSTEM
 Ts_ms : DINT := 0;      // Шаг дискретизации по времени [мс].

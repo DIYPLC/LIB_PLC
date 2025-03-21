@@ -1,11 +1,11 @@
-ORGANIZATION_BLOCK OB122 //Вызывается если вытаскиваем модули: AO.
-
-//Атрибуты для STEP7.
+ORGANIZATION_BLOCK OB122
 TITLE   = 'Вызывается если вытаскиваем модули: AO.'
+
 VERSION : '2.1'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
 
+//Вызывается если вытаскиваем модули: AO.
 VAR_TEMP
 OB122_EV_CLASS  :BYTE         ; //16#29, Event class 2, Entering event state, Internal fault event
 OB122_SW_FLT    :BYTE         ; //16#XX Software error code

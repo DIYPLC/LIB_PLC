@@ -1,4 +1,4 @@
-FUNCTION_BLOCK FbS7conTx //Данные отправленные через S7 connection в NetPro.
+FUNCTION_BLOCK "FbS7conTx"
 TITLE = 'Данные отправленные через S7 connection в NetPro.'
 
 {//Атрибуты для PCS7.
@@ -11,6 +11,7 @@ VERSION : '2.1'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
 
+//Данные отправленные через S7 connection в NetPro.
 VAR_INPUT //Входные переменные, сохраняемые.
 TX1  :INT := 0; //Отправить значение N1 в удаленный ПЛК.
 TX2  :INT := 0; //Отправить значение N2 в удаленный ПЛК.

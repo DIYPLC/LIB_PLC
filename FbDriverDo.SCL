@@ -1,4 +1,4 @@
-FUNCTION_BLOCK FbDriverDo //ƒрайвер дискретного выхода.
+FUNCTION_BLOCK "FbDriverDo"
 TITLE = 'FbDriverDo'
 
 {//јтрибуты дл€ PCS7.
@@ -11,6 +11,7 @@ VERSION : '0.2'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
 
+//ƒрайвер дискретного выхода.
 VAR_INPUT //¬ходные переменные, сохран€емые.
 In              :BOOL := FALSE; //¬ход дискретного сигнала.
 SimValue :BOOL := FALSE; //«начение дл€ Out при симул€ции.

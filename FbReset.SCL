@@ -1,4 +1,4 @@
-FUNCTION_BLOCK FbReset
+FUNCTION_BLOCK "FbReset"
 TITLE = 'FbReset'
 //Флаг первого скана с TOF задержкой CFC PCS7.
 

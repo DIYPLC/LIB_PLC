@@ -1,4 +1,4 @@
-FUNCTION_BLOCK FbTriggerRS //RS- “риггер с приоритетом на сброс.
+FUNCTION_BLOCK "FbTriggerRS"
 TITLE = 'RS- “риггер с приоритетом на сброс.'
 
 {//јтрибуты дл€ PCS7.
@@ -11,6 +11,7 @@ VERSION : '2.1'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
 
+//RS- “риггер с приоритетом на сброс.
 VAR_INPUT //¬ходные переменные, сохран€емые.
 Set :BOOL := FALSE; //Set Ч установить единицу.
 Rst :BOOL := FALSE; //Reset Ч сбросить на ноль.

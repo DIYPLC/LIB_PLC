@@ -1,4 +1,4 @@
-FUNCTION_BLOCK FbDriverFRA //Управление приводом MITSUBISHI FR-A740, FR-A840 по PROFIBUS PD.
+FUNCTION_BLOCK "FbDriverFRA"
 TITLE = 'Управление приводом MITSUBISHI FR-A740, FR-A840 по PROFIBUS PD.'
 //PROFIDRIVE profile PPO type1.
 
@@ -12,6 +12,7 @@ VERSION : '2.1'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
 
+//Управление приводом MITSUBISHI FR-A740, FR-A840 по PROFIBUS PD.
 VAR_INPUT //Входные переменные.
 ADR_I  :DINT := 0;     //Стартовый адрес FR-A7NP(FR-A8NP) в HardWare.
 ADR_Q  :DINT := 0;     //Стартовый адрес FR-A7NP(FR-A8NP) в HardWare.

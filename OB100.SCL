@@ -1,11 +1,11 @@
-ORGANIZATION_BLOCK OB100 //Программа первого скана.
-
-//Атрибуты для STEP7.
+ORGANIZATION_BLOCK OB100
 TITLE   = 'Программа первого скана.'
+
 VERSION : '2.1'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
 
+//Программа первого скана.
 VAR_TEMP
 OB100_EV_CLASS   :BYTE         ; //16#13, Event class 1, Entering event state, Event logged in diagnostic buffer
 OB100_STRTUP     :BYTE         ; //16#81/82/83/84 Method of startup

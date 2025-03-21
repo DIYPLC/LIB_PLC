@@ -1,4 +1,4 @@
-FUNCTION_BLOCK Fb1PC1 //ПИД- регулятор давления.
+FUNCTION_BLOCK "Fb1PC1"
 TITLE = '1PC1 ПИД- регулятор давления.'
 
 {// Атрибуты для PCS7.
@@ -13,6 +13,7 @@ VERSION : '2.1'
 AUTHOR  : VA
 FAMILY  : '1PC1'
 
+//ПИД- регулятор давления.
 VAR_INPUT // Входные переменные, сохраняемые.
 ADC_Pressure      :WORD := 0    ; //Датчик давления 0...27648[АЦП].
 RemoteStartButton :BOOL := FALSE; //Кнопка без фиксации NO "ПУСК" на пульте местного управления.

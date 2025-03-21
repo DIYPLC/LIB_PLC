@@ -1,4 +1,4 @@
-FUNCTION_BLOCK FbSum1bit //Сумматор 1бит.
+FUNCTION_BLOCK "FbSum1bit"
 TITLE = 'FbSum1bit'
 
 {//Атрибуты для PCS7.
@@ -11,6 +11,7 @@ VERSION : '1.0'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
 
+//Сумматор 1бит.
 VAR_INPUT //Входные переменные.
 A   :BOOL := FALSE; //Первое слагаемое.
 B   :BOOL := FALSE; //Второе слагаемое.

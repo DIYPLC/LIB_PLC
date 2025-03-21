@@ -1,4 +1,4 @@
-FUNCTION_BLOCK FbTaskCyclic //Задача вызывается циклически.
+FUNCTION_BLOCK "FbTaskCyclic"
 TITLE = 'Задача вызывается циклически.'
 
 {//Атрибуты для PCS7.
@@ -11,6 +11,7 @@ VERSION : '2.1'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
 
+//Задача вызывается циклически.
 VAR_INPUT //Входные переменные, не сохраняемые.
 Ts_ms :DINT := 100  ; //Шаг дискретизации по времени [мс].
 Reset :BOOL := FALSE; //Сброс при перезагрузке.

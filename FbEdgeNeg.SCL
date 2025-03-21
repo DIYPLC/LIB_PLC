@@ -1,4 +1,4 @@
-FUNCTION_BLOCK FbEdgeNeg //Детектор ниспадающего фронта (среза).
+FUNCTION_BLOCK "FbEdgeNeg"
 TITLE = 'Детектор ниспадающего фронта (среза).'
 
 {//Атрибуты для PCS7.
@@ -11,6 +11,7 @@ VERSION : '2.1'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
 
+//Детектор ниспадающего фронта (среза).
 VAR_INPUT //Входные переменные, сохраняемые.
 In :BOOL := FALSE; //Вход.
 END_VAR

@@ -1,4 +1,4 @@
-FUNCTION_BLOCK FbBlink //Мигающий светодиод.
+FUNCTION_BLOCK "FbBlink"
 TITLE = 'Мигающий светодиод.'
 
 {//Атрибуты для PCS7.
@@ -11,6 +11,7 @@ VERSION : '1.1'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
 
+//Мигающий светодиод.
 VAR_INPUT //Входные переменные, сохраняемые.
 TimeOn  :DINT := 2000 ; //Время включения лампочки [мс].
 TimeOff :DINT := 2000 ; //Время выключения лампочки [мс].

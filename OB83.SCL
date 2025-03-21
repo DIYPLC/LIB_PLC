@@ -1,11 +1,11 @@
-ORGANIZATION_BLOCK OB83 //Вызывается если вытаскиваем модули: DI DO AI.
-
-//Атрибуты для STEP7.
+ORGANIZATION_BLOCK OB83
 TITLE   = 'Вызывается если вытаскиваем модули: DI DO AI.'
+
 VERSION : '2.1'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
 
+//Вызывается если вытаскиваем модули: DI DO AI.
 VAR_TEMP
 OB83_EV_CLASS   :BYTE         ; //16#38/39, Event class 3, module inserted/removed (8/9)
 OB83_FLT_ID     :BYTE         ; //16#XX, Fault identifcation code
