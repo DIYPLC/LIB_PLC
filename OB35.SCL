@@ -1,9 +1,9 @@
 ORGANIZATION_BLOCK OB35
 TITLE   = 'Прерывание каждые 100мс.'
 
-VERSION : '2.1'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
+VERSION : '2.1'
 
 //Прерывание каждые 100мс.
 VAR_TEMP

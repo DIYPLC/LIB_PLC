@@ -4,9 +4,9 @@ TITLE = 'Обмен данными между двумя ПЛК S7-300(400).'
 { S7_read_back := 'true' ;
   S7_blockview := 'big'  }
 
-VERSION : '4.4'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
+VERSION : '4.4'
 
 //Обмен данными между двумя ПЛК S7-300(400).
 VAR_INPUT

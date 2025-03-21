@@ -4,9 +4,9 @@ TITLE = 'Фильтр NaN и Inf для чисел REAL.'
 { S7_read_back := 'true' ;
   S7_blockview := 'big'  }
 
-VERSION : '2.1'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
+VERSION : '2.1'
 
 //Фильтр NaN и Inf для чисел REAL.
 VAR_INPUT //Входные переменные, сохраняемые.

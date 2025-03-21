@@ -4,9 +4,9 @@ TITLE = 'FbS5TimeToReal'
 { S7_read_back := 'true' ;
   S7_blockview := 'big'  }
 
-VERSION : '1.0'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
+VERSION : '1.0'
 
 //Конвертор S5TIME в милисекунды.
 VAR_INPUT //Входные переменные, сохраняемые.

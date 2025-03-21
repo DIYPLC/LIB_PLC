@@ -6,9 +6,9 @@ TITLE = '1PC1 ПИД- регулятор давления.'
   S7_read_back := 'true' ;
   S7_blockview := 'big'  }
 
-VERSION : '2.1'
 AUTHOR  : VA
 FAMILY  : '1PC1'
+VERSION : '2.2'
 
 //ПИД- регулятор давления.
 VAR_INPUT // Входные переменные, сохраняемые.

@@ -4,9 +4,9 @@ TITLE = 'Виртуальный МЭО для отладки шагового регулятора.'
 { S7_read_back := 'true' ;
   S7_blockview := 'big'  }
 
-VERSION : '0.2'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
+VERSION : '0.2'
 
 //Виртуальный МЭО для отладки шагового регулятора.
 VAR_INPUT //Входные переменные, сохраняемые.

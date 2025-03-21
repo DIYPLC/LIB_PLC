@@ -4,9 +4,9 @@ TITLE = 'TOF - Таймер с задержкой на выключение.'
 { S7_read_back := 'true' ;
   S7_blockview := 'big'  }
 
-VERSION : '2.2'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
+VERSION : '2.2'
 
 //Таймер с задержкой на выключение.
 VAR_INPUT //Входные переменные, сохраняемые.

@@ -4,9 +4,9 @@ TITLE = '—четчик импульсов.'
 { S7_read_back := 'true' ;
   S7_blockview := 'big'  }
 
-VERSION : '2.1'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
+VERSION : '2.2'
 
 //—четчик импульсов.
 VAR_INPUT //¬ходные переменные, сохран€емые.

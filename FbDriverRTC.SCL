@@ -4,10 +4,9 @@ TITLE = 'Блок чтения часов реального времени.'
 { S7_read_back := 'true' ;
   S7_blockview := 'big'  }
 
-//Атрибуты для STEP7.
-VERSION : '3.2'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
+VERSION : '3.2'
 
 //Блок чтения часов реального времени.
 VAR_INPUT //Входные переменные, сохраняемые.

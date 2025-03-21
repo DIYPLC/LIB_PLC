@@ -3,9 +3,9 @@ TITLE = 'FbReset'
 
 { S7_tasklist := 'OB100' }
 
-VERSION : '1.1'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
+VERSION : '1.1'
 
 //Флаг первого скана с TOF задержкой CFC PCS7.
 VAR_INPUT

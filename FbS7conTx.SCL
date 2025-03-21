@@ -4,9 +4,9 @@ TITLE = 'Данные отправленные через S7 connection в NetPro.'
 { S7_read_back := 'true' ;
   S7_blockview := 'big'  }
 
-VERSION : '2.1'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
+VERSION : '2.1'
 
 //Данные отправленные через S7 connection в NetPro.
 VAR_INPUT //Входные переменные, сохраняемые.

@@ -1,9 +1,9 @@
 ORGANIZATION_BLOCK OB1
 TITLE   = 'Циклическая программа.'
 
-VERSION : '2.1'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
+VERSION : '2.1'
 
 //Циклическая программа.
 VAR_TEMP

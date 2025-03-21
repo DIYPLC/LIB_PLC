@@ -1,9 +1,9 @@
 ORGANIZATION_BLOCK OB100
 TITLE   = 'Программа первого скана.'
 
-VERSION : '2.1'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
+VERSION : '2.1'
 
 //Программа первого скана.
 VAR_TEMP

@@ -1,9 +1,9 @@
 ORGANIZATION_BLOCK OB82
 TITLE   = 'I/O Point Fault 1'
 
-VERSION : '2.1'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
+VERSION : '2.1'
 
 //I/O Point Fault 1
 VAR_TEMP

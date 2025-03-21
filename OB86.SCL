@@ -1,9 +1,9 @@
 ORGANIZATION_BLOCK OB86
 TITLE   = 'Loss of Rack Fault'
 
-VERSION : '2.1'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
+VERSION : '2.1'
 
 //Loss of Rack Fault
 VAR_TEMP
