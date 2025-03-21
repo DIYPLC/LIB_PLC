@@ -1,12 +1,9 @@
 FUNCTION_BLOCK "FbValve"
 TITLE = 'Пневмоцилиндр с концевиками.'
 
-{//Атрибуты для PCS7.
-S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
-S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
-}
+{ S7_read_back := 'true' ;
+  S7_blockview := 'big'  }
 
-//Атрибуты для STEP7.
 VERSION : '2.2'
 AUTHOR  : VA
 FAMILY  : LIB_PLC

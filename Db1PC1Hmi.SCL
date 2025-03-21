@@ -34,10 +34,8 @@
 
 DATA_BLOCK Db1PC1Hmi //1PC1 ПИД- регулятор давления.
 
-{//Атрибуты для PCS7.
-S7_m_c     := 'true'   ; //CFC: Блок может управляться или наблюдаться из OS.
-S7_tag     := 'true'     //CFC: Блок входит в писок тегов OS. 
-}
+{ S7_m_c     := 'true' ;
+  S7_tag     := 'true' }
 
 AUTHOR : VA
 FAMILY : '1PC1'

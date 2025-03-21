@@ -1,16 +1,8 @@
 FUNCTION_BLOCK "FbDriverRTC"
 TITLE = 'Блок чтения часов реального времени.'
 
-{//Атрибуты для PCS7.
-S7_read_back := 'true' ; //CFC: Chart>Readback активен для прототипов DB.
-S7_blockview := 'big'  ; //CFC: отображение блока маленькое или большое.
-//Опции компилятора SCL.
-GenerateReferenceData := 'y' ; //SCL: Генерировать перекрестные ссылки.
-CreateDebugInfo       := 'y' ; //SCL: Генерировать оладочную информацию.
-SetOKFlag             := 'y' ; //SCL: ENO = 1
-MonitorArrayLimits    := 'y' ; //SCL: Следить за границами массивов.
-OptimizeObjectCode    := 'y'   //SCL: Оптимизация объектного кода.
-}
+{ S7_read_back := 'true' ;
+  S7_blockview := 'big'  }
 
 //Атрибуты для STEP7.
 VERSION : '3.2'

@@ -1,5 +1,9 @@
 FUNCTION_BLOCK "FbTcpServer"
 
+VERSION : '1.0'
+AUTHOR  : VA
+FAMILY  : LIB_PLC
+
 // TCP server echo.
 VAR_INPUT
 // SYSTEM

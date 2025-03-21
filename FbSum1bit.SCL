@@ -1,12 +1,9 @@
 FUNCTION_BLOCK "FbSum1bit"
 TITLE = 'FbSum1bit'
 
-{//јтрибуты дл€ PCS7.
-S7_read_back := 'true' ; //CFC: Chart>Readback активен дл€ прототипов DB.
-S7_blockview := 'big'    //CFC: отображение блока маленькое или большое.
-}
+{ S7_read_back := 'true' ;
+  S7_blockview := 'big'  }
 
-//јтрибуты дл€ STEP7.
 VERSION : '1.0'
 AUTHOR  : VA
 FAMILY  : LIB_PLC

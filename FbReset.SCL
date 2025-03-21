@@ -1,15 +1,13 @@
 FUNCTION_BLOCK "FbReset"
 TITLE = 'FbReset'
-//Флаг первого скана с TOF задержкой CFC PCS7.
 
-{//FB attributes for PCS7.
-S7_tasklist := 'OB100' //Call in OB100
-}
+{ S7_tasklist := 'OB100' }
 
 VERSION : '1.1'
 AUTHOR  : VA
 FAMILY  : LIB_PLC
 
+//Флаг первого скана с TOF задержкой CFC PCS7.
 VAR_INPUT
 TimeDelayOff 
 {//Атрибуты переменных PCS7.
