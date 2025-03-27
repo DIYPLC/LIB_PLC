@@ -8,7 +8,6 @@ AUTHOR  : VA
 FAMILY  : LIB_PLC
 VERSION : '2.1'
 
-//Детектор ниспадающего фронта (среза).
 VAR_INPUT //Входные переменные, сохраняемые.
 In :BOOL := FALSE; //Вход.
 END_VAR
@@ -23,6 +22,7 @@ END_VAR
 
 BEGIN
 
+// Детектор ниспадающего фронта (среза).
 //       DbEdgeNeg
 //     +-----------+
 //     | FbEdgeNeg |

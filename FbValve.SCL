@@ -8,7 +8,6 @@ AUTHOR  : VA
 FAMILY  : LIB_PLC
 VERSION : '2.2'
 
-//Пневмоцилиндр с концевиками.
 VAR_INPUT //Входные переменные, сохраняемые.
 CommandOpen     :BOOL := FALSE; //Команда открыть клапан.
 FeedbackOpen    :BOOL := FALSE; //Датчик обратной связи "Клапан открылся".
@@ -45,6 +44,7 @@ END_CONST
 
 BEGIN
 
+// Пневмоцилиндр с концевиками.
 //                DbValve
 //    +-----------------------------+
 //    |           FbValve           |

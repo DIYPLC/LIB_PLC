@@ -1,5 +1,5 @@
 FUNCTION_BLOCK "FbDispersion"
-TITLE = 'FbDispersion'
+TITLE = 'Дисперсия PV.'
 
 { S7_read_back := 'true' ;
   S7_blockview := 'big'  }
@@ -8,7 +8,6 @@ AUTHOR  : VA
 FAMILY  : LIB_PLC
 VERSION : '1.1'
 
-//Дисперсия PV.
 VAR_INPUT //Входные переменные, сохраняемые.
 In:REAL := 0.0; //Вход измерения.
 END_VAR
@@ -31,6 +30,7 @@ END_VAR
 
 BEGIN
 
+// Дисперсия PV.
 //       DbDispersion
 //     +--------------+
 //     | FbDispersion |

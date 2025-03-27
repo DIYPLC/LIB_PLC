@@ -8,8 +8,6 @@ AUTHOR  : VA
 FAMILY  : LIB_PLC
 VERSION : '2.2'
 
-//Управление приводом MITSUBISHI FR-A740, FR-A840 по PROFIBUS PD.
-//PROFIDRIVE profile PPO type1.
 VAR_INPUT //Входные переменные.
 ADR_I  :DINT := 0;     //Стартовый адрес FR-A7NP(FR-A8NP) в HardWare.
 ADR_Q  :DINT := 0;     //Стартовый адрес FR-A7NP(FR-A8NP) в HardWare.
@@ -64,6 +62,8 @@ END_VAR
 
 BEGIN
 
+//PROFIDRIVE profile PPO type1.
+//Управление приводом MITSUBISHI FR-A740, FR-A840 по PROFIBUS PD.
 //       DbDriverFRA
 //    +---------------+
 //    |  FbDriverFRA  |

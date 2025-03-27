@@ -9,7 +9,6 @@ AUTHOR  : VA
 FAMILY  : LIB_PLC
 VERSION : '1.1'
 
-//Замещение аналогово сигнала для PCS7v9.
 VAR_INPUT //Входные переменные, сохраняемые.
 
 In

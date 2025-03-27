@@ -8,7 +8,6 @@ AUTHOR  : VA
 FAMILY  : LIB_PLC
 VERSION : '2.1'
 
-//Переключатель режимов работы.
 VAR_INPUT //Входные переменные, сохраняемые.
 ButtonStop   :BOOL := FALSE; //Кнопка "Стоп".
 ButtonManual :BOOL := FALSE; //Кнопка "Ручной режим".
@@ -36,6 +35,7 @@ END_CONST
 
 BEGIN
 
+// Переключатель режимов работы.
 //          DbModeSelector
 //    +------------------------+
 //    |     FbModeSelector     |

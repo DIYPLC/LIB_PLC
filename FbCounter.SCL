@@ -8,7 +8,6 @@ AUTHOR  : VA
 FAMILY  : LIB_PLC
 VERSION : '2.2'
 
-//—четчик импульсов.
 VAR_INPUT //¬ходные переменные, сохран€емые.
 INC      :BOOL := FALSE; //¬ход импульсов +1.
 DEC      :BOOL := FALSE; //¬ход импульсов -1.
@@ -34,6 +33,7 @@ END_CONST
 
 BEGIN
 
+// —четчик импульсов.
 //         DbCounter
 //    +-----------------+
 //    |    FbCounter    |

@@ -8,7 +8,6 @@ AUTHOR  : VA
 FAMILY  : LIB_PLC
 VERSION : '0.2'
 
-//Виртуальный МЭО для отладки шагового регулятора.
 VAR_INPUT //Входные переменные, сохраняемые.
 CmdOpen   :BOOL := FALSE; //Команда на открытие +.
 CmdClose  :BOOL := FALSE; //Команда на закрытие -.
@@ -31,6 +30,7 @@ END_VAR
 
 BEGIN
 
+// Виртуальный МЭО для отладки шагового регулятора.
 //           DbSimMotorGear
 //    +--------------------------+
 //    |      FbSimMotorGear      |

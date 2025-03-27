@@ -1,11 +1,10 @@
 ORGANIZATION_BLOCK OB122
-TITLE   = 'Вызывается если вытаскиваем модули: AO.'
+TITLE = 'Вызывается если вытаскиваем модули: AO.'
 
 AUTHOR  : VA
 FAMILY  : LIB_PLC
 VERSION : '2.1'
 
-//Вызывается если вытаскиваем модули: AO.
 VAR_TEMP
 OB122_EV_CLASS  :BYTE         ; //16#29, Event class 2, Entering event state, Internal fault event
 OB122_SW_FLT    :BYTE         ; //16#XX Software error code

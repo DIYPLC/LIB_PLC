@@ -1,5 +1,5 @@
 FUNCTION_BLOCK "FbTOF"
-TITLE = 'TOF - Таймер с задержкой на выключение.'
+TITLE = 'Таймер с задержкой на выключение.'
 
 { S7_read_back := 'true' ;
   S7_blockview := 'big'  }
@@ -8,7 +8,6 @@ AUTHOR  : VA
 FAMILY  : LIB_PLC
 VERSION : '2.2'
 
-//Таймер с задержкой на выключение.
 VAR_INPUT //Входные переменные, сохраняемые.
 In           :BOOL := FALSE; //Вход таймера.
 TimeDelayOff :DINT := 5000 ; //Время задержки выключения [мс].
@@ -25,6 +24,7 @@ END_VAR
 
 BEGIN
 
+// Таймер с задержкой на выключение.
 //          DbTOF
 //    +----------------+
 //    |     FbTOF      |

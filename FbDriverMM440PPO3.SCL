@@ -8,8 +8,6 @@ AUTHOR  : VA
 FAMILY  : LIB_PLC
 VERSION : '1.2'
 
-//Управление приводом SIEMENS MICROMASTER 440 по PROFIBUS PD.
-//PROFIDRIVE profile PPO 3.
 VAR_INPUT //Входные переменные.
 ADR_I :DINT := 256;   //Стартовый адрес IW256? в HardWare.
 ADR_Q :DINT := 256;   //Стартовый адрес QW256? в HardWare.
@@ -74,6 +72,8 @@ END_VAR
 
 BEGIN
 
+// PROFIDRIVE profile PPO 3.
+// Управление приводом SIEMENS MICROMASTER 440 по PROFIBUS PD.
 //      DbDriverMM440PPO3
 //    +-------------------+
 //    | FbDriverMM440PPO3 |

@@ -1,11 +1,10 @@
 ORGANIZATION_BLOCK OB86
-TITLE   = 'Loss of Rack Fault'
+TITLE = 'Loss of Rack Fault'
 
 AUTHOR  : VA
 FAMILY  : LIB_PLC
 VERSION : '2.1'
 
-//Loss of Rack Fault
 VAR_TEMP
 OB86_EV_CLASS   : BYTE                      ; //16#38/39 Event class 3
 OB86_FLT_ID     : BYTE                      ; //16#C1/C4/C5, Fault identifcation code

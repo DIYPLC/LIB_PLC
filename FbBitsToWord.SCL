@@ -8,7 +8,6 @@ AUTHOR  : VA
 FAMILY  : LIB_PLC
 VERSION : '2.2'
 
-//Преобразование 16 бит в слово.
 VAR_INPUT //Входные переменные, сохраняемые.
 In0  :BOOL := FALSE; //Входной сигнал бит0.
 In1  :BOOL := FALSE; //Входной сигнал бит1.
@@ -34,6 +33,7 @@ END_VAR
 
 BEGIN
 
+// Преобразование 16 бит в слово.
 //      DbBitsToWord
 //    +--------------+
 //    | FbBitsToWord |

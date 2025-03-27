@@ -8,7 +8,6 @@ AUTHOR  : VA
 FAMILY  : LIB_PLC
 VERSION : '2.1'
 
-//Масштабирование InMin...InMax -> OutMin...OutMax.
 VAR_INPUT //Входные переменные, сохраняемые.
 In     :REAL:= 0.0    ; //Вход до масштабирования.
 InMax  :REAL:= 27648.0; //Максимум входного диапазона.
@@ -23,6 +22,7 @@ END_VAR
 
 BEGIN
 
+// Масштабирование InMin...InMax -> OutMin...OutMax.
 //       DbScale
 //    +-----------+
 //    |  FbScale  |

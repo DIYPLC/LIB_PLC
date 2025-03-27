@@ -1,11 +1,10 @@
 ORGANIZATION_BLOCK OB35
-TITLE   = 'Прерывание каждые 100мс.'
+TITLE = 'Прерывание каждые 100мс.'
 
 AUTHOR  : VA
 FAMILY  : LIB_PLC
 VERSION : '2.1'
 
-//Прерывание каждые 100мс.
 VAR_TEMP
 OB35_EV_CLASS     :BYTE         ; //Bits 0-3 = 1 (Coming event), Bits 4-7 = 1 (Event class 1)
 OB35_STRT_INF     :BYTE         ; //16#36 (OB 35 has started)

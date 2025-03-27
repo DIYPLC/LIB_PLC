@@ -8,7 +8,6 @@ AUTHOR  : VA
 FAMILY  : LIB_PLC
 VERSION : '2.1'
 
-//Фильтр NaN и Inf для чисел REAL.
 VAR_INPUT //Входные переменные, сохраняемые.
 In:REAL := 0.0; //Вход.
 END_VAR
@@ -20,6 +19,7 @@ END_VAR
 
 BEGIN
 
+// Фильтр NaN и Inf для чисел REAL.
 //      DbFilterNaN
 //    +-------------+
 //    | FbFilterNaN |

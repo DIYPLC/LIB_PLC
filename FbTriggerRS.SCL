@@ -8,7 +8,6 @@ AUTHOR  : VA
 FAMILY  : LIB_PLC
 VERSION : '2.1'
 
-//RS- “риггер с приоритетом на сброс.
 VAR_INPUT //¬ходные переменные, сохран€емые.
 Set :BOOL := FALSE; //Set Ч установить единицу.
 Rst :BOOL := FALSE; //Reset Ч сбросить на ноль.
@@ -20,6 +19,7 @@ END_VAR
 
 BEGIN
 
+// RS- “риггер с приоритетом на сброс.
 //       DbTriggerRS
 //     +-------------+
 //     | FbTriggerRS |

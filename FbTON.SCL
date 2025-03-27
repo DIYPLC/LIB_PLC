@@ -1,5 +1,5 @@
 FUNCTION_BLOCK "FbTON"
-TITLE = 'TON - Таймер с задержкой на включение.'
+TITLE = 'Таймер с задержкой на включение.'
 
 { S7_read_back := 'true' ;
   S7_blockview := 'big'  }
@@ -8,7 +8,6 @@ AUTHOR  : VA
 FAMILY  : LIB_PLC
 VERSION : '2.2'
 
-//Таймер с задержкой на включение.
 VAR_INPUT //Входные переменные, сохраняемые.
 In          :BOOL := FALSE; //Вход таймера.
 TimeDelayOn :DINT := 5000 ; //Время задержки включения [мс].
@@ -25,6 +24,7 @@ END_VAR
 
 BEGIN
 
+// Таймер с задержкой на включение.
 //          DbTON
 //    +----------------+
 //    |     FbTON      |

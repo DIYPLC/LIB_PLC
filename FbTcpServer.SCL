@@ -1,10 +1,10 @@
 FUNCTION_BLOCK "FbTcpServer"
+TITLE = 'TCP server echo.'
 
 AUTHOR  : VA
 FAMILY  : LIB_PLC
 VERSION : '1.0'
 
-// TCP server echo.
 VAR_INPUT
 // SYSTEM
 Ts_ms : DINT := 0;      // Шаг дискретизации по времени [мс].

@@ -8,7 +8,6 @@ AUTHOR  : VA
 FAMILY  : LIB_PLC
 VERSION : '2.1'
 
-//Интегратор W(s)=1/s.
 VAR_INPUT //Входные переменные, сохраняемые.
 In        :REAL := 0.0       ; //Входной сигнал интегратора.
 OutMax    :REAL :=  1000000.0; //Максимальное значение выхода.
@@ -28,6 +27,7 @@ END_VAR
 
 BEGIN
 
+// Интегратор W(s)=1/s.
 //      DbIntegrator
 //    +--------------+
 //    | FbIntegrator |

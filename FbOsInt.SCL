@@ -1,5 +1,5 @@
 FUNCTION_BLOCK "FbOsInt"
-TITLE = 'FbOsInt'
+TITLE = 'WinCC interface CFC PCS7.'
 
 { S7_m_c       := 'true' ;
   S7_tag       := 'true' ;
@@ -9,7 +9,6 @@ AUTHOR  : VA
 FAMILY  : LIB_PLC
 VERSION : '2.0'
 
-//WinCC interface CFC PCS7.
 VAR_INPUT
 InTag
 {//Attributes for PCS7.
