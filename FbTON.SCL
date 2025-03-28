@@ -8,18 +8,18 @@ AUTHOR  : VA
 FAMILY  : LIB_PLC
 VERSION : '2.2'
 
-VAR_INPUT //Входные переменные, сохраняемые.
-In          :BOOL := FALSE; //Вход таймера.
-TimeDelayOn :DINT := 5000 ; //Время задержки включения [мс].
-Ts_ms       :DINT := 100  ; //Шаг дискретизации по времени [мс].
+VAR_INPUT // Входные переменные, сохраняемые.
+In          :BOOL := FALSE; // Вход таймера.
+TimeDelayOn :DINT := 5000 ; // Время задержки включения [мс].
+Ts_ms       :DINT := 100  ; // Шаг дискретизации по времени [мс].
 END_VAR
 
-VAR_OUTPUT //Выходные переменные, сохраняемые.
-Out :BOOL := FALSE; //Выход таймера.
+VAR_OUTPUT // Выходные переменные, сохраняемые.
+Out :BOOL := FALSE; // Выход таймера.
 END_VAR
 
-VAR //Внутренние переменные, сохраняемые.
-Timer1 :DINT := 0; //Текущее время таймер1 [мс].
+VAR // Внутренние переменные, сохраняемые.
+Timer1 :DINT := 0; // Текущее время таймер1 [мс].
 END_VAR
 
 BEGIN
@@ -33,25 +33,25 @@ BEGIN
 //   -|Ts_ms           |
 //    +----------------+
 
-IF (TimeDelayOn > 0) THEN //Таймер включен.
-  IF (In) THEN //На входе 1.
-    IF (Out) THEN //На выходе 1.
+IF (TimeDelayOn > 0) THEN // Таймер включен.
+  IF (In) THEN // На входе 1.
+    IF (Out) THEN // На выходе 1.
     Out := TRUE;
     Timer1 := 0;
-    ELSE //На выходе 0.
-      IF (Timer1 >= TimeDelayOn) THEN //Задержка включения закончилась.
+    ELSE // На выходе 0.
+      IF (Timer1 >= TimeDelayOn) THEN // Задержка включения закончилась.
       Out := TRUE;
       Timer1 := 0;
-      ELSE //Задержка включения активна.
+      ELSE // Задержка включения активна.
       Out := FALSE;
       Timer1 := Timer1 + Ts_ms;
       END_IF;
     END_IF;
-  ELSE //Если на входе 0 то на выходе тоже 0.
+  ELSE // Если на входе 0 то на выходе тоже 0.
   Out := FALSE;
   Timer1 := 0;
   END_IF;
-ELSE //Таймер выключен.
+ELSE // Таймер выключен.
 Out := In;
 Timer1 := 0;
 END_IF;

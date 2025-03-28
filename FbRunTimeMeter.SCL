@@ -8,20 +8,20 @@ AUTHOR  : VA
 FAMILY  : LIB_PLC
 VERSION : '2.1'
 
-VAR_INPUT //Входные переменные, сохраняемые.
-StartSeconds     :INT := 0; //Время в начале измерения- секунда 0...59.
-StartMillisecond :INT := 0; //Время в начале измерения- миллисекунда 0...999.
-StopSeconds      :INT := 0; //Время в конце измерения- секунда 0...59.
-StopMillisecond  :INT := 0; //Время в конце измерения- миллисекунда 0...999.
+VAR_INPUT // Входные переменные, сохраняемые.
+StartSeconds     :INT := 0; // Время в начале измерения- секунда 0...59.
+StartMillisecond :INT := 0; // Время в начале измерения- миллисекунда 0...999.
+StopSeconds      :INT := 0; // Время в конце измерения- секунда 0...59.
+StopMillisecond  :INT := 0; // Время в конце измерения- миллисекунда 0...999.
 END_VAR
 
-VAR_OUTPUT //Выходные переменные, сохраняемые.
-RunTime :INT := 0; //Измеренное время выполнения программы [мс].
+VAR_OUTPUT // Выходные переменные, сохраняемые.
+RunTime :INT := 0; // Измеренное время выполнения программы [мс].
 END_VAR
 
-VAR //Внутренние переменные, сохраняемые.
-Time_start_ms :DINT := 0; //Метка времени в начале измерения 0...59999ms
-Time_stop_ms  :DINT := 0; //Метка времени в конце измерения 0...59999ms
+VAR // Внутренние переменные, сохраняемые.
+Time_start_ms :DINT := 0; // Метка времени в начале измерения 0...59999ms
+Time_stop_ms  :DINT := 0; // Метка времени в конце измерения 0...59999ms
 END_VAR
 
 BEGIN
@@ -36,39 +36,39 @@ BEGIN
 //  ->-|StopMillisecond           |
 //     +--------------------------+
 
-//Начало измерения 00s000ms...59s999ms == 0...59999ms
+// Начало измерения 00s000ms...59s999ms == 0...59999ms
 Time_start_ms := ( INT_TO_DINT(StartSeconds) * 1000 ) + INT_TO_DINT(StartMillisecond);
 
-//Конец измерения 00s000ms...59s999ms == 0...59999ms.
+// Конец измерения 00s000ms...59s999ms == 0...59999ms.
 Time_stop_ms := ( INT_TO_DINT(StopSeconds) * 1000 ) + INT_TO_DINT(StopMillisecond);
 
-//Разность времени с учетом переполнения.
+// Разность времени с учетом переполнения.
 IF (Time_stop_ms >= Time_start_ms) THEN
 RunTime := DINT_TO_INT(Time_stop_ms - Time_start_ms);
-//Ts_ms = 7 - 2 = 5 ms
-//0
-//1
-//2 <- Time_start_ms
-//3
-//4
-//5
-//6
-//7 <- Time_stop_ms
-//8
-//9
+// Ts_ms = 7 - 2 = 5 ms
+// 0
+// 1
+// 2 <- Time_start_ms
+// 3
+// 4
+// 5
+// 6
+// 7 <- Time_stop_ms
+// 8
+// 9
 ELSE
 RunTime := DINT_TO_INT((60000 - Time_start_ms) + Time_stop_ms);
-//Ts_ms = (60000 - 59997) + 2 = 5 ms
-//59995
-//59996
-//59997 <- Time_start_ms
-//59998
-//59999
-//0
-//1
-//2 <- Time_stop_ms
-//3
-//4
+// Ts_ms = (60000 - 59997) + 2 = 5 ms
+// 59995
+// 59996
+// 59997 <- Time_start_ms
+// 59998
+// 59999
+// 0
+// 1
+// 2 <- Time_stop_ms
+// 3
+// 4
 END_IF;
 
 // @COPYLEFT ALL WRONGS RESERVED :)

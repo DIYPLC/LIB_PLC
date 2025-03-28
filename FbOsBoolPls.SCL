@@ -11,47 +11,43 @@ VERSION : '2.0'
 
 VAR_INPUT
 InTag
-{//Attributes for PCS7.
-S7_m_c     := 'true' ; //FB can be controlled or monitored from the OS.
-S7_dynamic := 'true'   //Tag view in CFC
-}
-:BOOL := FALSE; //WinCC Tag.
+{ S7_m_c     := 'true' ;
+  S7_dynamic := 'true' }
+:BOOL := FALSE; // WinCC Tag.
 END_VAR
 
 VAR_OUTPUT
 OutTag
-{//Attributes for PCS7.
-S7_dynamic := 'true'   //Tag view in CFC
-}
-:BOOL := FALSE; //IMPULSE(InTag);
+{ S7_dynamic := 'true' }
+:BOOL := FALSE; // IMPULSE(InTag);
 END_VAR
 
 BEGIN
 
-//2. Гасим выходной импульс на следующем цикле.
+// 2. Гасим выходной импульс на следующем цикле.
 IF ((InTag = FALSE) AND (OutTag = TRUE)) THEN
 OutTag := FALSE;
 InTag  := FALSE;
 END_IF;
 
-//1. Пришел входной импульс от WinCC генерируем выходной.
+// 1. Пришел входной импульс от WinCC генерируем выходной.
 IF ((InTag = TRUE) AND (OutTag = FALSE)) THEN
 OutTag := TRUE ;
 InTag  := FALSE;
 END_IF;
 
-//3. Нештатный режим.
+// 3. Нештатный режим.
 IF ((InTag = TRUE) AND (OutTag = TRUE)) THEN
 OutTag := TRUE ;
 InTag  := FALSE;
 END_IF;
 
-//Блок автоматически передает одну переменную PLC <-> SCADA WinCC.
-//Блок генерирует импульс в один скан чтобы его увидень ставьте вы выходе TOF таймер.
-//WinCC взводит тег InTag = TRUE блок сам гасит входной импульс InTag = FALSE.
-//AS == PLC
-//OS == SCADA WinCC
-//Блок спроектирован под PCS7 v5.
+// Блок автоматически передает одну переменную PLC <-> SCADA WinCC.
+// Блок генерирует импульс в один скан чтобы его увидень ставьте вы выходе TOF таймер.
+// WinCC взводит тег InTag = TRUE блок сам гасит входной импульс InTag = FALSE.
+// AS == PLC
+// OS == SCADA WinCC
+// Блок спроектирован под PCS7 v5.
 
 // @COPYLEFT ALL WRONGS RESERVED :)
 // Author: VA

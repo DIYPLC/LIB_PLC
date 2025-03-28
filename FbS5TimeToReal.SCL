@@ -8,35 +8,35 @@ AUTHOR  : VA
 FAMILY  : LIB_PLC
 VERSION : '1.0'
 
-VAR_INPUT //Входные переменные, сохраняемые.
-X:S5TIME:=T#0s; //Вход S5TIME 16 бит BCD.
-//Представим это слово как 2 байта...
+VAR_INPUT // Входные переменные, сохраняемые.
+X:S5TIME := T#0s; // Вход S5TIME 16 бит BCD.
+// Представим это слово как 2 байта...
 LocalStructTime AT X: STRUCT
 ArrayByte:ARRAY[0..1] OF BYTE;
 END_STRUCT;
 END_VAR
 
-VAR_OUTPUT //Выходные переменные, сохраняемые.
-Y:REAL:=0.0; //Выход милисекунды.
+VAR_OUTPUT // Выходные переменные, сохраняемые.
+Y :REAL := 0.0; // Выход милисекунды.
 END_VAR
 
-VAR //Внутренние переменные, сохраняемые.
-Digit1:INT:=0; //Единицы BCD.
-Digit10:INT:=0; //Десятки BCD.
-Digit100:INT:=0; //Сотни BCD.
-Base:INT:=0; //База 2 бита (BCD*10^(Base+1)).
+VAR // Внутренние переменные, сохраняемые.
+Digit1   :INT := 0; // Единицы BCD.
+Digit10  :INT := 0; // Десятки BCD.
+Digit100 :INT := 0; // Сотни BCD.
+Base     :INT := 0; // База 2 бита (BCD*10^(Base+1)).
 END_VAR
 
 BEGIN
 
-//Разбиваем BCD на части по 4 бита
-//Байты в слове поменяны местами из за архитектуры процессора.
-Digit1   :=BYTE_TO_INT(LocalStructTime.ArrayByte[1] AND 2#0000_1111);
-Digit10  :=BYTE_TO_INT(LocalStructTime.ArrayByte[1] AND 2#1111_0000)/16;
-Digit100 :=BYTE_TO_INT(LocalStructTime.ArrayByte[0] AND 2#0000_1111);
-Base     :=BYTE_TO_INT(LocalStructTime.ArrayByte[0] AND 2#0011_0000)/16;
-//Вычислем количество милисекунд согласно спецификации формата S5TIME.
-Y:=( 10**(INT_TO_REAL(Base+1)) ) * 
+// Разбиваем BCD на части по 4 бита
+// Байты в слове поменяны местами из за архитектуры процессора.
+Digit1   := BYTE_TO_INT(LocalStructTime.ArrayByte[1] AND 2#0000_1111);
+Digit10  := BYTE_TO_INT(LocalStructTime.ArrayByte[1] AND 2#1111_0000)/16;
+Digit100 := BYTE_TO_INT(LocalStructTime.ArrayByte[0] AND 2#0000_1111);
+Base     := BYTE_TO_INT(LocalStructTime.ArrayByte[0] AND 2#0011_0000)/16;
+// Вычислем количество милисекунд согласно спецификации формата S5TIME.
+Y := ( 10**(INT_TO_REAL(Base+1)) ) * 
 (
 INT_TO_REAL(Digit100*100) + 
 INT_TO_REAL(Digit10*10) + 

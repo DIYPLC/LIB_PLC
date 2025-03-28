@@ -7,11 +7,11 @@ VERSION : '1.0'
 
 VAR_INPUT
 // SYSTEM
-Ts_ms : DINT := 0;      // Шаг дискретизации по времени [мс].
+Ts_ms : DINT := 0    ;  // Шаг дискретизации по времени [мс].
 Reset : BOOL := FALSE;  // Сброс при перезагрузке.
 // HW TCP SERVER
-ID    : INT  := 1;      // Connection ID 1..16
-LADDR : WORD := 16#100; // Module address in hardware configuration
+ID    : INT  := 1     ; // Connection ID 1..16.
+LADDR : WORD := 16#100; // Module address in hardware configuration.
 END_VAR
 
 VAR_OUTPUT
@@ -33,22 +33,22 @@ AG_SEND_DONE    : BOOL := FALSE; // OUT: Job done without errors
 AG_SEND_ERR     : BOOL := FALSE; // OUT: ERROR code
 AG_SEND_STATUS  : WORD := 0;     // OUT: STATUS code
 // INTERNAL LOGIC
-ByteCounter     : INT  := 0;     // Счетчик принятых байт
-Flag100ms       : BOOL := FALSE; // Флаг взводится на 1 скан раз в 100мс
-Timer100ms      : DINT := 0;     // Таймер для циклического вызова FC6 AG_RECV каждые 100мс
-TimerRxEnd      : DINT := 0;     // Таймер для определения конца пакета
-BufferRx        : ARRAY[0..32] OF BYTE; // Буфер для хранения последнего принятого TCP сообщения
+ByteCounter     : INT  := 0;     // Счетчик принятых байт.
+Flag100ms       : BOOL := FALSE; // Флаг взводится на 1 скан раз в 100мс.
+Timer100ms      : DINT := 0;     // Таймер для циклического вызова FC6 AG_RECV каждые 100мс.
+TimerRxEnd      : DINT := 0;     // Таймер для определения конца пакета.
+BufferRx        : ARRAY[0..32] OF BYTE; // Буфер для хранения последнего принятого TCP сообщения.
 END_VAR
 
 CONST // Константы.
-MAX_RX_BYTE_SIZE   := 29;    // Максимальный размер в байтах принятого TCP сообщения
+MAX_RX_BYTE_SIZE   := 29;    // Максимальный размер в байтах принятого TCP сообщения.
 TIMEOUT_RX_MESSAGE := 300;   // Если в течении этого времени [мс] не пришло новое сообщение значит сообщение закончилось
-ASCII_CODE_1       := 16#31; // ASCII код символа '1' 
+ASCII_CODE_1       := 16#31; // ASCII код символа '1'.
 END_CONST
 
 BEGIN
 
-// Формирование импульсов в 1 скан раз в 100мс
+// Формирование импульсов в 1 скан раз в 100мс.
 IF (Timer100ms >= 100) THEN
 Flag100ms := TRUE;
 Timer100ms := 0;
@@ -95,9 +95,9 @@ IF (Flag100ms) THEN
 END_IF;
 // ---Данный код выполняется раз в 100 мс---
 
-// Если мы не приняли ни одного пакета в течении ~300 мс то считаем пакет принятым
-// Конец пакета определяем по таймауту
-IF (AG_RECV_STATUS = 16#8180) THEN // 16#8180 клиент подключился
+// Если мы не приняли ни одного пакета в течении ~300 мс то считаем пакет принятым.
+// Конец пакета определяем по таймауту.
+IF (AG_RECV_STATUS = 16#8180) THEN // 16#8180 клиент подключился.
 TimerRxEnd := TimerRxEnd + Ts_ms;
     IF (TimerRxEnd >= TIMEOUT_RX_MESSAGE) THEN
     ByteCounter := 0;
@@ -105,12 +105,12 @@ TimerRxEnd := TimerRxEnd + Ts_ms;
     END_IF;
 END_IF;
 
-// Если клиент не подключен сбрасываем счетчик принятых байт
-IF (AG_RECV_STATUS = 16#8183) THEN // 16#8183 клиент не подключился
+// Если клиент не подключен сбрасываем счетчик принятых байт.
+IF (AG_RECV_STATUS = 16#8183) THEN // 16#8183 клиент не подключился.
 ByteCounter := 0;
 END_IF;
 
-// Команда от TCP клиента
+// Команда от TCP клиента.
 // Lamp=1 если прислали ASCII '1'.
 // Если нет связи или ASCII не равно '1' то Lamp=0.
 Lamp := (BufferRx[0] = ASCII_CODE_1) AND NOT(AG_RECV_ERR);

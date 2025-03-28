@@ -8,29 +8,29 @@ AUTHOR  : VA
 FAMILY  : LIB_PLC
 VERSION : '2.1'
 
-VAR_INPUT //Входные переменные, сохраняемые.
-ButtonStop   :BOOL := FALSE; //Кнопка "Стоп".
-ButtonManual :BOOL := FALSE; //Кнопка "Ручной режим".
-ButtonAuto   :BOOL := FALSE; //Кнопка "Автоматический режим".
-Error        :BOOL := FALSE; //Отсутствие готовности системы к работе.
-Reset        :BOOL := FALSE; //Сброс при перезагрузке.
+VAR_INPUT // Входные переменные, сохраняемые.
+ButtonStop   :BOOL := FALSE; // Кнопка "Стоп".
+ButtonManual :BOOL := FALSE; // Кнопка "Ручной режим".
+ButtonAuto   :BOOL := FALSE; // Кнопка "Автоматический режим".
+Error        :BOOL := FALSE; // Отсутствие готовности системы к работе.
+Reset        :BOOL := FALSE; // Сброс при перезагрузке.
 END_VAR
 
-VAR_OUTPUT //Выходные переменные, сохраняемые.
-LampStop   :BOOL := FALSE; //Флаг "Активен режим СТОП".
-LampManual :BOOL := FALSE; //Флаг "Активен РУЧНОЙ режим".
-LampAuto   :BOOL := FALSE; //Флаг "Активен АВТОМАТИЧЕСКИЙ режим.
+VAR_OUTPUT // Выходные переменные, сохраняемые.
+LampStop   :BOOL := FALSE; // Флаг "Активен режим СТОП".
+LampManual :BOOL := FALSE; // Флаг "Активен РУЧНОЙ режим".
+LampAuto   :BOOL := FALSE; // Флаг "Активен АВТОМАТИЧЕСКИЙ режим.
 END_VAR
 
-VAR //Внутренние переменные, сохраняемые.
-State1    :INT  := 0; //Локальный граф состояний.
-FlagError :BOOL := FALSE; //Флаг запрещенного состояния входов.
+VAR // Внутренние переменные, сохраняемые.
+State1    :INT  := 0    ; // Локальный граф состояний.
+FlagError :BOOL := FALSE; // Флаг запрещенного состояния входов.
 END_VAR
 
-CONST //Константы.
-STATE_STOP   := 0; //Состояние "СТОП РЕЖИМ".
-STATE_MANUAL := 1; //Состояние "РУЧНОЙ РЕЖИМ".
-STATE_AUTO   := 2; //Состояние "АВТОМАТИЧЕСКИЙ РЕЖИМ".
+CONST // Константы.
+STATE_STOP   := 0; // Состояние "СТОП РЕЖИМ".
+STATE_MANUAL := 1; // Состояние "РУЧНОЙ РЕЖИМ".
+STATE_AUTO   := 2; // Состояние "АВТОМАТИЧЕСКИЙ РЕЖИМ".
 END_CONST
 
 BEGIN
@@ -52,28 +52,28 @@ FlagError:=
 ((ButtonStop AND ButtonAuto) OR
 ( ButtonStop AND ButtonManual));
 
-//При перезагрузке контроллера режим СТОП.
+// При перезагрузке контроллера режим СТОП.
 IF (Reset OR FlagError) THEN
     State1     := STATE_STOP;
     LampStop   := TRUE;
     LampManual := FALSE;
     LampAuto   := FALSE;
 ELSE
-    //Граф состояний.
+    // Граф состояний.
     CASE State1 OF
 
-    STATE_STOP://Режим СТОП.
+    STATE_STOP: // Режим СТОП.
     LampStop   := TRUE;
     LampManual := FALSE;
     LampAuto   := FALSE;
-    //Переход СТОП -> РУЧНОЙ.
+    // Переход СТОП -> РУЧНОЙ.
     IF ButtonManual THEN
     State1     := STATE_MANUAL;
     LampStop   := FALSE;
     LampManual := TRUE;
     LampAuto   := FALSE;
     END_IF;
-    //Переход СТОП -> АВТОМАТ.
+    // Переход СТОП -> АВТОМАТ.
     IF (ButtonAuto AND NOT(Error)) THEN
     State1     := STATE_AUTO;
     LampStop   := FALSE;
@@ -81,18 +81,18 @@ ELSE
     LampAuto   := TRUE;
     END_IF;
 
-    STATE_MANUAL://Режим РУЧНОЙ.
+    STATE_MANUAL: // Режим РУЧНОЙ.
     LampStop   := FALSE;
     LampManual := TRUE;
     LampAuto   := FALSE;
-    //Переход РУЧНОЙ -> СТОП.
+    // Переход РУЧНОЙ -> СТОП.
     IF ButtonStop THEN
     State1     := 0;
     LampStop   := TRUE;
     LampManual := FALSE;
     LampAuto   := FALSE;
     END_IF;
-    //Преход РУЧНОЙ -> АВТОМАТ.
+    // Преход РУЧНОЙ -> АВТОМАТ.
     IF (ButtonAuto AND NOT(Error)) THEN
     State1     := STATE_AUTO;
     LampStop   := FALSE;
@@ -100,18 +100,18 @@ ELSE
     LampAuto   := TRUE;
     END_IF;
 
-    STATE_AUTO://Режим АВТОМАТ.
+    STATE_AUTO: // Режим АВТОМАТ.
     LampStop   := FALSE;
     LampManual := FALSE;
     LampAuto   := TRUE;
-    //Переход АВТОМАТ -> СТОП.
+    // Переход АВТОМАТ -> СТОП.
     IF (ButtonStop OR Error) THEN
     State1     := STATE_STOP;
     LampStop   := TRUE;
     LampManual := FALSE;
     LampAuto   := FALSE;
     END_IF;
-    //Переход АВТОМАТ -> РУЧНОЙ.
+    // Переход АВТОМАТ -> РУЧНОЙ.
     IF ButtonManual THEN
     State1     := STATE_MANUAL;
     LampStop   := FALSE;
@@ -119,11 +119,11 @@ ELSE
     LampAuto   := FALSE;
     END_IF;
 
-    ELSE//СТОП при неопределенном состоянии.
+    ELSE //СТОП при неопределенном состоянии.
     State1 := STATE_STOP;
     END_CASE;
 
-END_IF;//IF (Reset OR FlagError) THEN
+END_IF; // IF (Reset OR FlagError) THEN
 
 // Граф состояний.
 //

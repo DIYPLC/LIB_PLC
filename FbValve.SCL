@@ -8,38 +8,38 @@ AUTHOR  : VA
 FAMILY  : LIB_PLC
 VERSION : '2.2'
 
-VAR_INPUT //Входные переменные, сохраняемые.
-CommandOpen     :BOOL := FALSE; //Команда открыть клапан.
-FeedbackOpen    :BOOL := FALSE; //Датчик обратной связи "Клапан открылся".
-FeedbackClose   :BOOL := FALSE; //Датчик обратной связи "Клапан закрылся".
-OnFeedbackOpen  :BOOL := FALSE; //Включить датчик обратной связи "Клапан открылся".
-OnFeedbackClose :BOOL := FALSE; //Включить датчик обратной связи "Клапан закрылся".
-Reset           :BOOL := FALSE; //Сброс драйвера в исходное состояние.
-TimeOpen        :DINT := 5000 ; //Время открытия клапана [мс].
-TimeClose       :DINT := 5000 ; //Время закрытия клапана [мс].
-Ts_ms           :DINT := 100  ; //Шаг дискретизации по времени [мс].
+VAR_INPUT // Входные переменные, сохраняемые.
+CommandOpen     :BOOL := FALSE; // Команда открыть клапан.
+FeedbackOpen    :BOOL := FALSE; // Датчик обратной связи "Клапан открылся".
+FeedbackClose   :BOOL := FALSE; // Датчик обратной связи "Клапан закрылся".
+OnFeedbackOpen  :BOOL := FALSE; // Включить датчик обратной связи "Клапан открылся".
+OnFeedbackClose :BOOL := FALSE; // Включить датчик обратной связи "Клапан закрылся".
+Reset           :BOOL := FALSE; // Сброс драйвера в исходное состояние.
+TimeOpen        :DINT := 5000 ; // Время открытия клапана [мс].
+TimeClose       :DINT := 5000 ; // Время закрытия клапана [мс].
+Ts_ms           :DINT := 100  ; // Шаг дискретизации по времени [мс].
 END_VAR
 
-VAR_OUTPUT //Выходные переменные, сохраняемые.
-CoilOpen   :BOOL := FALSE; //Сигнал на электромагнит "Открыть клапан".
-StateOpen  :BOOL := FALSE; //Сосотение "Клапан открыт".
-StateClose :BOOL := FALSE; //Сосотение "Клапан закрыт".
-Error      :BOOL := FALSE; //Ошибка "Неисправность клапана".
+VAR_OUTPUT // Выходные переменные, сохраняемые.
+CoilOpen   :BOOL := FALSE; // Сигнал на электромагнит "Открыть клапан".
+StateOpen  :BOOL := FALSE; // Сосотение "Клапан открыт".
+StateClose :BOOL := FALSE; // Сосотение "Клапан закрыт".
+Error      :BOOL := FALSE; // Ошибка "Неисправность клапана".
 END_VAR
 
-VAR //Внутренние переменные, сохраняемые.
-Timer1 :DINT := 0; //Таймер [мс].
-State1 :INT  := 0; //Граф состояния.
+VAR // Внутренние переменные, сохраняемые.
+Timer1 :DINT := 0; // Таймер [мс].
+State1 :INT  := 0; // Граф состояния.
 END_VAR
 
-CONST //Константы.
-STATE_RESET         := 0; //Сброс алгоритма.
-STATE_VALVE_CLOSING := 1; //Закрытие клапана.
-STATE_VALVE_CLOSE   := 2; //Клапан закрыт.
-STATE_VALVE_OPENING := 3; //Открытие клапана.
-STATE_VALVE_OPEN    := 4; //Клапан открыт.
-STATE_ERROR_CLOSE   := 5; //Клапан не закрылся.
-STATE_ERROR_OPEN    := 6; //Клапан не открылся.
+CONST // Константы.
+STATE_RESET         := 0; // Сброс алгоритма.
+STATE_VALVE_CLOSING := 1; // Закрытие клапана.
+STATE_VALVE_CLOSE   := 2; // Клапан закрыт.
+STATE_VALVE_OPENING := 3; // Открытие клапана.
+STATE_VALVE_OPEN    := 4; // Клапан открыт.
+STATE_ERROR_CLOSE   := 5; // Клапан не закрылся.
+STATE_ERROR_OPEN    := 6; // Клапан не открылся.
 END_CONST
 
 BEGIN
@@ -59,111 +59,111 @@ BEGIN
 //   -|Ts_ms                        |
 //    +-----------------------------+
 
-CoilOpen := CommandOpen; //Это основная часть блока все остальное нужно для удобства использования.
+CoilOpen := CommandOpen; // Это основная часть блока все остальное нужно для удобства использования.
 
-//Сброс алгоритма.
+// Сброс алгоритма.
 IF (Reset) THEN
 State1 := STATE_RESET;
 END_IF;
 
-//Граф состояний.
+// Граф состояний.
 CASE State1 OF
 
-STATE_RESET://Сброс алгоритма.
+STATE_RESET: // Сброс алгоритма.
 Timer1     := 0;
 StateOpen  := FALSE;
 StateClose := FALSE;
 Error      := FALSE;
-//Смотрим куда надо перейти на закрытие или открытие.
+// Смотрим куда надо перейти на закрытие или открытие.
 IF (CommandOpen) THEN
 State1 := STATE_VALVE_OPENING;
 ELSE
 State1 := STATE_VALVE_CLOSING;
 END_IF;
 
-STATE_VALVE_CLOSING: //Закрытие клапана.
+STATE_VALVE_CLOSING: // Закрытие клапана.
 Timer1     := Timer1 + Ts_ms;
 StateOpen  := FALSE;
 StateClose := FALSE;
 Error      := FALSE;
-//Если доехали до датчика то переходим в состояние закрыто.
-//Если нет обратной связи по датчику то переходим в состояние закрыто по таймеру.
+// Если доехали до датчика то переходим в состояние закрыто.
+// Если нет обратной связи по датчику то переходим в состояние закрыто по таймеру.
 IF (FeedbackClose OR (NOT(OnFeedbackClose) AND (Timer1>=TimeClose)) ) THEN
 State1 := STATE_VALVE_CLOSE;
 END_IF;
-//Если клапан заклинил и не доехал до датчика за заданное время уходим в состояние ошибки.
+// Если клапан заклинил и не доехал до датчика за заданное время уходим в состояние ошибки.
 IF (OnFeedbackClose AND (Timer1>=TimeClose) ) THEN
 State1 := STATE_ERROR_CLOSE;
 END_IF;
-//Если во время закрытия пришла команда на открытие переходим в режим открытие.
+// Если во время закрытия пришла команда на открытие переходим в режим открытие.
 IF (CommandOpen) THEN
 State1 := STATE_VALVE_OPENING;
 END_IF;
 
-STATE_VALVE_CLOSE: //Клапан закрыт.
+STATE_VALVE_CLOSE: // Клапан закрыт.
 Timer1     := 0;
 StateOpen  := FALSE;
 StateClose := TRUE;
 Error      := FALSE;
-//Если пришла команда на открытие то переходим в состояние открытие.
+// Если пришла команда на открытие то переходим в состояние открытие.
 IF (CommandOpen) THEN
 State1 := STATE_VALVE_OPENING;
 END_IF;
 
-STATE_VALVE_OPENING: //Открытие клапана.
+STATE_VALVE_OPENING: // Открытие клапана.
 Timer1     := Timer1 + Ts_ms;
 StateOpen  := FALSE;
 StateClose := FALSE;
 Error      := FALSE;
-//Если доехали до датчика то переходим в состояние открыто.
-//Если нет обратной связи по датчику то переходим в состояние открыто по таймеру.
+// Если доехали до датчика то переходим в состояние открыто.
+// Если нет обратной связи по датчику то переходим в состояние открыто по таймеру.
 IF (FeedbackOpen OR (NOT(OnFeedbackOpen) AND (Timer1>=TimeClose)) ) THEN
 State1 := STATE_VALVE_OPEN;
 END_IF;
-//Если клапан заклинил и не доехал до датчика за заданное время уходим в состояние ошибки.
+// Если клапан заклинил и не доехал до датчика за заданное время уходим в состояние ошибки.
 IF (OnFeedbackOpen AND (Timer1>=TimeClose) ) THEN
 State1 := STATE_ERROR_OPEN;
 END_IF;
-//Если во время открытия пришла команда на закрытие переходим в режим закрытие.
+// Если во время открытия пришла команда на закрытие переходим в режим закрытие.
 IF NOT(CommandOpen) THEN
 State1 := STATE_VALVE_CLOSING;
 END_IF;
 
-STATE_VALVE_OPEN: //Клапан открыт.
+STATE_VALVE_OPEN: // Клапан открыт.
 Timer1     := 0;
 StateOpen  := TRUE;
 StateClose := FALSE;
 Error      := FALSE;
-//Если пришла команда на закрытие то переходим в состояние закрытие.
+// Если пришла команда на закрытие то переходим в состояние закрытие.
 IF NOT(CommandOpen) THEN
 State1 := STATE_VALVE_CLOSING;
 END_IF;
 
-STATE_ERROR_CLOSE: //Клапан не закрылся.
+STATE_ERROR_CLOSE: // Клапан не закрылся.
 Timer1     := 0;
 StateOpen  := FALSE;
 StateClose := FALSE;
 Error      := TRUE;
-//Если все таки доехали до датчика то сброс для перехода на правильное состояние.
-//Если пришла команда на отрытие то сброс для перехода на правильное состояние.
-//Если выключили контроль обратной связи то сброс для перехода на правильное состояние.
+// Если все таки доехали до датчика то сброс для перехода на правильное состояние.
+// Если пришла команда на отрытие то сброс для перехода на правильное состояние.
+// Если выключили контроль обратной связи то сброс для перехода на правильное состояние.
 IF (FeedbackClose OR CommandOpen OR NOT(OnFeedbackClose)) THEN
 State1 := STATE_RESET;
 END_IF;
 
-STATE_ERROR_OPEN: //Клапан не открылся.
+STATE_ERROR_OPEN: // Клапан не открылся.
 Timer1     := 0;
 StateOpen  := FALSE;
 StateClose := FALSE;
 Error      := TRUE;
-//Если все таки доехали до датчика то сброс для перехода на правильное состояние.
-//Если пришла команда на закрытие то сброс для перехода на правильное состояние.
-//Если выключили контроль обратной связи то сброс для перехода на правильное состояние.
+// Если все таки доехали до датчика то сброс для перехода на правильное состояние.
+// Если пришла команда на закрытие то сброс для перехода на правильное состояние.
+// Если выключили контроль обратной связи то сброс для перехода на правильное состояние.
 IF (FeedbackOpen OR NOT(CommandOpen) OR NOT(OnFeedbackOpen)) THEN
 State1 := STATE_RESET;
 END_IF;
 
-ELSE//СТОП при неопределенном состоянии.
+ELSE // СТОП при неопределенном состоянии.
 State1 := STATE_RESET;
 END_CASE;
 

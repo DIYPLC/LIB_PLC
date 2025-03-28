@@ -8,16 +8,16 @@ AUTHOR  : VA
 FAMILY  : LIB_PLC
 VERSION : '2.1'
 
-VAR_INPUT //Входные переменные, сохраняемые.
-In :BOOL := FALSE; //Вход.
+VAR_INPUT // Входные переменные, сохраняемые.
+In :BOOL := FALSE; // Вход.
 END_VAR
 
-VAR_OUTPUT //Выходные переменные, сохраняемые.
-Out :BOOL := FALSE; //Выход.
+VAR_OUTPUT // Выходные переменные, сохраняемые.
+Out :BOOL := FALSE; // Выход.
 END_VAR
 
-VAR //Внутренние переменные, сохраняемые.
-In_previos :BOOL := FALSE; //Предыдущее состояние входа.
+VAR // Внутренние переменные, сохраняемые.
+In_previos :BOOL := FALSE; // Предыдущее состояние входа.
 END_VAR
 
 BEGIN
@@ -29,9 +29,9 @@ BEGIN
 //  ->-|In      Out|->-
 //     +-----------+
 
-//Детектор ниспадающего фронта (среза).
+// Детектор ниспадающего фронта (среза).
 Out := In_previos AND NOT(In);
-//Запомнить предыдущее состояние входа.
+// Запомнить предыдущее состояние входа.
 In_previos := In;
 
 // @COPYLEFT ALL WRONGS RESERVED :)

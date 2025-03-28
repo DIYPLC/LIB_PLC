@@ -9,68 +9,68 @@ FAMILY  : LIB_PLC
 VERSION : '2.1'
 
 VAR_INPUT // Входные переменные.
-ADR_I :DINT := 256;   //Стартовый адрес IW256? в HardWare.
-ADR_Q :DINT := 256;   //Стартовый адрес QW256? в HardWare.
-FSP   :REAL := 25.0;  //Заданое значение частоты [Гц].
-FWD   :BOOL := FALSE; //Вкл вперед.
-REV   :BOOL := FALSE; //Вкл назад.
-RST   :BOOL := FALSE; //Сброс ошибки привода импусьсом или перезагрузка по питанию привода.
+ADR_I :DINT := 256;   // Стартовый адрес IW256? в HardWare.
+ADR_Q :DINT := 256;   // Стартовый адрес QW256? в HardWare.
+FSP   :REAL := 25.0;  // Заданое значение частоты [Гц].
+FWD   :BOOL := FALSE; // Вкл вперед.
+REV   :BOOL := FALSE; // Вкл назад.
+RST   :BOOL := FALSE; // Сброс ошибки привода импусьсом или перезагрузка по питанию привода.
 END_VAR
 
 VAR_OUTPUT // Выходные переменные.
-FPV  :REAL := 0.0;   //Измереное значение частоты [Гц].
-IPV  :REAL := 0.0;   //Ток двигателя [A].
-UPV  :REAL := 0.0;   //Напряжене звена пост. тока [В].
-ERR  :BOOL := FALSE; //Ошибка привода.
-ALM  :BOOL := FALSE; //Предупреждение от привода.
-RUN  :BOOL := FALSE; //Привод в работе.
+FPV  :REAL := 0.0;   // Измереное значение частоты [Гц].
+IPV  :REAL := 0.0;   // Ток двигателя [A].
+UPV  :REAL := 0.0;   // Напряжене звена пост. тока [В].
+ERR  :BOOL := FALSE; // Ошибка привода.
+ALM  :BOOL := FALSE; // Предупреждение от привода.
+RUN  :BOOL := FALSE; // Привод в работе.
 END_VAR
 
 VAR // Внутренние сохраняемые переменные.
 
-StatusWord        :WORD := W#16#0000; //Слово состояния.
-FrequencyMeasured :WORD := W#16#0000; //Фактическая скорость [F*10].
-MotorCurrent      :WORD := W#16#0000; //Ток двигателя [A*10].
-VoltageRectifier  :WORD := W#16#0000; //Напряжене звена пост. тока [В].
+StatusWord        :WORD := W#16#0000; // Слово состояния.
+FrequencyMeasured :WORD := W#16#0000; // Фактическая скорость [F*10].
+MotorCurrent      :WORD := W#16#0000; // Ток двигателя [A*10].
+VoltageRectifier  :WORD := W#16#0000; // Напряжене звена пост. тока [В].
 
-ControlWord  :WORD := W#16#0000; //Слово управления.
-FrequencySet :WORD := W#16#0000; //Заданая скорость.
+ControlWord  :WORD := W#16#0000; // Слово управления.
+FrequencySet :WORD := W#16#0000; // Заданая скорость.
 
-ControlWord_B00 :BOOL := FALSE; //Вращение вперед.
-ControlWord_B01 :BOOL := FALSE; //Вращение назад. 
-ControlWord_B02 :BOOL := FALSE; //Толчковый режим вперед.
-ControlWord_B03 :BOOL := FALSE; //Толчковый режим назад.
-ControlWord_B04 :BOOL := FALSE; //Стоп.
-ControlWord_B05 :BOOL := FALSE; //Останов выбегом.
-ControlWord_B06 :BOOL := FALSE; //Сброс.
-ControlWord_B07 :BOOL := FALSE; //Снятие всех команд пуска / останова.
-ControlWord_B08 :BOOL := FALSE; //Предустановленное задание 0.
-ControlWord_B09 :BOOL := FALSE; //Предустановленное задание 1.
-ControlWord_B10 :BOOL := FALSE; //Предустановленное задание 2.
-ControlWord_B11 :BOOL := FALSE; //Предустановленное задание 3.
-ControlWord_B12 :BOOL := FALSE; //Разгон / замедление 1.
-ControlWord_B13 :BOOL := FALSE; //Разгон / замедление 2.
-ControlWord_B14 :BOOL := FALSE; //Резерв.
-ControlWord_B15 :BOOL := FALSE; //Включить биты 8...13.
+ControlWord_B00 :BOOL := FALSE; // Вращение вперед.
+ControlWord_B01 :BOOL := FALSE; // Вращение назад. 
+ControlWord_B02 :BOOL := FALSE; // Толчковый режим вперед.
+ControlWord_B03 :BOOL := FALSE; // Толчковый режим назад.
+ControlWord_B04 :BOOL := FALSE; // Стоп.
+ControlWord_B05 :BOOL := FALSE; // Останов выбегом.
+ControlWord_B06 :BOOL := FALSE; // Сброс.
+ControlWord_B07 :BOOL := FALSE; // Снятие всех команд пуска / останова.
+ControlWord_B08 :BOOL := FALSE; // Предустановленное задание 0.
+ControlWord_B09 :BOOL := FALSE; // Предустановленное задание 1.
+ControlWord_B10 :BOOL := FALSE; // Предустановленное задание 2.
+ControlWord_B11 :BOOL := FALSE; // Предустановленное задание 3.
+ControlWord_B12 :BOOL := FALSE; // Разгон / замедление 1.
+ControlWord_B13 :BOOL := FALSE; // Разгон / замедление 2.
+ControlWord_B14 :BOOL := FALSE; // Резерв.
+ControlWord_B15 :BOOL := FALSE; // Включить биты 8...13.
 
-StatusWord_B00 :BOOL := FALSE; //Готовность управления.
-StatusWord_B01 :BOOL := FALSE; //Готовность управления.
-StatusWord_B02 :BOOL := FALSE; //Работа.
-StatusWord_B03 :BOOL := FALSE; //Отключение по ошибке.
-StatusWord_B04 :BOOL := FALSE; //Ошибка без отключения.
-StatusWord_B05 :BOOL := FALSE; //Резерв.
-StatusWord_B06 :BOOL := FALSE; //Отключение по ошибке.
-StatusWord_B07 :BOOL := FALSE; //Предупреждение.
-StatusWord_B08 :BOOL := FALSE; //Работа по заданию.
-StatusWord_B09 :BOOL := FALSE; //Удаленный режим.
-StatusWord_B10 :BOOL := FALSE; //Частота в допустимом диапазоне.
-StatusWord_B11 :BOOL := FALSE; //Работа.
-StatusWord_B12 :BOOL := FALSE; //Резерв.
-StatusWord_B13 :BOOL := FALSE; //Недопустимое напряжение.
-StatusWord_B14 :BOOL := FALSE; //Резерв.
-StatusWord_B15 :BOOL := FALSE; //Предупреждение перегрев.
+StatusWord_B00 :BOOL := FALSE; // Готовность управления.
+StatusWord_B01 :BOOL := FALSE; // Готовность управления.
+StatusWord_B02 :BOOL := FALSE; // Работа.
+StatusWord_B03 :BOOL := FALSE; // Отключение по ошибке.
+StatusWord_B04 :BOOL := FALSE; // Ошибка без отключения.
+StatusWord_B05 :BOOL := FALSE; // Резерв.
+StatusWord_B06 :BOOL := FALSE; // Отключение по ошибке.
+StatusWord_B07 :BOOL := FALSE; // Предупреждение.
+StatusWord_B08 :BOOL := FALSE; // Работа по заданию.
+StatusWord_B09 :BOOL := FALSE; // Удаленный режим.
+StatusWord_B10 :BOOL := FALSE; // Частота в допустимом диапазоне.
+StatusWord_B11 :BOOL := FALSE; // Работа.
+StatusWord_B12 :BOOL := FALSE; // Резерв.
+StatusWord_B13 :BOOL := FALSE; // Недопустимое напряжение.
+StatusWord_B14 :BOOL := FALSE; // Резерв.
+StatusWord_B15 :BOOL := FALSE; // Предупреждение перегрев.
 
-DbTON :TON; //Таймер для сигнала сброса.
+DbTON :TON; // Таймер для сигнала сброса.
 END_VAR
 
 BEGIN

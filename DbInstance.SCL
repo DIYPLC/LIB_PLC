@@ -1,6 +1,7 @@
-//Файл генерирует блоки данных к функциональным блокам.
+// Файл генерирует блоки данных к функциональным блокам.
+// Instance data block.
 
-DATA_BLOCK Db1PC1 Fb1PC1 //Instance data block.
+DATA_BLOCK Db1PC1 Fb1PC1
 BEGIN
 END_DATA_BLOCK
 

@@ -1,10 +1,11 @@
-//Файл генерирует блоки данных к функциональным блокам.
+// Файл генерирует блоки данных к функциональным блокам.
+// Instance data block.
 
-DATA_BLOCK DbTaskCyclic FbTaskCyclic //Instance data block.
+DATA_BLOCK DbTaskCyclic FbTaskCyclic
 BEGIN
 END_DATA_BLOCK
 
-DATA_BLOCK DbTask100ms FbTask100ms //Instance data block.
+DATA_BLOCK DbTask100ms FbTask100ms
 BEGIN
 END_DATA_BLOCK
 

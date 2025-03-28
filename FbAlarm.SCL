@@ -8,24 +8,24 @@ AUTHOR  : VA
 FAMILY  : LIB_PLC
 VERSION : '2.2'
 
-VAR_INPUT //Входные переменные, сохраняемые.
-In        :REAL := 0.0 ; //Входной сигнал.
-LevelHi   :REAL := 90.0; //Верхняя граница предупреждения.
-LevelLo   :REAL := 10.0; //Нижняя граница предупреждения.
-TimeDelay :DINT := 2000; //Время задержки включения [мс].
-Ts_ms     :DINT := 100 ; //Шаг дискретизации по времени [мс].
+VAR_INPUT // Входные переменные, сохраняемые.
+In        :REAL := 0.0 ; // Входной сигнал.
+LevelHi   :REAL := 90.0; // Верхняя граница предупреждения.
+LevelLo   :REAL := 10.0; // Нижняя граница предупреждения.
+TimeDelay :DINT := 2000; // Время задержки включения [мс].
+Ts_ms     :DINT := 100 ; // Шаг дискретизации по времени [мс].
 END_VAR
 
-VAR_OUTPUT //Выходные переменные, сохраняемые.
-AlarmHi :BOOL := FALSE; //Достигнут верхний предел.
-AlarmLo :BOOL := FALSE; //Достигнут нижний предел.
+VAR_OUTPUT // Выходные переменные, сохраняемые.
+AlarmHi :BOOL := FALSE; // Достигнут верхний предел.
+AlarmLo :BOOL := FALSE; // Достигнут нижний предел.
 END_VAR
 
-VAR //Внутренние переменные, сохраняемые.
-_AlarmHi :BOOL := FALSE; //Достигнут верхний предел.
-_AlarmLo :BOOL := FALSE; //Достигнут нижний предел.
-Timer1   :DINT := 0    ; //Текущее время таймер1 [мс].
-Timer2   :DINT := 0    ; //Текущее время таймер1 [мс].
+VAR // Внутренние переменные, сохраняемые.
+_AlarmHi :BOOL := FALSE; // Достигнут верхний предел.
+_AlarmLo :BOOL := FALSE; // Достигнут нижний предел.
+Timer1   :DINT := 0    ; // Текущее время таймер1 [мс].
+Timer2   :DINT := 0    ; // Текущее время таймер1 [мс].
 END_VAR
 
 BEGIN
@@ -41,52 +41,52 @@ BEGIN
 //   -|Ts_ms            |
 //    +-----------------+
 
-//Верхний предел.
+// Верхний предел.
 _AlarmHi := (In >= LevelHi);
 
-//Таймер задержки включения для верхнего предела.
-IF (TimeDelay > 0) THEN //Таймер включен.
-  IF (_AlarmHi) THEN //На входе 1.
-    IF (AlarmHi) THEN //На выходе 1.
+// Таймер задержки включения для верхнего предела.
+IF (TimeDelay > 0) THEN // Таймер включен.
+  IF (_AlarmHi) THEN // На входе 1.
+    IF (AlarmHi) THEN // На выходе 1.
     AlarmHi := TRUE;
-    ELSE //На выходе 0.
-      IF (Timer1 >= TimeDelay) THEN //Задержка включения закончилась.
+    ELSE // На выходе 0.
+      IF (Timer1 >= TimeDelay) THEN // Задержка включения закончилась.
       AlarmHi := TRUE;
-      ELSE //Задержка включения активна.
+      ELSE // Задержка включения активна.
       AlarmHi := FALSE;
       Timer1 := Timer1 + Ts_ms;
       END_IF;
     END_IF;
-  ELSE //Если на входе 0 то на выходе тоже 0.
+  ELSE // Если на входе 0 то на выходе тоже 0.
   AlarmHi := FALSE;
   Timer1 := 0;
   END_IF;
-ELSE //Таймер выключен.
+ELSE // Таймер выключен.
 AlarmHi := _AlarmHi;
 Timer1 := 0;
 END_IF;
 
-//Нижний предел.
+// Нижний предел.
 _AlarmLo := (In <= LevelLo);
 
-//Таймер задержки включения для нижнего предела.
-IF (TimeDelay > 0) THEN //Таймер включен.
-  IF (_AlarmLo) THEN //На входе 1.
-    IF (AlarmLo) THEN //На выходе 1.
+// Таймер задержки включения для нижнего предела.
+IF (TimeDelay > 0) THEN // Таймер включен.
+  IF (_AlarmLo) THEN // На входе 1.
+    IF (AlarmLo) THEN // На выходе 1.
     AlarmLo := TRUE;
-    ELSE //На выходе 0.
-      IF (Timer2 >= TimeDelay) THEN //Задержка включения закончилась.
+    ELSE // На выходе 0.
+      IF (Timer2 >= TimeDelay) THEN // Задержка включения закончилась.
       AlarmLo := TRUE;
-      ELSE //Задержка включения активна.
+      ELSE // Задержка включения активна.
       AlarmLo := FALSE;
       Timer2 := Timer2 + Ts_ms;
       END_IF;
     END_IF;
-  ELSE //Если на входе 0 то на выходе тоже 0.
+  ELSE // Если на входе 0 то на выходе тоже 0.
   AlarmLo := FALSE;
   Timer2 := 0;
   END_IF;
-ELSE //Таймер выключен.
+ELSE // Таймер выключен.
 AlarmLo := _AlarmLo;
 Timer2 := 0;
 END_IF;

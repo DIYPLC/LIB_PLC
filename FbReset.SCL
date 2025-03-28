@@ -8,20 +8,19 @@ FAMILY  : LIB_PLC
 VERSION : '1.1'
 
 VAR_INPUT
-TimeDelayOff 
-{//Атрибуты переменных PCS7.
-S7_link    := 'false'; //'false' запрет CFC соединений.
-S7_dynamic := 'true'   //'true' просмотр в CFC.
-} : DINT := 2000; //Задержка выключен. импульса сброса ms.
+TimeDelayOff
+{ S7_link    := 'false';
+  S7_dynamic := 'true' }
+:DINT := 2000; // Задержка выключен. импульса сброса ms.
 END_VAR
 
 VAR_OUTPUT
-Reset :BOOL := FALSE; //Сброс алгоритма.
+Reset :BOOL := FALSE; // Сброс алгоритма.
 END_VAR
 
 VAR
-RST :BOOL := FALSE; //Сброс алгоритма локальный.
-TOF1 :TOF; //TOF timer.
+RST :BOOL := FALSE; // Сброс алгоритма локальный.
+TOF1 :TOF; // TOF timer.
 END_VAR 
 
 VAR_TEMP
@@ -50,13 +49,13 @@ END_VAR
 
 BEGIN
 
-//Анализ из какого OB произошел вызов.
-//Штатно вызов из OB35 или другой цикличный.
-//При перезагрузке вызов из OB100.
+// Анализ из какого OB произошел вызов.
+// Штатно вызов из OB35 или другой цикличный.
+// При перезагрузке вызов из OB100.
 ERROR_RD_SINFO := RD_SINFO(TOP_SI := TOP_SI, START_UP_SI := START_UP_SI); // SFC6
-RST := (TOP_SI.NUM = 100); //Call in OB100
+RST := (TOP_SI.NUM = 100); // Call in OB100
 
-//Задержка выключен. импульса первого скана.
+// Задержка выключен. импульса первого скана.
 IF (TimeDelayOff <= 0) THEN
 TOF1.IN := FALSE;
 TOF1.PT := T#0ms;
@@ -69,7 +68,7 @@ TOF1();
 Reset := TOF1.Q; // OUT: BOOL
 END_IF;
 
-//Блок спроектирован под PCS7 v5.
+// Блок спроектирован под PCS7 v5.
 
 // @COPYLEFT ALL WRONGS RESERVED :)
 // Author: VA

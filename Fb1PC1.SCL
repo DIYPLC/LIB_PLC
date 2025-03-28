@@ -11,55 +11,55 @@ FAMILY  : '1PC1'
 VERSION : '2.2'
 
 VAR_INPUT // Входные переменные, сохраняемые.
-ADC_Pressure      :WORD := 0    ; //Датчик давления 0...27648[АЦП].
-RemoteStartButton :BOOL := FALSE; //Кнопка без фиксации NO "ПУСК" на пульте местного управления.
-RemoteStopButton  :BOOL := FALSE; //Кнопка без фиксации NC "СТОП" на пульте местного управления.
-VoltageOk         :BOOL := FALSE; //Схема собрана (вводной автомат 380VAC включен).
-DriveOk           :BOOL := FALSE; //Частотный привод: Готовность к работе (нет ошибок).
-ContactorOk       :BOOL := FALSE; //Контактор включился NO контакт.
-InterlockOn       :BOOL := FALSE; //Включена технологическая блокировка регулятора.
-GroupStart        :BOOL := FALSE; //Групповой пуск (подать импульс).
-GroupStop         :BOOL := FALSE; //Групповой стоп (подать импульс).
-Ts_ms             :DINT := 100  ; //Шаг дискретизации по времени [мс].
-Reset             :BOOL := FALSE; //Сброс при перезагрузке.
+ADC_Pressure      :WORD := 0    ; // Датчик давления 0...27648[АЦП].
+RemoteStartButton :BOOL := FALSE; // Кнопка без фиксации NO "ПУСК" на пульте местного управления.
+RemoteStopButton  :BOOL := FALSE; // Кнопка без фиксации NC "СТОП" на пульте местного управления.
+VoltageOk         :BOOL := FALSE; // Схема собрана (вводной автомат 380VAC включен).
+DriveOk           :BOOL := FALSE; // Частотный привод: Готовность к работе (нет ошибок).
+ContactorOk       :BOOL := FALSE; // Контактор включился NO контакт.
+InterlockOn       :BOOL := FALSE; // Включена технологическая блокировка регулятора.
+GroupStart        :BOOL := FALSE; // Групповой пуск (подать импульс).
+GroupStop         :BOOL := FALSE; // Групповой стоп (подать импульс).
+Ts_ms             :DINT := 100  ; // Шаг дискретизации по времени [мс].
+Reset             :BOOL := FALSE; // Сброс при перезагрузке.
 END_VAR
 
 VAR_OUTPUT // Выходные переменные, сохраняемые.
-DAC_Frequency :WORD := 0    ; //Частотный привод: Сигнал задания частоты 0...27648[ЦАП].
-MotorOn       :BOOL := FALSE; //Частотный привод: Включить привод.
-ContactorOn   :BOOL := FALSE; //Включить контактор между частотным приводом и двигателем.
-Error         :BOOL := FALSE; //Флаг ошибки.
+DAC_Frequency :WORD := 0    ; // Частотный привод: Сигнал задания частоты 0...27648[ЦАП].
+MotorOn       :BOOL := FALSE; // Частотный привод: Включить привод.
+ContactorOn   :BOOL := FALSE; // Включить контактор между частотным приводом и двигателем.
+Error         :BOOL := FALSE; // Флаг ошибки.
 END_VAR
 
 VAR // Внутренние переменные, сохраняемые.
 // Промежуточные переменные для быстрой диагностики.
-PV              :REAL := 0.0  ; //Измеренное значение регулируемого параметра [Бар].
-SP              :REAL := 0.0  ; //Заданное значение регулируемого параметра [Бар].
-MV              :REAL := 0.0  ; //Сигнал управления на исполнительный механизм [Гц].
-Ts              :REAL := 0.1  ; //Шаг дискретизации по времени [с].
-ModeStop        :BOOL := FALSE; //Сигал текущего режима работы "СТОП".
-ModeManual      :BOOL := FALSE; //Сигал текущего режима работы "РУЧНОЙ".
-ModeAuto        :BOOL := FALSE; //Сигал текущего режима работы "АВТО".
-HmiButtonAuto   :BOOL := FALSE; //Кнопка без фиксации "АВТО"   в окне управления двигателем.
-HmiButtonManual :BOOL := FALSE; //Кнопка без фиксации "РУЧНОЙ" в окне управления двигателем.
-HmiButtonStop   :BOOL := FALSE; //Кнопка без фиксации "СТОП"   в окне управления двигателем.
-ErrorButtonStop :BOOL := FALSE; //Ошибка: Нажата кнопка СТОП на пульте местного управления.
-TimerForCW      :DINT := 0    ; //Таймер авто обнуления слова управления.
+PV              :REAL := 0.0  ; // Измеренное значение регулируемого параметра [Бар].
+SP              :REAL := 0.0  ; // Заданное значение регулируемого параметра [Бар].
+MV              :REAL := 0.0  ; // Сигнал управления на исполнительный механизм [Гц].
+Ts              :REAL := 0.1  ; // Шаг дискретизации по времени [с].
+ModeStop        :BOOL := FALSE; // Сигал текущего режима работы "СТОП".
+ModeManual      :BOOL := FALSE; // Сигал текущего режима работы "РУЧНОЙ".
+ModeAuto        :BOOL := FALSE; // Сигал текущего режима работы "АВТО".
+HmiButtonAuto   :BOOL := FALSE; // Кнопка без фиксации "АВТО"   в окне управления двигателем.
+HmiButtonManual :BOOL := FALSE; // Кнопка без фиксации "РУЧНОЙ" в окне управления двигателем.
+HmiButtonStop   :BOOL := FALSE; // Кнопка без фиксации "СТОП"   в окне управления двигателем.
+ErrorButtonStop :BOOL := FALSE; // Ошибка: Нажата кнопка СТОП на пульте местного управления.
+TimerForCW      :DINT := 0    ; // Таймер авто обнуления слова управления.
 // Блоки данных подпрограмм в порядке их вызова.
-DbWordToBits_CW  :FbWordToBits  ; //Преобразование слова в 16 бит.
-DbModeSelector1  :FbModeSelector; //Переключатель режимов работы.
-DbBitsToWord_SW  :FbBitsToWord  ; //Преобразование 16 бит в слово.
-DbBitsToWord_EW  :FbBitsToWord  ; //Преобразование 16 бит в слово.
-DbMotor1         :FbMotor       ; //Двигатель с частотником и контактором.
-DbDriverAi420_PV :FbDriverAi420 ; //Драйвер аналогово входа 4...20мА.
-DbFilterA_PV     :FbFilterA     ; //Фильтр апериодический.
-DbLimit_PV       :FbLimit       ; //Амплитудный ограничитель.
-DbLimit_SP       :FbLimit       ; //Амплитудный ограничитель.
-DbPIDcontrol1    :FbPIDcontrol  ; //ПИД-регулятор.
-DbRamp_MV        :FbRamp        ; //Рампа разгона / торможения.
-DbDriverAo420_MV :FbDriverAo420 ; //Драйвер аналогово выхода 4...20мА.
-DbAlarm_PV       :FbAlarm       ; //Блок предупреждений.
-DbAlarm_MV       :FbAlarm       ; //Блок предупреждений.
+DbWordToBits_CW  :FbWordToBits  ; // Преобразование слова в 16 бит.
+DbModeSelector1  :FbModeSelector; // Переключатель режимов работы.
+DbBitsToWord_SW  :FbBitsToWord  ; // Преобразование 16 бит в слово.
+DbBitsToWord_EW  :FbBitsToWord  ; // Преобразование 16 бит в слово.
+DbMotor1         :FbMotor       ; // Двигатель с частотником и контактором.
+DbDriverAi420_PV :FbDriverAi420 ; // Драйвер аналогово входа 4...20мА.
+DbFilterA_PV     :FbFilterA     ; // Фильтр апериодический.
+DbLimit_PV       :FbLimit       ; // Амплитудный ограничитель.
+DbLimit_SP       :FbLimit       ; // Амплитудный ограничитель.
+DbPIDcontrol1    :FbPIDcontrol  ; // ПИД-регулятор.
+DbRamp_MV        :FbRamp        ; // Рампа разгона / торможения.
+DbDriverAo420_MV :FbDriverAo420 ; // Драйвер аналогово выхода 4...20мА.
+DbAlarm_PV       :FbAlarm       ; // Блок предупреждений.
+DbAlarm_MV       :FbAlarm       ; // Блок предупреждений.
 // Резервные переменные для правки программы на лету без остановки ПЛК.
 ReserveBool0        :BOOL          := FALSE; // Резерв 1 бит.
 ReserveBool1        :BOOL          := FALSE; // Резерв 1 бит.
@@ -88,12 +88,12 @@ ReserveDint3        :DINT          := 0    ; // Резерв 32 бит.
 END_VAR
 
 VAR_TEMP // Внутренние переменные, не сохраняемые.
-CmdStop   :BOOL; //Команда перейти в режим "СТОП".
-CmdManual :BOOL; //Команда перейти в режим "РУЧНОЙ".
-CmdAuto   :BOOL; //Команда перейти в режим "АВТО".
-DriveRun  :BOOL; //Сигнал на включение частотного привода.
-TempReal1 :REAL; //Временная переменная.
-TempReal2 :REAL; //Временная переменная.
+CmdStop   :BOOL; // Команда перейти в режим "СТОП".
+CmdManual :BOOL; // Команда перейти в режим "РУЧНОЙ".
+CmdAuto   :BOOL; // Команда перейти в режим "АВТО".
+DriveRun  :BOOL; // Сигнал на включение частотного привода.
+TempReal1 :REAL; // Временная переменная.
+TempReal2 :REAL; // Временная переменная.
 END_VAR
 
 BEGIN
@@ -156,24 +156,24 @@ Ts := DINT_TO_REAL(Ts_ms) * 0.001;
 //    |         Out14|->-
 //    |         Out15|->-
 //    +--------------+
-DbWordToBits_CW.In := "Db1PC1Hmi".CW       ; //Входной сигнал.
-DbWordToBits_CW()                          ; //Преобразование слова в 16 бит.
-HmiButtonStop      := DbWordToBits_CW.Out0 ; //Выходной сигнал бит0.
-HmiButtonManual    := DbWordToBits_CW.Out1 ; //Выходной сигнал бит1.
-HmiButtonAuto      := DbWordToBits_CW.Out2 ; //Выходной сигнал бит2.
-//                 := DbWordToBits_CW.Out3 ; //Выходной сигнал бит3.
-//                 := DbWordToBits_CW.Out4 ; //Выходной сигнал бит4.
-//                 := DbWordToBits_CW.Out5 ; //Выходной сигнал бит5.
-//                 := DbWordToBits_CW.Out6 ; //Выходной сигнал бит6.
-//                 := DbWordToBits_CW.Out7 ; //Выходной сигнал бит7.
-//                 := DbWordToBits_CW.Out8 ; //Выходной сигнал бит8.
-//                 := DbWordToBits_CW.Out9 ; //Выходной сигнал бит9.
-//                 := DbWordToBits_CW.Out10; //Выходной сигнал бит10.
-//                 := DbWordToBits_CW.Out11; //Выходной сигнал бит11.
-//                 := DbWordToBits_CW.Out12; //Выходной сигнал бит12.
-//                 := DbWordToBits_CW.Out13; //Выходной сигнал бит13.
-//                 := DbWordToBits_CW.Out14; //Выходной сигнал бит14.
-//                 := DbWordToBits_CW.Out15; //Выходной сигнал бит15.
+DbWordToBits_CW.In := "Db1PC1Hmi".CW       ; // Входной сигнал.
+DbWordToBits_CW()                          ; // Преобразование слова в 16 бит.
+HmiButtonStop      := DbWordToBits_CW.Out0 ; // Выходной сигнал бит0.
+HmiButtonManual    := DbWordToBits_CW.Out1 ; // Выходной сигнал бит1.
+HmiButtonAuto      := DbWordToBits_CW.Out2 ; // Выходной сигнал бит2.
+//                 := DbWordToBits_CW.Out3 ; // Выходной сигнал бит3.
+//                 := DbWordToBits_CW.Out4 ; // Выходной сигнал бит4.
+//                 := DbWordToBits_CW.Out5 ; // Выходной сигнал бит5.
+//                 := DbWordToBits_CW.Out6 ; // Выходной сигнал бит6.
+//                 := DbWordToBits_CW.Out7 ; // Выходной сигнал бит7.
+//                 := DbWordToBits_CW.Out8 ; // Выходной сигнал бит8.
+//                 := DbWordToBits_CW.Out9 ; // Выходной сигнал бит9.
+//                 := DbWordToBits_CW.Out10; // Выходной сигнал бит10.
+//                 := DbWordToBits_CW.Out11; // Выходной сигнал бит11.
+//                 := DbWordToBits_CW.Out12; // Выходной сигнал бит12.
+//                 := DbWordToBits_CW.Out13; // Выходной сигнал бит13.
+//                 := DbWordToBits_CW.Out14; // Выходной сигнал бит14.
+//                 := DbWordToBits_CW.Out15; // Выходной сигнал бит15.
 
 // SCADA включает биты в слове управления, а PLC сбрасывает их.
 // Такой протокол взаимодействия проще с точки зрения реализации в WinCC, которая и без скриптов любит тупить.
@@ -211,15 +211,15 @@ CmdAuto := HmiButtonAuto OR (RemoteStartButton AND NOT(Error)) OR (GroupStart AN
 //   -|Error                  |
 //   -|Reset                  |
 //    +-----------------------+
-DbModeSelector1.ButtonStop   := CmdStop                   ; //Кнопка "Стоп".
-DbModeSelector1.ButtonManual := CmdManual                 ; //Кнопка "Ручной режим".
-DbModeSelector1.ButtonAuto   := CmdAuto                   ; //Кнопка "Автоматический режим".
-DbModeSelector1.Error        := Error                     ; //Отсутствие готовности системы к работе.
-DbModeSelector1.Reset        := Reset                     ; //Сброс при перезагрузке.
-DbModeSelector1()                                         ; //Переключатель режимов работы.
-ModeStop                     := DbModeSelector1.LampStop  ; //Флаг "Активен режим СТОП".
-ModeManual                   := DbModeSelector1.LampManual; //Флаг "Активен РУЧНОЙ режим".
-ModeAuto                     := DbModeSelector1.LampAuto  ; //Флаг "Активен АВТОМАТИЧЕСКИЙ режим.
+DbModeSelector1.ButtonStop   := CmdStop                   ; // Кнопка "Стоп".
+DbModeSelector1.ButtonManual := CmdManual                 ; // Кнопка "Ручной режим".
+DbModeSelector1.ButtonAuto   := CmdAuto                   ; // Кнопка "Автоматический режим".
+DbModeSelector1.Error        := Error                     ; // Отсутствие готовности системы к работе.
+DbModeSelector1.Reset        := Reset                     ; // Сброс при перезагрузке.
+DbModeSelector1()                                         ; // Переключатель режимов работы.
+ModeStop                     := DbModeSelector1.LampStop  ; // Флаг "Активен режим СТОП".
+ModeManual                   := DbModeSelector1.LampManual; // Флаг "Активен РУЧНОЙ режим".
+ModeAuto                     := DbModeSelector1.LampAuto  ; // Флаг "Активен АВТОМАТИЧЕСКИЙ режим.
 
 // Сборка слова состояния SW из 16 бит для передачи в SCADA/HMI.
 // Слово состояния SW влияет на отображение кнопок в SCADA/HMI.
@@ -243,25 +243,25 @@ ModeAuto                     := DbModeSelector1.LampAuto  ; //Флаг "Активен АВТО
 // ->-|In14          |
 // ->-|In15          |
 //    +--------------+
-DbBitsToWord_SW.In0  := ModeStop           ; //Входной сигнал бит0.
-DbBitsToWord_SW.In1  := ModeManual         ; //Входной сигнал бит1.
-DbBitsToWord_SW.In2  := ModeAuto           ; //Входной сигнал бит2.
-DbBitsToWord_SW.In3  := FALSE              ; //Входной сигнал бит3.
-DbBitsToWord_SW.In4  := FALSE              ; //Входной сигнал бит4.
-DbBitsToWord_SW.In5  := FALSE              ; //Входной сигнал бит5.
-DbBitsToWord_SW.In6  := FALSE              ; //Входной сигнал бит6.
-DbBitsToWord_SW.In7  := FALSE              ; //Входной сигнал бит7.
-DbBitsToWord_SW.In8  := FALSE              ; //Входной сигнал бит8.
-DbBitsToWord_SW.In9  := FALSE              ; //Входной сигнал бит9.
-DbBitsToWord_SW.In10 := FALSE              ; //Входной сигнал бит10.
-DbBitsToWord_SW.In11 := FALSE              ; //Входной сигнал бит11.
-DbBitsToWord_SW.In12 := FALSE              ; //Входной сигнал бит12.
-DbBitsToWord_SW.In13 := FALSE              ; //Входной сигнал бит13.
-DbBitsToWord_SW.In14 := FALSE              ; //Входной сигнал бит14.
-DbBitsToWord_SW.In14 := FALSE              ; //Входной сигнал бит14.
-DbBitsToWord_SW.In15 := FALSE              ; //Входной сигнал бит15.
-DbBitsToWord_SW()                          ; //Преобразование 16 бит в слово.
-"Db1PC1Hmi".SW       := DbBitsToWord_SW.Out; //Выходной сигнал.
+DbBitsToWord_SW.In0  := ModeStop           ; // Входной сигнал бит0.
+DbBitsToWord_SW.In1  := ModeManual         ; // Входной сигнал бит1.
+DbBitsToWord_SW.In2  := ModeAuto           ; // Входной сигнал бит2.
+DbBitsToWord_SW.In3  := FALSE              ; // Входной сигнал бит3.
+DbBitsToWord_SW.In4  := FALSE              ; // Входной сигнал бит4.
+DbBitsToWord_SW.In5  := FALSE              ; // Входной сигнал бит5.
+DbBitsToWord_SW.In6  := FALSE              ; // Входной сигнал бит6.
+DbBitsToWord_SW.In7  := FALSE              ; // Входной сигнал бит7.
+DbBitsToWord_SW.In8  := FALSE              ; // Входной сигнал бит8.
+DbBitsToWord_SW.In9  := FALSE              ; // Входной сигнал бит9.
+DbBitsToWord_SW.In10 := FALSE              ; // Входной сигнал бит10.
+DbBitsToWord_SW.In11 := FALSE              ; // Входной сигнал бит11.
+DbBitsToWord_SW.In12 := FALSE              ; // Входной сигнал бит12.
+DbBitsToWord_SW.In13 := FALSE              ; // Входной сигнал бит13.
+DbBitsToWord_SW.In14 := FALSE              ; // Входной сигнал бит14.
+DbBitsToWord_SW.In14 := FALSE              ; // Входной сигнал бит14.
+DbBitsToWord_SW.In15 := FALSE              ; // Входной сигнал бит15.
+DbBitsToWord_SW()                          ; // Преобразование 16 бит в слово.
+"Db1PC1Hmi".SW       := DbBitsToWord_SW.Out; // Выходной сигнал.
 
 // Сборка слова активных ошибок и аварий EW из 16 бит, для передачи в SCADA/HMI.
 // Слово активных ошибок и аварий EW используется для предупреждения оператора.
@@ -285,25 +285,25 @@ DbBitsToWord_SW()                          ; //Преобразование 16 бит в слово.
 // ->-|In14          |
 // ->-|In15          |
 //    +--------------+
-DbBitsToWord_EW.In0  := DbAlarm_PV.AlarmLo     ; //Входной сигнал бит0.
-DbBitsToWord_EW.In1  := DbAlarm_PV.AlarmHi     ; //Входной сигнал бит1.
-DbBitsToWord_EW.In2  := DbAlarm_MV.AlarmLo     ; //Входной сигнал бит2.
-DbBitsToWord_EW.In3  := DbAlarm_MV.AlarmHi     ; //Входной сигнал бит3.
-DbBitsToWord_EW.In4  := DbDriverAi420_PV.Error ; //Входной сигнал бит4.
-DbBitsToWord_EW.In5  := DbMotor1.ErrorVoltage  ; //Входной сигнал бит5.
-DbBitsToWord_EW.In6  := DbMotor1.ErrorDrive    ; //Входной сигнал бит6.
-DbBitsToWord_EW.In7  := DbMotor1.ErrorContactor; //Входной сигнал бит7.
-DbBitsToWord_EW.In8  := ErrorButtonStop        ; //Входной сигнал бит8.
-DbBitsToWord_EW.In9  := InterlockOn            ; //Входной сигнал бит9.
-DbBitsToWord_EW.In10 := GroupStop              ; //Входной сигнал бит10.
-DbBitsToWord_EW.In11 := FALSE                  ; //Входной сигнал бит11.
-DbBitsToWord_EW.In12 := FALSE                  ; //Входной сигнал бит12.
-DbBitsToWord_EW.In13 := FALSE                  ; //Входной сигнал бит13.
-DbBitsToWord_EW.In14 := FALSE                  ; //Входной сигнал бит14.
-DbBitsToWord_EW.In14 := FALSE                  ; //Входной сигнал бит14.
-DbBitsToWord_EW.In15 := FALSE                  ; //Входной сигнал бит15.
-DbBitsToWord_EW()                              ; //Преобразование 16 бит в слово.
-"Db1PC1Hmi".EW       := DbBitsToWord_EW.Out    ; //Выходной сигнал.
+DbBitsToWord_EW.In0  := DbAlarm_PV.AlarmLo     ; // Входной сигнал бит0.
+DbBitsToWord_EW.In1  := DbAlarm_PV.AlarmHi     ; // Входной сигнал бит1.
+DbBitsToWord_EW.In2  := DbAlarm_MV.AlarmLo     ; // Входной сигнал бит2.
+DbBitsToWord_EW.In3  := DbAlarm_MV.AlarmHi     ; // Входной сигнал бит3.
+DbBitsToWord_EW.In4  := DbDriverAi420_PV.Error ; // Входной сигнал бит4.
+DbBitsToWord_EW.In5  := DbMotor1.ErrorVoltage  ; // Входной сигнал бит5.
+DbBitsToWord_EW.In6  := DbMotor1.ErrorDrive    ; // Входной сигнал бит6.
+DbBitsToWord_EW.In7  := DbMotor1.ErrorContactor; // Входной сигнал бит7.
+DbBitsToWord_EW.In8  := ErrorButtonStop        ; // Входной сигнал бит8.
+DbBitsToWord_EW.In9  := InterlockOn            ; // Входной сигнал бит9.
+DbBitsToWord_EW.In10 := GroupStop              ; // Входной сигнал бит10.
+DbBitsToWord_EW.In11 := FALSE                  ; // Входной сигнал бит11.
+DbBitsToWord_EW.In12 := FALSE                  ; // Входной сигнал бит12.
+DbBitsToWord_EW.In13 := FALSE                  ; // Входной сигнал бит13.
+DbBitsToWord_EW.In14 := FALSE                  ; // Входной сигнал бит14.
+DbBitsToWord_EW.In14 := FALSE                  ; // Входной сигнал бит14.
+DbBitsToWord_EW.In15 := FALSE                  ; // Входной сигнал бит15.
+DbBitsToWord_EW()                              ; // Преобразование 16 бит в слово.
+"Db1PC1Hmi".EW       := DbBitsToWord_EW.Out    ; // Выходной сигнал.
 
 // Двигатель с частотником и контактором.
 //                 DbMotor
@@ -321,21 +321,21 @@ DbBitsToWord_EW()                              ; //Преобразование 16 бит в слово
 //    +-------------------------------+
 // Команда на включение двигателя.
 DriveRun := (ModeAuto OR ModeManual) AND NOT(ModeStop);
-DbMotor1.MotorRun       := DriveRun               ; //Команда: включить двигатель.
-DbMotor1.VoltageOk      := VoltageOk              ; //Схема собрана 380VAC Ok.
-DbMotor1.DriveOk        := DriveOk                ; //Обратная связь: нет ошибок на частотном приводе.
-DbMotor1.ContactorOk    := ContactorOk            ; //Обратная связь: контактор включился.
-DbMotor1.TimeMonitoring := 1000                   ; //Время гарантированного включения контактора [мс].
-DbMotor1.TimeDelayOn    := 1000                   ; //Время задержки включения частотника [мс].
-DbMotor1.TimeDelayOff   := 5000                   ; //Врямя задержки выключения контактора [мс].
-DbMotor1.Ts_ms          := Ts_ms                  ; //Шаг дискретизации по времени [мс].
-DbMotor1.Reset          := Reset                  ; //Сброс при перезагрузке.
-DbMotor1()                                        ; //Двигатель с частотником и контактором.
-MotorOn                 := DbMotor1.MotorOn       ; //Включить двигатель.
-ContactorOn             := DbMotor1.ContactorOn   ; //Включить контактор.
-//                      := DbMotor1.ErrorVoltage  ; //Схема разобрана нет 380VAC.
-//                      := DbMotor1.ErrorDrive    ; //Ошибка частотного привода.
-//                      := DbMotor1.ErrorContactor; //Ошибка контактора.
+DbMotor1.MotorRun       := DriveRun               ; // Команда: включить двигатель.
+DbMotor1.VoltageOk      := VoltageOk              ; // Схема собрана 380VAC Ok.
+DbMotor1.DriveOk        := DriveOk                ; // Обратная связь: нет ошибок на частотном приводе.
+DbMotor1.ContactorOk    := ContactorOk            ; // Обратная связь: контактор включился.
+DbMotor1.TimeMonitoring := 1000                   ; // Время гарантированного включения контактора [мс].
+DbMotor1.TimeDelayOn    := 1000                   ; // Время задержки включения частотника [мс].
+DbMotor1.TimeDelayOff   := 5000                   ; // Врямя задержки выключения контактора [мс].
+DbMotor1.Ts_ms          := Ts_ms                  ; // Шаг дискретизации по времени [мс].
+DbMotor1.Reset          := Reset                  ; // Сброс при перезагрузке.
+DbMotor1()                                        ; // Двигатель с частотником и контактором.
+MotorOn                 := DbMotor1.MotorOn       ; // Включить двигатель.
+ContactorOn             := DbMotor1.ContactorOn   ; // Включить контактор.
+//                      := DbMotor1.ErrorVoltage  ; // Схема разобрана нет 380VAC.
+//                      := DbMotor1.ErrorDrive    ; // Ошибка частотного привода.
+//                      := DbMotor1.ErrorContactor; // Ошибка контактора.
 
 //////////////////////////////////////////////////////////////
 //--- Часть программы обрабатывающая аналоговые сигналы. ---//
@@ -345,7 +345,7 @@ ContactorOn             := DbMotor1.ContactorOn   ; //Включить контактор.
 // Для задания нулевых начальных условий интегрирования.
 // Для устранения проблем с NaN INF по IEEE 754.
 IF (Reset) THEN
-//Сохранили константы.
+// Сохранили константы.
 TempReal1 := DbPIDcontrol1.Ki;
 TempReal2 := DbPIDcontrol1.Kd;
 // Обнулили интеграторы.
@@ -368,16 +368,16 @@ END_IF;
 //   -|SimValue                   |
 //   -|SimOn                      |
 //    +---------------------------+
-DbDriverAi420_PV.ADC      := ADC_Pressure              ; //АЦП Сигнал от датчика 0...27648.
-DbDriverAi420_PV.SensMax  := "Db1PC1Hmi".PressureMaxAi ; //Диаппазон датчика максимум.
-DbDriverAi420_PV.SensMin  := "Db1PC1Hmi".PressureMinAi ; //Диаппазон датчика минимум.
-DbDriverAi420_PV.ErrValue := 0.0                       ; //Значение для SensorValue при ошибке датчика.
-DbDriverAi420_PV.SimValue := "Db1PC1Hmi".SimulationAi  ; //Значение для SensorValue при симуляции.
-DbDriverAi420_PV.SimOn    := "Db1PC1Hmi".SimulationAiOn; //Включить симуляцию.
-DbDriverAi420_PV()                                     ; //Драйвер аналогово входа 4...20мА.
-//                        := DbDriverAi420_PV.SensValue; //Выход в единицах датчика.
-//                        := DbDriverAi420_PV.Current  ; //Ток на аналоговом входе 4...20мА.
-//                        := DbDriverAi420_PV.Error    ; //Ошибка аналогово входа или датчика.
+DbDriverAi420_PV.ADC      := ADC_Pressure              ; // АЦП Сигнал от датчика 0...27648.
+DbDriverAi420_PV.SensMax  := "Db1PC1Hmi".PressureMaxAi ; // Диаппазон датчика максимум.
+DbDriverAi420_PV.SensMin  := "Db1PC1Hmi".PressureMinAi ; // Диаппазон датчика минимум.
+DbDriverAi420_PV.ErrValue := 0.0                       ; // Значение для SensorValue при ошибке датчика.
+DbDriverAi420_PV.SimValue := "Db1PC1Hmi".SimulationAi  ; // Значение для SensorValue при симуляции.
+DbDriverAi420_PV.SimOn    := "Db1PC1Hmi".SimulationAiOn; // Включить симуляцию.
+DbDriverAi420_PV()                                     ; // Драйвер аналогово входа 4...20мА.
+//                        := DbDriverAi420_PV.SensValue; // Выход в единицах датчика.
+//                        := DbDriverAi420_PV.Current  ; // Ток на аналоговом входе 4...20мА.
+//                        := DbDriverAi420_PV.Error    ; // Ошибка аналогово входа или датчика.
 
 // Фильтрация сигнала с датчика давления 0...10[Бар].
 //      DbFilterA
@@ -387,11 +387,11 @@ DbDriverAi420_PV()                                     ; //Драйвер аналогово вхо
 //   -|Tf         |
 //   -|Ts         |
 //    +-----------+
-DbFilterA_PV.In := DbDriverAi420_PV.SensValue    ; //Входной сигнал до фильтрации.
-DbFilterA_PV.Tf := "Db1PC1Hmi".PressureFilterTime; //Постоянная времени фильтра [с].
-DbFilterA_PV.Ts := Ts                            ; //Шаг дискретизации по времени [с].
-DbFilterA_PV()                                   ; //Фильтр апериодический.
-//              := DbFilterA_PV.Out              ; //Выходной сигнал после фильтрации.
+DbFilterA_PV.In := DbDriverAi420_PV.SensValue    ; // Входной сигнал до фильтрации.
+DbFilterA_PV.Tf := "Db1PC1Hmi".PressureFilterTime; // Постоянная времени фильтра [с].
+DbFilterA_PV.Ts := Ts                            ; // Шаг дискретизации по времени [с].
+DbFilterA_PV()                                   ; // Фильтр апериодический.
+//              := DbFilterA_PV.Out              ; // Выходной сигнал после фильтрации.
 
 // Ограничение измеренного значения давления 0...10[Бар].
 //       DbLimit
@@ -401,11 +401,11 @@ DbFilterA_PV()                                   ; //Фильтр апериодический.
 //   -|OutMax     |
 //   -|OutMin     |
 //    +-----------+
-DbLimit_PV.In     := DbFilterA_PV.Out         ; //Вход амплитудного ограничителя.
-DbLimit_PV.OutMax := "Db1PC1Hmi".PressureMaxAi; //Максимальное значение выхода.
-DbLimit_PV.OutMin := "Db1PC1Hmi".PressureMinAi; //Минимальное значение выхода.
-DbLimit_PV()                                  ; //Амплитудный ограничитель.
-PV                := DbLimit_PV.Out           ; //Выход амплитудного ограничителя.
+DbLimit_PV.In     := DbFilterA_PV.Out         ; // Вход амплитудного ограничителя.
+DbLimit_PV.OutMax := "Db1PC1Hmi".PressureMaxAi; // Максимальное значение выхода.
+DbLimit_PV.OutMin := "Db1PC1Hmi".PressureMinAi; // Минимальное значение выхода.
+DbLimit_PV()                                  ; // Амплитудный ограничитель.
+PV                := DbLimit_PV.Out           ; // Выход амплитудного ограничителя.
 
 // Отображение давления на SCADA/HMI.
 "Db1PC1Hmi".PV := PV;
@@ -418,11 +418,11 @@ PV                := DbLimit_PV.Out           ; //Выход амплитудного ограничител
 //   -|OutMax     |
 //   -|OutMin     |
 //    +-----------+
-DbLimit_SP.In     := "Db1PC1Hmi".SP           ; //Вход амплитудного ограничителя.
-DbLimit_SP.OutMax := "Db1PC1Hmi".PressureMaxAi; //Максимальное значение выхода.
-DbLimit_SP.OutMin := "Db1PC1Hmi".PressureMinAi; //Минимальное значение выхода.
-DbLimit_SP()                                  ; //Амплитудный ограничитель.
-SP                := DbLimit_SP.Out           ; //Выход амплитудного ограничителя.
+DbLimit_SP.In     := "Db1PC1Hmi".SP           ; // Вход амплитудного ограничителя.
+DbLimit_SP.OutMax := "Db1PC1Hmi".PressureMaxAi; // Максимальное значение выхода.
+DbLimit_SP.OutMin := "Db1PC1Hmi".PressureMinAi; // Минимальное значение выхода.
+DbLimit_SP()                                  ; // Амплитудный ограничитель.
+SP                := DbLimit_SP.Out           ; // Выход амплитудного ограничителя.
 
 // Сигнал управления от SADA/HMI.
 MV := "Db1PC1Hmi".MV;
@@ -445,21 +445,21 @@ MV := "Db1PC1Hmi".MV;
 //   -|Manual              |
 //   -|OnMan               |
 //    +--------------------+
-DbPIDcontrol1.PV     := PV               ; //Измеренное значение регулируемого параметра.
-DbPIDcontrol1.SP     := SP               ; //Заданное значение регулируемого параметра.
-DbPIDcontrol1.Kp     := "Db1PC1Hmi".Kp   ; //Коэффициент усиления пропорциональный.
-DbPIDcontrol1.Ki     := "Db1PC1Hmi".Ki   ; //Коэффициент усиления интегральный.
-DbPIDcontrol1.Kd     := "Db1PC1Hmi".Kd   ; //Коэффициент усиления дифференциальный.
-DbPIDcontrol1.Kdf    := "Db1PC1Hmi".Kdf  ; //Коэффициент фильтрации дифференциальный Kdf=1/Tdf.
-DbPIDcontrol1.ERMAX  := "Db1PC1Hmi".ERMAX; //Зона нечувствительности к ошибке регулирования, максимум.
-DbPIDcontrol1.ERMIN  := "Db1PC1Hmi".ERMIN; //Зона нечувствительности к ошибке регулирования, минимум.
-DbPIDcontrol1.MVMAX  := "Db1PC1Hmi".MVMAX; //Максимальное значение сигнала управления.
-DbPIDcontrol1.MVMIN  := "Db1PC1Hmi".MVMIN; //Минимальное значение сигнала управления.
-DbPIDcontrol1.Ts     := Ts               ; //Шаг дискретизации по времени в секундах.
-DbPIDcontrol1.Manual := MV               ; //Сигнал управления в ручном режиме работы.
-DbPIDcontrol1.OnMan  := NOT(ModeAuto)    ; //Включить ручной режим работы регулятора.
-DbPIDcontrol1()                          ; //ПИД-регулятор.
-//                   := DbPIDcontrol1.MV ; //Сигнал управления на исполнительный механизм.
+DbPIDcontrol1.PV     := PV               ; // Измеренное значение регулируемого параметра.
+DbPIDcontrol1.SP     := SP               ; // Заданное значение регулируемого параметра.
+DbPIDcontrol1.Kp     := "Db1PC1Hmi".Kp   ; // Коэффициент усиления пропорциональный.
+DbPIDcontrol1.Ki     := "Db1PC1Hmi".Ki   ; // Коэффициент усиления интегральный.
+DbPIDcontrol1.Kd     := "Db1PC1Hmi".Kd   ; // Коэффициент усиления дифференциальный.
+DbPIDcontrol1.Kdf    := "Db1PC1Hmi".Kdf  ; // Коэффициент фильтрации дифференциальный Kdf=1/Tdf.
+DbPIDcontrol1.ERMAX  := "Db1PC1Hmi".ERMAX; // Зона нечувствительности к ошибке регулирования, максимум.
+DbPIDcontrol1.ERMIN  := "Db1PC1Hmi".ERMIN; // Зона нечувствительности к ошибке регулирования, минимум.
+DbPIDcontrol1.MVMAX  := "Db1PC1Hmi".MVMAX; // Максимальное значение сигнала управления.
+DbPIDcontrol1.MVMIN  := "Db1PC1Hmi".MVMIN; // Минимальное значение сигнала управления.
+DbPIDcontrol1.Ts     := Ts               ; // Шаг дискретизации по времени в секундах.
+DbPIDcontrol1.Manual := MV               ; // Сигнал управления в ручном режиме работы.
+DbPIDcontrol1.OnMan  := NOT(ModeAuto)    ; // Включить ручной режим работы регулятора.
+DbPIDcontrol1()                          ; // ПИД-регулятор.
+//                   := DbPIDcontrol1.MV ; // Сигнал управления на исполнительный механизм.
 
 // Ограничение величины ускорения / замедления привода 0...50[Гц].
 //         DbRamp
@@ -471,13 +471,13 @@ DbPIDcontrol1()                          ; //ПИД-регулятор.
 //   -|TDec          |
 //   -|Ts            |
 //    +--------------+
-DbRamp_MV.In    := DbPIDcontrol1.MV    ; //Входной сигнал.
-DbRamp_MV.Scale := 50.0                ; //Диапазон времени разгона и торможения.
-DbRamp_MV.TAcc  := "Db1PC1Hmi".RampTAcc; //Время разгона от 0 до Scale [с].
-DbRamp_MV.TDec  := "Db1PC1Hmi".RampTDec; //Время торможения от Scale до 0 [c].
-DbRamp_MV.Ts    := Ts                  ; //Шаг дискретизации по времени [с].
-DbRamp_MV()                            ; //Рампа разгона / торможения.
-MV              := DbRamp_MV.Out       ; //Выходной сигнал.
+DbRamp_MV.In    := DbPIDcontrol1.MV    ; // Входной сигнал.
+DbRamp_MV.Scale := 50.0                ; // Диапазон времени разгона и торможения.
+DbRamp_MV.TAcc  := "Db1PC1Hmi".RampTAcc; // Время разгона от 0 до Scale [с].
+DbRamp_MV.TDec  := "Db1PC1Hmi".RampTDec; // Время торможения от Scale до 0 [c].
+DbRamp_MV.Ts    := Ts                  ; // Шаг дискретизации по времени [с].
+DbRamp_MV()                            ; // Рампа разгона / торможения.
+MV              := DbRamp_MV.Out       ; // Выходной сигнал.
 
 // Сигнал управления отображение на SADA/HMI.
 "Db1PC1Hmi".MV := MV;
@@ -492,14 +492,14 @@ MV              := DbRamp_MV.Out       ; //Выходной сигнал.
 //   -|SimValue               |
 //   -|SimOn                  |
 //    +-----------------------+
-DbDriverAo420_MV.In       := MV                        ; //Вход сигнала на исполнительный механизм.
-DbDriverAo420_MV.InMax    := "Db1PC1Hmi".MotorMaxAo    ; //Исполнительный механизм максимум.
-DbDriverAo420_MV.InMin    := "Db1PC1Hmi".MotorMinAo    ; //Исполнительный механизм минимум.
-DbDriverAo420_MV.SimValue := "Db1PC1Hmi".SimulationAo  ; //Значение для исполнительного механизма при симуляции.
-DbDriverAo420_MV.SimOn    := "Db1PC1Hmi".SimulationAoOn; //Включить симуляцию.
-DbDriverAo420_MV()                                     ; //Драйвер аналогово выхода 4...20мА.
-DAC_Frequency             := DbDriverAo420_MV.DAC      ; //ЦАП Сигнал на исполнительный механизм 0...27648.
-//                        := DbDriverAo420_MV.Current  ; //Ток на аналоговом выходе 4...20мА.
+DbDriverAo420_MV.In       := MV                        ; // Вход сигнала на исполнительный механизм.
+DbDriverAo420_MV.InMax    := "Db1PC1Hmi".MotorMaxAo    ; // Исполнительный механизм максимум.
+DbDriverAo420_MV.InMin    := "Db1PC1Hmi".MotorMinAo    ; // Исполнительный механизм минимум.
+DbDriverAo420_MV.SimValue := "Db1PC1Hmi".SimulationAo  ; // Значение для исполнительного механизма при симуляции.
+DbDriverAo420_MV.SimOn    := "Db1PC1Hmi".SimulationAoOn; // Включить симуляцию.
+DbDriverAo420_MV()                                     ; // Драйвер аналогово выхода 4...20мА.
+DAC_Frequency             := DbDriverAo420_MV.DAC      ; // ЦАП Сигнал на исполнительный механизм 0...27648.
+//                        := DbDriverAo420_MV.Current  ; // Ток на аналоговом выходе 4...20мА.
 
 // Предупреждение о выходе за допустимые пределы измеренного значения.
 //          DbAlarm
@@ -511,14 +511,14 @@ DAC_Frequency             := DbDriverAo420_MV.DAC      ; //ЦАП Сигнал на исполни
 //   -|TimeDelay        |
 //   -|Ts_ms            |
 //    +-----------------+
-DbAlarm_PV.In        := PV                        ; //Входной сигнал.
-DbAlarm_PV.LevelHi   := "Db1PC1Hmi".AlarmPV_Hi    ; //Верхняя граница предупреждения.
-DbAlarm_PV.LevelLo   := "Db1PC1Hmi".AlarmPV_Lo    ; //Нижняя граница предупреждения.
-DbAlarm_PV.TimeDelay := "Db1PC1Hmi".AlarmDelayTime; //Время задержки включения [мс].
-DbAlarm_PV.Ts_ms     := Ts_ms                     ; //Шаг дискретизации по времени [мс].
-DbAlarm_PV()                                      ; //Блок предупреждений.
-//                   := DbAlarm_PV.AlarmHi        ; //Достигнут верхний предел.
-//                   := DbAlarm_PV.AlarmLo        ; //Достигнут нижний предел.
+DbAlarm_PV.In        := PV                        ; // Входной сигнал.
+DbAlarm_PV.LevelHi   := "Db1PC1Hmi".AlarmPV_Hi    ; // Верхняя граница предупреждения.
+DbAlarm_PV.LevelLo   := "Db1PC1Hmi".AlarmPV_Lo    ; // Нижняя граница предупреждения.
+DbAlarm_PV.TimeDelay := "Db1PC1Hmi".AlarmDelayTime; // Время задержки включения [мс].
+DbAlarm_PV.Ts_ms     := Ts_ms                     ; // Шаг дискретизации по времени [мс].
+DbAlarm_PV()                                      ; // Блок предупреждений.
+//                   := DbAlarm_PV.AlarmHi        ; // Достигнут верхний предел.
+//                   := DbAlarm_PV.AlarmLo        ; // Достигнут нижний предел.
 
 // Предупреждение о выходе за допустимые пределы сигнала управления.
 //          DbAlarm
@@ -530,14 +530,14 @@ DbAlarm_PV()                                      ; //Блок предупреждений.
 //   -|TimeDelay        |
 //   -|Ts_ms            |
 //    +-----------------+
-DbAlarm_MV.In        := MV                        ; //Входной сигнал.
-DbAlarm_MV.LevelHi   := "Db1PC1Hmi".AlarmMV_Hi    ; //Верхняя граница предупреждения.
-DbAlarm_MV.LevelLo   := "Db1PC1Hmi".AlarmMV_Lo    ; //Нижняя граница предупреждения.
-DbAlarm_MV.TimeDelay := "Db1PC1Hmi".AlarmDelayTime; //Время задержки включения [мс].
-DbAlarm_MV.Ts_ms     := Ts_ms                     ; //Шаг дискретизации по времени [мс].
-DbAlarm_MV()                                      ; //Блок предупреждений.
-//                   := DbAlarm_MV.AlarmHi        ; //Достигнут верхний предел.
-//                   := DbAlarm_MV.AlarmLo        ; //Достигнут нижний предел.
+DbAlarm_MV.In        := MV                        ; // Входной сигнал.
+DbAlarm_MV.LevelHi   := "Db1PC1Hmi".AlarmMV_Hi    ; // Верхняя граница предупреждения.
+DbAlarm_MV.LevelLo   := "Db1PC1Hmi".AlarmMV_Lo    ; // Нижняя граница предупреждения.
+DbAlarm_MV.TimeDelay := "Db1PC1Hmi".AlarmDelayTime; // Время задержки включения [мс].
+DbAlarm_MV.Ts_ms     := Ts_ms                     ; // Шаг дискретизации по времени [мс].
+DbAlarm_MV()                                      ; // Блок предупреждений.
+//                   := DbAlarm_MV.AlarmHi        ; // Достигнут верхний предел.
+//                   := DbAlarm_MV.AlarmLo        ; // Достигнут нижний предел.
 
 // Наименование технологической позиции согласно ГОСТ 21.404-85.
 //
