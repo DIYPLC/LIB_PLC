@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include "FbGSS.hpp"
 
-void FbGSS::Run(void) {
+void FbGSS::operator()() {
 
   Sine = Amplitude * sinf(2 * M_PI * (1.0 / Period) * CurrentTime + Phase) + Offset;
   Cosine = Amplitude * cosf(2 * M_PI * (1.0 / Period) * CurrentTime + Phase) + Offset;
