@@ -15,16 +15,6 @@
 void FbTs(struct DbTs *p)
 {
 
-  // Инициализация при первом старте.
-  if (Reset)
-  {
-    Time_previous_ms = millis;
-    Ts_ms = millis;
-    Ts = 0.0;
-    Ts_ms_max = 0;
-    Uptime_s = 0;
-  }
-
   // Рассчет шага дискретизации по времени [мс].
   if (Time_previous_ms <= millis)
   {
@@ -44,6 +34,16 @@ void FbTs(struct DbTs *p)
   // sizeof(uint64_t) = 8byte = 64bit
   // sizeof(float) = 4byte = 32bit
   // sizeof(double) = 8byte = 64bit
+
+  // Инициализация при первом старте.
+  if (Reset)
+  {
+    Time_previous_ms = millis;
+    Ts_ms = 0;
+    Ts = 0.0;
+    Ts_ms_max = 0;
+    Uptime_s = 0;
+  }
 
   // Запомнить предидущее состояние.
   Time_previous_ms = millis;
