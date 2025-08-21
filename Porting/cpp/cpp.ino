@@ -69,9 +69,7 @@ void FcTaskCyclic(bool Reset, uint32_t Ts_ms) {  // Задача выполня�
   Serial.print(',');
   Serial.print(DbFilterA.Out);
   Serial.print(',');
-  Serial.print(Ts);  // Plotter scale min.
-  //Serial.print(',');
-  //Serial.print(1.1);  // Plotter scale max.
+  Serial.print(Ts);
   Serial.println();
 
   if (DbBlink.Out) {
