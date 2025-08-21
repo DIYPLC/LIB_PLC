@@ -1,5 +1,6 @@
 #include <math.h>
 #include <stdint.h>
+#include <iso646.h>
 #include "FbGSS.hpp"
 
 void FbGSS::operator()() {
