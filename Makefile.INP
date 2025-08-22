@@ -31,6 +31,7 @@ FbDelayN           // LIB_PLC Задержка на N тактов.
 FbIntegrator       // LIB_PLC Интегратор W(s)=1/s.
 FbDeadBand         // LIB_PLC Зона нечувствительности.
 FbS5TimeToReal     // LIB_PLC Конвертор S5TIME в милисекунды.
+Fb2oo3             // LIB_PLC Резервирование датчиков методом голосования.
 
 // Базовые дискретные блоки, упорядочил по частоте использования.
 FbModeSelector     // LIB_PLC Переключатель режимов работы.
