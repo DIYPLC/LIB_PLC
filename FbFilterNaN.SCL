@@ -6,15 +6,24 @@ TITLE = 'Фильтр NaN и Inf для чисел REAL.'
 
 AUTHOR  : VA
 FAMILY  : LIB_PLC
-VERSION : '2.1'
+VERSION : '2.2'
 
 VAR_INPUT // Входные переменные, сохраняемые.
-In:REAL := 0.0; // Вход.
+In       :REAL := 0.0; // Вход.
+ErrValue :REAL := 0.0  ; // Значение для Out при не корректном значении на входе In.
 END_VAR
 
 VAR_OUTPUT // Выходные переменные, сохраняемые.
-Out   :REAL := 0.0  ; // Выход.
-Alarm :BOOL := FALSE; // Флаг ошибки.
+Out :REAL := 0.0  ; // Выход.
+Err :BOOL := FALSE; // Флаг ошибки.
+END_VAR
+
+VAR // Внутренние переменные, сохраняемые.
+Flag_nan_1   :BOOL := FALSE ; // Флаг не число метод 1, по стандарту IEEE 754.
+Flag_nan_2   :BOOL := FALSE ; // Флаг не число метод 2, как в GCC.
+Flag_nan_3   :BOOL := FALSE ; // Флаг не число метод 3, математическое определение.
+Flag_pos_inf :BOOL := FALSE ; // Флаг плюс бесконечность, математическое определение.
+Flag_neg_inf :BOOL := FALSE ; // Флаг минус бесконечность, математическое определение.
 END_VAR
 
 BEGIN
@@ -24,18 +33,30 @@ BEGIN
 //    +-------------+
 //    | FbFilterNaN |
 // ->-|In        Out|->-
-//    |        Alarm|-
+//   -|ErrValue  Err|-
 //    +-------------+
 
 // Если In==(NaN или Inf или -Inf) то Out=0 иначе Out=In.
 // DW#16#7F800000=DW#2#01111111_10000000_00000000_00000000
 // Стандарт IEEE 754.
-IF ((REAL_TO_DWORD(In) AND DW#16#7F800000) = DW#16#7F800000) THEN
-Out   := 0.0;
-Alarm := TRUE;
+Flag_nan_1   := ((REAL_TO_DWORD(In) AND DW#16#7F800000) = DW#16#7F800000);
+Flag_nan_2   := (In <> In);
+Flag_nan_3   := (( 0.0 / 0.0) = In);
+Flag_pos_inf := (( 1.0 / 0.0) = In);
+Flag_neg_inf := ((-1.0 / 0.0) = In);
+
+Err := Flag_nan_1 OR Flag_nan_2 OR Flag_nan_3 OR Flag_pos_inf OR Flag_neg_inf;
+
+IF (Err) THEN
+Out := ErrValue;
+// По умолчанию при ошибке на выходе будит 0.
+// Если хотим показать последнее значение без ошибки то,
+// при вызове данного блока сделать петлю с выхода на так:
+// DbFilterNaN1.ErrValue := DbFilterNaN1.Out
+// DbFilterNaN1();
 ELSE
-Out   := In;
-Alarm := FALSE;
+// Штатный режим работы без ошибок.
+Out := In;
 END_IF;
 
 // @COPYLEFT ALL WRONGS RESERVED :)

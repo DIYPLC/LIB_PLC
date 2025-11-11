@@ -8,7 +8,7 @@ TITLE = '1PC1 ПИД-регулятор давления.'
 
 AUTHOR  : VA
 FAMILY  : '1PC1'
-VERSION : '2.2'
+VERSION : '2.3'
 
 VAR_INPUT // Входные переменные, сохраняемые.
 ADC_Pressure      :WORD := 0    ; // Датчик давления 0...27648[АЦП].
@@ -357,26 +357,29 @@ DbPIDcontrol1.Ki := TempReal1;
 DbPIDcontrol1.Kd := TempReal2;
 END_IF;
 
+// TODO Так же необходимо добавить аналоговый вход для отображения нагрузки привода.
+// Тренд нагрузки частотника очень важен для диагностики неисправностей.
+
 // Датчик давления 4...20[мА] -> 0...10[Бар].
 //            DbDriverAi420
 //    +---------------------------+
 //    |       FbDriverAi420       |
-// ->-|ADC               SensValue|->-
-//   -|SensMax             Current|-
-//   -|SensMin               Error|-
+// ->-|ADC                     Out|->-
+//   -|OutMax                 I_mA|-
+//   -|OutMin                Error|-
 //   -|ErrValue                   |
 //   -|SimValue                   |
 //   -|SimOn                      |
 //    +---------------------------+
 DbDriverAi420_PV.ADC      := ADC_Pressure              ; // АЦП Сигнал от датчика 0...27648.
-DbDriverAi420_PV.SensMax  := "Db1PC1Hmi".PressureMaxAi ; // Диаппазон датчика максимум.
-DbDriverAi420_PV.SensMin  := "Db1PC1Hmi".PressureMinAi ; // Диаппазон датчика минимум.
+DbDriverAi420_PV.OutMax   := "Db1PC1Hmi".PressureMaxAi ; // Диаппазон датчика максимум.
+DbDriverAi420_PV.OutMin   := "Db1PC1Hmi".PressureMinAi ; // Диаппазон датчика минимум.
 DbDriverAi420_PV.ErrValue := 0.0                       ; // Значение для SensorValue при ошибке датчика.
 DbDriverAi420_PV.SimValue := "Db1PC1Hmi".SimulationAi  ; // Значение для SensorValue при симуляции.
 DbDriverAi420_PV.SimOn    := "Db1PC1Hmi".SimulationAiOn; // Включить симуляцию.
 DbDriverAi420_PV()                                     ; // Драйвер аналогово входа 4...20мА.
-//                        := DbDriverAi420_PV.SensValue; // Выход в единицах датчика.
-//                        := DbDriverAi420_PV.Current  ; // Ток на аналоговом входе 4...20мА.
+//                        := DbDriverAi420_PV.Out      ; // Выход в единицах датчика.
+//                        := DbDriverAi420_PV.I_mA     ; // Ток на аналоговом входе 4...20мА.
 //                        := DbDriverAi420_PV.Error    ; // Ошибка аналогово входа или датчика.
 
 // Фильтрация сигнала с датчика давления 0...10[Бар].
@@ -387,7 +390,7 @@ DbDriverAi420_PV()                                     ; // Драйвер аналогово вх
 //   -|Tf         |
 //   -|Ts         |
 //    +-----------+
-DbFilterA_PV.In := DbDriverAi420_PV.SensValue    ; // Входной сигнал до фильтрации.
+DbFilterA_PV.In := DbDriverAi420_PV.Out          ; // Входной сигнал до фильтрации.
 DbFilterA_PV.Tf := "Db1PC1Hmi".PressureFilterTime; // Постоянная времени фильтра [с].
 DbFilterA_PV.Ts := Ts                            ; // Шаг дискретизации по времени [с].
 DbFilterA_PV()                                   ; // Фильтр апериодический.
@@ -487,7 +490,7 @@ MV              := DbRamp_MV.Out       ; // Выходной сигнал.
 //    +-----------------------+
 //    |     FbDriverAo420     |
 // ->-|In                  DAC|->-
-//   -|InMax           Current|-
+//   -|InMax              I_mA|-
 //   -|InMin                  |
 //   -|SimValue               |
 //   -|SimOn                  |
@@ -499,7 +502,7 @@ DbDriverAo420_MV.SimValue := "Db1PC1Hmi".SimulationAo  ; // Значение для исполни
 DbDriverAo420_MV.SimOn    := "Db1PC1Hmi".SimulationAoOn; // Включить симуляцию.
 DbDriverAo420_MV()                                     ; // Драйвер аналогово выхода 4...20мА.
 DAC_Frequency             := DbDriverAo420_MV.DAC      ; // ЦАП Сигнал на исполнительный механизм 0...27648.
-//                        := DbDriverAo420_MV.Current  ; // Ток на аналоговом выходе 4...20мА.
+//                        := DbDriverAo420_MV.I_mA  ; // Ток на аналоговом выходе 4...20мА.
 
 // Предупреждение о выходе за допустимые пределы измеренного значения.
 //          DbAlarm
@@ -564,12 +567,12 @@ DbAlarm_MV()                                      ; // Блок предупреждений.
 //                                DbDriverAi420                DbScale          DbFilterA          DbLimit                           
 //                        +---------------------------+     +-----------+     +-----------+     +-----------+                        
 // +----------------+     |       FbDriverAi420       |     |  FbScale  |     | FbFilterA |     |  FbLimit  |     +-----------------+
-// | SensorPressure |-->--|ADC             SensorValue|-->--|In      Out|-->--|In      Out|-->--|In      Out|-->--| PV              |
-// +----------------+    -|SensorMaxValue      Current|-   -|InMax      |    -|Tf         |    -|OutMax     |     +-----------------+
-//                       -|SensorMinValue        Error|-   -|InMin      |    -|Ts         |    -|OutMin     |                        
-// +-------+             -|ErrorValue                 |    -|OutMax     |     +-----------+     +-----------+                        
-// | MV    |----------->--|SimulationValue            |    -|OutMin     |                                          
-// +-------+             -|SimulationOn               |     +-----------+                                          
+// | SensorPressure |-->--|ADC                     Out|-->--|In      Out|-->--|In      Out|-->--|In      Out|-->--| PV              |
+// +----------------+    -|OutMax                 I_mA|-   -|InMax      |    -|Tf         |    -|OutMax     |     +-----------------+
+//                       -|OutMin                Error|-   -|InMin      |    -|Ts         |    -|OutMin     |                        
+// +-------+             -|ErrValue                   |    -|OutMax     |     +-----------+     +-----------+                        
+// | MV    |----------->--|SimValue                   |    -|OutMin     |                                          
+// +-------+             -|SimOn                      |     +-----------+                                          
 //                        +---------------------------+                                                            
 //
 // +-----------------+     +------------------------------+
@@ -621,10 +624,10 @@ DbAlarm_MV()                                      ; // Блок предупреждений.
 //                       +-----------------------+            
 // +---------------+     |     FbDriverAo420     |     +----------------+
 // | MV            |-->--|In                  DAC|-->--| DriveFrequency |
-// +---------------+    -|InMax           Current|-    +----------------+
+// +---------------+    -|InMax              I_mA|-    +----------------+
 //                      -|InMin                  |            
-//                      -|SimulationValue        |            
-//                      -|SimulationOn           |            
+//                      -|SimValue               |            
+//                      -|SimOn                  |            
 //                       +-----------------------+            
 
 // GUI SCADA/HMI

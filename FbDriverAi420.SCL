@@ -6,21 +6,21 @@ TITLE = 'Драйвер аналогово входа 4...20мА.'
 
 AUTHOR  : VA
 FAMILY  : LIB_PLC
-VERSION : '2.2'
+VERSION : '2.3'
 
 VAR_INPUT // Входные переменные, сохраняемые.
 ADC      :WORD := 0    ; // АЦП Сигнал от датчика 0...27648.
-SensMax  :REAL := 100.0; // Диаппазон датчика максимум.
-SensMin  :REAL := 0.0  ; // Диаппазон датчика минимум.
-ErrValue :REAL := 0.0  ; // Значение для SensValue при ошибке датчика.
-SimValue :REAL := 0.0  ; // Значение для SensValue при симуляции.
+OutMax   :REAL := 100.0; // Диаппазон датчика максимум.
+OutMin   :REAL := 0.0  ; // Диаппазон датчика минимум.
+ErrValue :REAL := 0.0  ; // Значение для Out при ошибке датчика.
+SimValue :REAL := 0.0  ; // Значение для Out при симуляции.
 SimOn    :BOOL := FALSE; // Включить симуляцию.
 END_VAR
 
 VAR_OUTPUT // Выходные переменные, сохраняемые.
-SensValue :REAL := 0.0  ; // Выход в единицах датчика.
-Current   :REAL := 0.0  ; // Ток на аналоговом входе 4...20мА.
-Error     :BOOL := FALSE; // Ошибка аналогово входа или датчика.
+Out   :REAL := 0.0  ; // Выход в единицах датчика.
+I_mA  :REAL := 0.0  ; // Ток на аналоговом входе 4...20мА.
+Error :BOOL := FALSE; // Ошибка аналогово входа или датчика.
 END_VAR
 
 BEGIN
@@ -29,9 +29,9 @@ BEGIN
 //            DbDriverAi420
 //    +---------------------------+
 //    |       FbDriverAi420       |
-// ->-|ADC               SensValue|->-
-//   -|SensMax             Current|-
-//   -|SensMin               Error|-
+// ->-|ADC                     Out|->-
+//   -|OutMax                 I_mA|-
+//   -|OutMin                Error|-
 //   -|ErrValue                   |
 //   -|SimValue                   |
 //   -|SimOn                      |
@@ -42,39 +42,39 @@ Error := (ADC = W#16#7FFF) OR (ADC = W#16#8000); // 32767,-32768
 
 // Ток на аналоговом входе 4...20мА.
 IF (Error) THEN
-Current := 0.0;
+I_mA := 0.0;
 ELSE
 // Масштабирование 0...27648 [АЦП] -> 4...20[мА]
-Current := ((INT_TO_REAL(WORD_TO_INT(ADC)) * 16.0 ) / 27648.0) + 4.0;
+I_mA := ((INT_TO_REAL(WORD_TO_INT(ADC)) * 16.0 ) / 27648.0) + 4.0;
 END_IF;
 
 IF (SimOn) THEN // Включена симуляция.
-SensValue := SimValue; // Значение для SensValue при симуляции.
+Out := SimValue; // Значение для Out при симуляции.
 ELSE
     IF (Error) THEN // Ошибка аналогово входа или датчика.
-    SensValue := ErrValue; // Значение для SensValue при ошибке датчика.
+    Out := ErrValue; // Значение для Out при ошибке датчика.
     ELSE
-    // Масштабирование 4...20[мА] -> SensMin...SensMax
-    SensValue := (SensMax - SensMin) * ((Current - 4.0) / 16.0) + SensMin;
+    // Масштабирование 4...20[мА] -> OutMin...OutMax
+    Out := (OutMax - OutMin) * ((I_mA - 4.0) / 16.0) + OutMin;
     END_IF;
 END_IF;
 
-// Амплитудный ограничитель диапазона датчика SensMin...SensMax
-IF (SensValue >= SensMax) THEN // Ограничение выхода сверху.
-SensValue := SensMax; 
+// Амплитудный ограничитель диапазона датчика OutMin...OutMax
+IF (Out >= OutMax) THEN // Ограничение выхода сверху.
+Out := OutMax; 
 ELSE
-    IF (SensValue <= SensMin) THEN // Ограничение выхода снизу.
-    SensValue := SensMin;
+    IF (Out <= OutMin) THEN // Ограничение выхода снизу.
+    Out := OutMin;
     ELSE
     // Выход без ограничений.
-    SensValue := SensValue;
+    Out := Out;
     END_IF;
 END_IF;
 
 // Описание работы драйвера аналогово входа 4...20мА.
 // 1.Сначала сигнал с АЦП 0...27648 преобразуется в токовый сигна 4...20мА.
-// 2.Если не включена симуляция и нет ошибок сигнал 4...20мА преобразуется в сигнал датчика SensMin...SensMax.
-// 3.Сигнал датчика ограничивается в пределах его диаппазона измерения SensMin...SensMax.
+// 2.Если не включена симуляция и нет ошибок сигнал 4...20мА преобразуется в сигнал датчика OutMin...OutMax.
+// 3.Сигнал датчика ограничивается в пределах его диаппазона измерения OutMin...OutMax.
 
 // @COPYLEFT ALL WRONGS RESERVED :)
 // Author: VA
