@@ -1,0 +1,78 @@
+﻿FUNCTION_BLOCK "FbDispersion"
+TITLE = Дисперсия PV.
+{ S7_Optimized_Access := 'FALSE' }
+AUTHOR : VA
+FAMILY : LIB_PLC
+VERSION : 1.1
+   VAR_INPUT 
+      In : Real;   // Вход измерения.
+   END_VAR
+
+   VAR_OUTPUT 
+      Variance : Real;   // Дисперсия.
+      Deviation : Real;   // Среднеквадратическое отклонение.
+      Mean : Real;   // Математическое ожидание (Среднее арифметическое).
+   END_VAR
+
+   VAR 
+      Buffer1 : Array[0..99] of Real;   // Буфер.
+      COUNTER1 : Int;   // Счетчик.
+      Summator : Real;   // Сумматор.
+   END_VAR
+
+   VAR CONSTANT 
+      NUMBER : Int := 99;   // Размер массива 100.
+   END_VAR
+
+
+BEGIN
+	
+	
+	// Дисперсия PV.
+	//       DbDispersion
+	//     +--------------+
+	//     | FbDispersion |
+	//  ->-|In    Variance|->-
+	//     |     Deviation|->-
+	//     |          Mean|->-
+	//     +--------------+
+	
+	// Обновление массива.
+	FOR #COUNTER1 := #NUMBER TO 1 BY -1 DO
+	#Buffer1[#COUNTER1] := #Buffer1[#COUNTER1 - 1];
+	END_FOR;
+	#Buffer1[0] := #In;
+	
+	// Расчет математического ожидания (среднего арифметического).
+	#Summator := 0.0;
+	FOR #COUNTER1 := 0 TO #NUMBER BY 1 DO
+	#Summator := #Summator + #Buffer1[#COUNTER1];
+	END_FOR;
+	#Mean := #Summator /(INT_TO_REAL(#NUMBER + 1));
+	
+	// Рассчет дисперсии.
+	#Summator := 0.0;
+	FOR #COUNTER1 := 0 TO #NUMBER BY 1 DO
+	#Summator := #Summator + ((#Buffer1[#COUNTER1] - #Mean) * (#Buffer1[#COUNTER1] - #Mean));
+	END_FOR;
+	#Variance := #Summator / (INT_TO_REAL(#NUMBER + 1));
+	
+	// Рассчет среднеквадратического отклонения.
+	#Deviation := SQRT(#Variance);
+	
+	// @COPYLEFT ALL WRONGS RESERVED :)
+	// Author: VA
+	// Contacts: DIY.PLC.314@gmail.com
+	// Date start LIB_PLC: 2014
+	// License: GNU GPL-2.0-or-later
+	// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+	// https://www.youtube.com/watch?v=n1F_MfLRlX0
+	// https://www.youtube.com/@DIY_PLC
+	// https://github.com/DIYPLC/LIB_PLC
+	// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+	// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+	// https://t.me/DIY_PLC
+	
+	
+END_FUNCTION_BLOCK
+

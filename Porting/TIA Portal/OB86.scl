@@ -1,0 +1,40 @@
+﻿ORGANIZATION_BLOCK "RACK_FLT"
+TITLE = Loss of Rack Fault
+{ S7_Optimized_Access := 'FALSE' }
+AUTHOR : VA
+FAMILY : LIB_PLC
+VERSION : 2.1
+   VAR_TEMP 
+      OB86_EV_CLASS : Byte;   // 16#38/39 Event class 3
+      OB86_FLT_ID : Byte;   // 16#C1/C4/C5, Fault identifcation code
+      OB86_PRIORITY : Byte;   // Priority of OB Execution
+      OB86_OB_NUMBR : Byte;   // 86 (Organization block 86, OB86)
+      OB86_RESERVED_1 : Byte;   // Reserved for system
+      OB86_RESERVED_2 : Byte;   // Reserved for system
+      OB86_MDL_ADDR : Word;   // Base address of IM module in rack with fault
+      OB86_RACKS_FLTD : Array[0..31] of Bool;   // Racks in fault
+      OB86_DATE_TIME : Date_And_Time;   // Date and time OB86 started
+   END_VAR
+
+
+BEGIN
+	
+	
+	"DbDebug".OB86_CNT_ERR := "DbDebug".OB86_CNT_ERR + 1; // Счетчик вызовов обработчика ошибок OB86.
+	
+	// @COPYLEFT ALL WRONGS RESERVED :)
+	// Author: VA
+	// Contacts: DIY.PLC.314@gmail.com
+	// Date start LIB_PLC: 2014
+	// License: GNU GPL-2.0-or-later
+	// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+	// https://www.youtube.com/watch?v=n1F_MfLRlX0
+	// https://www.youtube.com/@DIY_PLC
+	// https://github.com/DIYPLC/LIB_PLC
+	// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+	// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+	// https://t.me/DIY_PLC
+	
+	
+END_ORGANIZATION_BLOCK
+

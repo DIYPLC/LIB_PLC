@@ -1,0 +1,50 @@
+﻿FUNCTION_BLOCK "FbEdgeNeg"
+TITLE = Детектор ниспадающего фронта (среза).
+{ S7_Optimized_Access := 'FALSE' }
+AUTHOR : VA
+FAMILY : LIB_PLC
+VERSION : 2.1
+   VAR_INPUT 
+      In : Bool;   // Вход.
+   END_VAR
+
+   VAR_OUTPUT 
+      Out : Bool;   // Выход.
+   END_VAR
+
+   VAR 
+      In_previos : Bool;   // Предыдущее состояние входа.
+   END_VAR
+
+
+BEGIN
+	
+	
+	// Детектор ниспадающего фронта (среза).
+	//       DbEdgeNeg
+	//     +-----------+
+	//     | FbEdgeNeg |
+	//  ->-|In      Out|->-
+	//     +-----------+
+	
+	// Детектор ниспадающего фронта (среза).
+	#Out := #In_previos AND NOT(#In);
+	// Запомнить предыдущее состояние входа.
+	#In_previos := #In;
+	
+	// @COPYLEFT ALL WRONGS RESERVED :)
+	// Author: VA
+	// Contacts: DIY.PLC.314@gmail.com
+	// Date start LIB_PLC: 2014
+	// License: GNU GPL-2.0-or-later
+	// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+	// https://www.youtube.com/watch?v=n1F_MfLRlX0
+	// https://www.youtube.com/@DIY_PLC
+	// https://github.com/DIYPLC/LIB_PLC
+	// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+	// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+	// https://t.me/DIY_PLC
+	
+	
+END_FUNCTION_BLOCK
+

@@ -1,0 +1,58 @@
+﻿FUNCTION_BLOCK "FbS5TimeToReal"
+TITLE = Конвертор S5TIME в милисекунды.
+{ S7_Optimized_Access := 'FALSE' }
+AUTHOR : VA
+FAMILY : LIB_PLC
+VERSION : 1.0
+   VAR_INPUT 
+      X : S5Time;   // Вход S5TIME 16 бит BCD.
+      LocalStructTime { S7_HMI_Accessible := 'False'; S7_HMI_Visible := 'False'} AT X : Struct
+         ArrayByte { S7_HMI_Accessible := 'False'; S7_HMI_Visible := 'False'} : Array[0..1] of Byte;
+      END_STRUCT;
+   END_VAR
+
+   VAR_OUTPUT 
+      Y : Real;   // Выход милисекунды.
+   END_VAR
+
+   VAR 
+      Digit1 : Int;   // Единицы BCD.
+      Digit10 : Int;   // Десятки BCD.
+      Digit100 : Int;   // Сотни BCD.
+      Base : Int;   // База 2 бита (BCD*10^(Base+1)).
+   END_VAR
+
+
+BEGIN
+	
+	
+	// Разбиваем BCD на части по 4 бита
+	// Байты в слове поменяны местами из за архитектуры процессора.
+	#Digit1   := BYTE_TO_INT(#LocalStructTime.ArrayByte[1] AND 2#0000_1111);
+	#Digit10  := BYTE_TO_INT(#LocalStructTime.ArrayByte[1] AND 2#1111_0000)/16;
+	#Digit100 := BYTE_TO_INT(#LocalStructTime.ArrayByte[0] AND 2#0000_1111);
+	#Base     := BYTE_TO_INT(#LocalStructTime.ArrayByte[0] AND 2#0011_0000)/16;
+	// Вычислем количество милисекунд согласно спецификации формата S5TIME.
+	#Y := ( 10**(INT_TO_REAL(#Base+1)) ) * 
+	(
+	INT_TO_REAL(#Digit100*100) + 
+	INT_TO_REAL(#Digit10*10) + 
+	INT_TO_REAL(#Digit1)
+	);
+	
+	// @COPYLEFT ALL WRONGS RESERVED :)
+	// Author: VA
+	// Contacts: DIY.PLC.314@gmail.com
+	// Date start LIB_PLC: 2014
+	// License: GNU GPL-2.0-or-later
+	// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+	// https://www.youtube.com/watch?v=n1F_MfLRlX0
+	// https://www.youtube.com/@DIY_PLC
+	// https://github.com/DIYPLC/LIB_PLC
+	// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+	// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+	// https://t.me/DIY_PLC
+	
+	
+END_FUNCTION_BLOCK
+

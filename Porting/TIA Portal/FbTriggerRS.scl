@@ -1,0 +1,55 @@
+﻿FUNCTION_BLOCK "FbTriggerRS"
+TITLE = RS- Триггер с приоритетом на сброс.
+{ S7_Optimized_Access := 'FALSE' }
+AUTHOR : VA
+FAMILY : LIB_PLC
+VERSION : 2.1
+   VAR_INPUT 
+      Set : Bool;   // Set — установить единицу.
+      Rst : Bool;   // Reset — сбросить на ноль.
+   END_VAR
+
+   VAR_OUTPUT 
+      Out : Bool;   // Выход триггера.
+   END_VAR
+
+
+BEGIN
+	
+	
+	// RS- Триггер с приоритетом на сброс.
+	//       DbTriggerRS
+	//     +-------------+
+	//     | FbTriggerRS |
+	//  ->-|Set       Out|->-
+	//  ->-|Rst          |
+	//     +-------------+
+	
+	// RS- Триггер.
+	#Out := (#Out OR #Set) AND (NOT(#Rst));
+	
+	//   Релейная интерпритация. 
+	//  |                       |
+	//  |  Rst     Set     Out  |
+	//  +--|/|--+--| |--+--( )--+
+	//  |       |       |       |
+	//  |       |  Out  |       |
+	//  |       +--| |--+       |
+	//  |                       |
+	
+	// @COPYLEFT ALL WRONGS RESERVED :)
+	// Author: VA
+	// Contacts: DIY.PLC.314@gmail.com
+	// Date start LIB_PLC: 2014
+	// License: GNU GPL-2.0-or-later
+	// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+	// https://www.youtube.com/watch?v=n1F_MfLRlX0
+	// https://www.youtube.com/@DIY_PLC
+	// https://github.com/DIYPLC/LIB_PLC
+	// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+	// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+	// https://t.me/DIY_PLC
+	
+	
+END_FUNCTION_BLOCK
+

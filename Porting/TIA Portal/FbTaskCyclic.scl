@@ -1,0 +1,94 @@
+﻿FUNCTION_BLOCK "FbTaskCyclic"
+TITLE = Задача вызывается циклически.
+{ S7_Optimized_Access := 'FALSE' }
+AUTHOR : VA
+FAMILY : LIB_PLC
+VERSION : 2.1
+   VAR_INPUT 
+      Ts_ms : DInt := L#100;   // Шаг дискретизации по времени [мс].
+      Reset : Bool;   // Сброс при перезагрузке.
+   END_VAR
+
+   VAR 
+      Ts : Real := 1.0e-1;   // Шаг дискретизации по времени [с].
+   END_VAR
+
+
+BEGIN
+	
+	
+	// Задача вызывается циклически.
+	//      DbTaskCyclic
+	//    +--------------+
+	//    | FbTaskCyclic |
+	// ->-|Ts_ms         |
+	// ->-|Reset         |
+	//    +--------------+
+	
+	//---------------------------------------------------------------------------------------------------------
+	// Шаг дискретизации по времени [с].
+	#Ts := DINT_TO_REAL(#Ts_ms) * 0.001;
+	
+	//---------------------------------------------------------------------------------------------------------
+	// 1PC1 ПИД-регулятор давления.
+	//                   Db1PC1
+	//    +---------------------------------+
+	//    |              Fb1PC1             |
+	// ->-|ADC_Pressure        DAC_Frequency|->-
+	//   -|RemoteStartButton         MotorOn|-
+	//   -|RemoteStopButton      ContactorOn|-
+	//   -|VoltageOk                   Error|-
+	//   -|DriveOk                          |
+	//   -|ContactorOk                      |
+	//   -|InterlockOn                      |
+	//   -|GroupStart                       |
+	//   -|GroupStop                        |
+	//   -|Ts_ms                            |
+	//   -|Reset                            |
+	//    +---------------------------------+
+	//                    ^
+	//                    |
+	//                    v
+	//    +---------------------------------+
+	//    |                                 |
+	//    |            Db1PC1Hmi            |
+	//    |                                 |
+	//    |      SCADA / HMI interface      |
+	//    |                                 |
+	//    +---------------------------------+
+	// Входы выходы ПЛК Di Do Ai Ao подключаем здесь.
+	//Db1PC1.SensorPressure  := Ai1PC1PT            ; // Датчик давления 0...27648[АЦП].
+	"Db1PC1".ADC_Pressure      := "Db1PC1".DAC_Frequency; // Датчик давления 0...27648[АЦП].
+	"Db1PC1".RemoteStartButton := TRUE                ; // Кнопка без фиксации NO "ПУСК" на пульте местного управления.
+	"Db1PC1".RemoteStopButton  := TRUE                ; // Кнопка без фиксации NC "СТОП" на пульте местного управления.
+	"Db1PC1".VoltageOk         := TRUE                ; // Схема собрана (вводной автомат 380VAC включен).
+	"Db1PC1".DriveOk           := TRUE                ; // Частотный привод: Готовность к работе (нет ошибок).
+	//Db1PC1.ContactorOk     := TRUE                ; // Контактор включился NO контакт.
+	"Db1PC1".ContactorOk       := "Db1PC1".ContactorOn  ; // Контактор включился NO контакт.
+	"Db1PC1".InterlockOn       := FALSE               ; // Включена технологическая блокировка регулятора.
+	"Db1PC1".GroupStart        := FALSE               ; // Групповой пуск (подать импульс).
+	"Db1PC1".GroupStop         := FALSE               ; // Групповой стоп (подать импульс).
+	"Db1PC1".Ts_ms             := #Ts_ms               ; // Шаг дискретизации по времени [мс].
+	"Db1PC1".Reset             := #Reset               ; // Сброс при перезагрузке.
+	"Db1PC1"()                                 ; // 1PC1 ПИД- регулятор давления.
+	//Ao1PC1FR               := Db1PC1.DAC_Frequency; // Частотный привод: Сигнал задания частоты 0...27648[ЦАП].
+	//                       := Db1PC1.MotorOn      ; // Частотный привод: Включить привод.
+	//                       := Db1PC1.ContactorOn  ; // Включить контактор между частотным приводом и двигателем.
+	//                       := Db1PC1.Error        ; // Флаг ошибки.
+	
+	// @COPYLEFT ALL WRONGS RESERVED :)
+	// Author: VA
+	// Contacts: DIY.PLC.314@gmail.com
+	// Date start LIB_PLC: 2014
+	// License: GNU GPL-2.0-or-later
+	// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+	// https://www.youtube.com/watch?v=n1F_MfLRlX0
+	// https://www.youtube.com/@DIY_PLC
+	// https://github.com/DIYPLC/LIB_PLC
+	// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+	// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+	// https://t.me/DIY_PLC
+	
+	
+END_FUNCTION_BLOCK
+

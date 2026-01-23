@@ -1,0 +1,105 @@
+﻿FUNCTION_BLOCK "FbGSS"
+TITLE = Генератор сигналов и псевдослучайных чисел.
+{ S7_Optimized_Access := 'FALSE' }
+AUTHOR : VA
+FAMILY : LIB_PLC
+VERSION : 2.1
+   VAR_INPUT 
+      Amplitude : Real := 1.0e+0;   // Амплитуда выходного сигнала.
+      Period : Real := 1.0e+1;   // Период выходного сигнала [с].
+      Phase : Real;   // Фаза выходного сигнала [рад].
+      Offset : Real;   // Постоянная составляющая выходного сигнала.
+      PulseTime : Real := 5.0e+0;   // Время импульса [с].
+      Ts : Real := 1.0e-1;   // Шаг дискретизации по времени [с].
+   END_VAR
+
+   VAR_OUTPUT 
+      Sine : Real;   // Синусоидальный сигнал.
+      Cosine : Real;   // Косинусоидальный сигнал.
+      RectangleR : Real;   // Прямоугольный сигнал вещественный.
+      RectangleB : Bool;   // Прямоугольный сигнал булевый.
+      Triangle : Real;   // Треугольный, линейно нарастающий и убывающий сигнал.
+      Prnd : Real;   // Псевдослучайные числа в диапазоне 0...1.
+   END_VAR
+
+   VAR 
+      CurrentTime : Real;   // Текущее время расчета [с].
+      IntegratorTriangle : Real;   // Интегратор для треугольных импульсов.
+      SummatorRnd : DInt := L#1;   // Сумматор для псевдослучайных чисел.
+   END_VAR
+
+   VAR_TEMP 
+      Tmp : DWord;   // Временная переменная для псевдослучайных чисел.
+   END_VAR
+
+   VAR CONSTANT 
+      PI : Real := 3.141593;   // Число Пи.
+   END_VAR
+
+
+BEGIN
+	
+	
+	// Генератор сигналов и псевдослучайных чисел.
+	//             DbGSS
+	//     +--------------------+
+	//     |       FbGSS        |
+	//    -|Amplitude       Sine|->-
+	//    -|Period        Cosine|->-
+	//    -|Phase     RectangleR|->-
+	//    -|Offset    RectangleB|->-
+	//    -|PulseTime   Triangle|->-
+	//    -|Ts              Prnd|->-
+	//     +--------------------+
+	
+	#Sine   := #Amplitude*SIN(2*#PI*(1.0/#Period)*#CurrentTime+#Phase) + #Offset;
+	#Cosine := #Amplitude*COS(2*#PI*(1.0/#Period)*#CurrentTime+#Phase) + #Offset;
+	
+	IF (#CurrentTime < #PulseTime) THEN // Прямоугольные импульсы.
+	#RectangleR := #Amplitude + #Offset;
+	#RectangleB := TRUE;
+	ELSE
+	#RectangleR := #Offset;
+	#RectangleB := FALSE;
+	END_IF;
+	
+	IF (#CurrentTime <= (#Period * 0.5)) THEN // Треугольные импульсы.
+	#IntegratorTriangle := #IntegratorTriangle + #Ts;
+	ELSE
+	#IntegratorTriangle := #IntegratorTriangle - #Ts;
+	END_IF;
+	IF (#Period <> 0.0) THEN
+	#Triangle := (((#IntegratorTriangle*2.0)/#Period)*#Amplitude) + #Offset;
+	END_IF;
+	
+	// Псевдослучайные числа линейный конгруэнтный метод.
+	#SummatorRnd := #SummatorRnd * 1103515245 + 12345;
+	// Принудительно отбрасывающей младшие 16 и один старший разряд.
+	#Tmp := DINT_TO_DWORD(#SummatorRnd) AND DW#2#01111111111111110000000000000000;
+	// Арифметический сдвиг вправо на 16бит.
+	#Tmp := SHR(IN := #Tmp, N := 16);
+	// Масштабирование 0...32767 -> 0...1
+	#Prnd := (DINT_TO_REAL(DWORD_TO_DINT(#Tmp))/32767.0)*#Amplitude+#Offset;
+	
+	#CurrentTime := #CurrentTime+#Ts; // Формирование периода.
+	IF (#CurrentTime >= #Period) THEN
+	#CurrentTime := 0.0;
+	#IntegratorTriangle := 0.0;
+	END_IF;
+	
+	// @COPYLEFT ALL WRONGS RESERVED :)
+	// Author: VA
+	// Contacts: DIY.PLC.314@gmail.com
+	// Date start LIB_PLC: 2014
+	// License: GNU GPL-2.0-or-later
+	// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+	// https://www.youtube.com/watch?v=n1F_MfLRlX0
+	// https://www.youtube.com/@DIY_PLC
+	// https://github.com/DIYPLC/LIB_PLC
+	// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+	// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+	// https://t.me/DIY_PLC
+	
+	
+END_FUNCTION_BLOCK
+

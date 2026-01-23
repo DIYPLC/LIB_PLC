@@ -1,0 +1,87 @@
+﻿FUNCTION_BLOCK "FbSimMotorGear"
+TITLE = Виртуальный МЭО для отладки шагового регулятора.
+{ S7_Optimized_Access := 'FALSE' }
+AUTHOR : VA
+FAMILY : LIB_PLC
+VERSION : 0.2
+   VAR_INPUT 
+      CmdOpen : Bool;   // Команда на открытие +.
+      CmdClose : Bool;   // Команда на закрытие -.
+      TimeOpen : Real := 6.0e+1;   // Время необходимое для открытия задвижки [с].
+      TimeClose : Real := 5.0e+1;   // Время необходимое для закрытия задвижки [с].
+      Ts : Real := 1.0e-1;   // Шаг дискретизации по времени в секундах.
+      Reset : Bool;   // Сброс при перезагрузке.
+   END_VAR
+
+   VAR_OUTPUT 
+      Position : Real;   // Положение штока 0...100 [%].
+      SensorOpen : Bool;   // Датчик на открытие задвижки.
+      SensorClose : Bool;   // Датчик на закрытие задвижки.
+   END_VAR
+
+   VAR_TEMP 
+      SpeedPos : Real;   // Скорость открытия.
+      SpeedNeg : Real;   // Скорость закрытия.
+   END_VAR
+
+
+BEGIN
+	
+	
+	// Виртуальный МЭО для отладки шагового регулятора.
+	//           DbSimMotorGear
+	//    +--------------------------+
+	//    |      FbSimMotorGear      |
+	// ->-|CmdOpen           Position|->-
+	// ->-|CmdClose        SensorOpen|-
+	//   -|TimeOpen       SensorClose|-
+	//   -|TimeClose                 |
+	//   -|Ts                        |
+	//   -|Reset                     |
+	//    +--------------------------+
+	
+	IF(#Reset) THEN
+	#Position := 0.0;
+	END_IF;
+	
+	#SpeedPos := 100.0 / #TimeOpen ; //[%/s]
+	#SpeedNeg := 100.0 / #TimeClose; //[%/s]
+	
+	IF(#CmdOpen) THEN
+	#Position := #Position + #SpeedPos * #Ts; //[%]
+	END_IF;
+	
+	IF(#CmdClose) THEN
+	#Position := #Position - #SpeedNeg * #Ts; //[%]
+	END_IF;
+	
+	IF(#Position >= 100.0) THEN
+	#Position := 100.0;
+	#SensorOpen := TRUE;
+	ELSE
+	#SensorOpen := FALSE;
+	END_IF;
+	
+	IF(#Position <= 0.0) THEN
+	#Position := 0.0;
+	#SensorClose := TRUE;
+	ELSE
+	#SensorClose := FALSE;
+	END_IF;
+	
+	// @COPYLEFT ALL WRONGS RESERVED :)
+	// Author: VA
+	// Contacts: DIY.PLC.314@gmail.com
+	// Date start LIB_PLC: 2014
+	// License: GNU GPL-2.0-or-later
+	// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+	// https://www.youtube.com/watch?v=n1F_MfLRlX0
+	// https://www.youtube.com/@DIY_PLC
+	// https://github.com/DIYPLC/LIB_PLC
+	// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+	// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+	// https://t.me/DIY_PLC
+	
+	
+END_FUNCTION_BLOCK
+

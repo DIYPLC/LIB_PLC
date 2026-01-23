@@ -1,0 +1,558 @@
+﻿FUNCTION_BLOCK "FbDriverFRA"
+TITLE = Управление приводом MITSUBISHI FR-A740, FR-A840 по PROFIBUS PD.
+{ S7_Optimized_Access := 'FALSE' }
+AUTHOR : VA
+FAMILY : LIB_PLC
+VERSION : 2.2
+   VAR_INPUT 
+      ADR_I : DInt;   // Стартовый адрес FR-A7NP(FR-A8NP) в HardWare.
+      ADR_Q : DInt;   // Стартовый адрес FR-A7NP(FR-A8NP) в HardWare.
+      FSP : Real;   // Заданое значение частоты Гц.
+      STF : Bool;   // Вкл вперед.
+      STR : Bool;   // Вкл назад.
+      MRS : Bool;   // Выкл IGBT.
+      RST_ER : Bool;   // Сброс ошибки частотника
+   END_VAR
+
+   VAR_OUTPUT 
+      FPV : Real;   // Измереное значение частоты [Гц].
+      IPV : Real;   // Измеренное значение тока [А]*10 или 100.
+      UPV : Real;   // Измеренное значение напряжения [В]*10.
+      Fault : Bool;   // Ошибка FVD.
+      Alarm : Bool;   // Сигнализация FVD.
+      RUN : Bool;   // FVD в работе.
+      FWD : Bool;   // Вращение вперед.
+      REW : Bool;   // Вращение назад.
+      NET : Bool;   // FVD в режиме NET-управление по сети.
+      DiSTF : Bool;   // Дискретный вход FVD STF.
+      DiSTR : Bool;   // Дискретный вход FVD STR.
+      DiRL : Bool;   // Дискретный вход FVD RL.
+      DiRM : Bool;   // Дискретный вход FVD RM.
+      DiRH : Bool;   // Дискретный вход FVD RH.
+      DiRT : Bool;   // Дискретный вход FVD RT.
+      DiJOG : Bool;   // Дискретный вход FVD JOG.
+      DiCS : Bool;   // Дискретный вход FVD CS.
+      DiSTOP : Bool;   // Дискретный вход FVD STOP.
+      DiRES : Bool;   // Дискретный вход FVD RES.
+      Error1 : Int;   // Последняя ошибка
+      Error2 : Int;   // Предпоследняя ошибка
+      Error3 : Int;   // Предпредпоследняя ошибка
+   END_VAR
+
+   VAR 
+      iPKE : Word;   // Идентификатор параметра.
+      iIND : Word;   // Индекс параметра.
+      iPWEh : Word;   // Величина параметра старшее слово.
+      iZSW : Word;   // Слово состояния FVD.
+      iHIW : Word;   // Фактическая частота Гц*100.
+      qPKE : Word;   // Идентификатор параметра.
+      qIND : Word;   // Индекс параметра.
+      qPWEh : Word;   // Величина параметра старшее слово.
+      qSTW : Word;   // Слово управления FVD.
+      qHSW : Word;   // Заданая частота Гц*100.
+      StateGraph : Int;   // Номер графа состояния.
+      DIWORD : Word;   // Слово состояния дискретных входов
+   END_VAR
+
+
+BEGIN
+	
+	
+	// PROFIDRIVE profile PPO type1.
+	// Управление приводом MITSUBISHI FR-A740, FR-A840 по PROFIBUS PD.
+	//       DbDriverFRA
+	//    +---------------+
+	//    |  FbDriverFRA  |
+	// ->-|ADR_I       FPV|-
+	// ->-|ADR_Q       IPV|-
+	// ->-|FSP         UPV|-
+	// ->-|STF       Fault|->-
+	//   -|STR       Alarm|-
+	//   -|MRS         RUN|-
+	//   -|RST_ER      FWD|-
+	//    |            REW|-
+	//    |            NET|-
+	//    |          DiSTF|-
+	//    |          DiSTR|-
+	//    |           DiRL|-
+	//    |           DiRM|-
+	//    |           DiRH|-
+	//    |           DiRT|-
+	//    |          DiJOG|-
+	//    |           DiCS|-
+	//    |         DiSTOP|-
+	//    |          DiRES|-
+	//    |         Error1|-
+	//    |         Error2|-
+	//    |         Error3|-
+	//    +---------------+
+	
+	// Читать слова из сети.
+	// Если ADR=W#16#0200 то PIW512...PIW522.
+	#iPKE    := %IW(#ADR_I):P;
+	#iIND    := %IW(#ADR_I + 2):P;
+	// iPWEl := PIW[ADR_I + 4];
+	#iPWEh   := %IW(#ADR_I + 6):P;
+	#iZSW    := %IW(#ADR_I + 8):P;
+	#iHIW    := %IW(#ADR_I + 10):P;
+	
+	// Измеренное значение частоты FVD.
+	#FPV := (INT_TO_REAL(WORD_TO_INT(#iHIW)) / 100.0);
+	
+	// Заданное значение частоты FVD.
+	#qHSW := INT_TO_WORD(REAL_TO_INT(#FSP * 100.0));
+	
+	// Граф состояний для поочередного чтения параметров.
+	
+	// Состояние №0 cчитать ток двигателя P1.2.
+	IF (#StateGraph = 0) THEN
+	#qPKE := W#16#6001;
+	#qIND := W#16#0200;
+	// Если получен верный ответ на запрос.
+	IF ((#iPKE = W#16#4001) AND (#iIND = W#16#0200)) THEN
+	    #IPV := INT_TO_REAL(WORD_TO_INT(#iPWEh));
+	    #StateGraph := 1; // Переключение графа состояний.
+	END_IF;
+	END_IF;
+	
+	// Состояние №1 cчитать слово состояния дискретных входов FVD P1.15.
+	IF (#StateGraph = 1) THEN
+	#qPKE := W#16#6001;
+	#qIND := W#16#0F00;
+	// Если получен верный ответ на запрос.
+	IF ((#iPKE = W#16#4001) AND (#iIND = W#16#0F00)) THEN
+	    #DIWORD := #iPWEh;
+	    #StateGraph := 2; // Переключение графа состояний.
+	END_IF;
+	END_IF;
+	
+	// Состояние №2 cчитать напряжение P1.3
+	IF (#StateGraph = 2) THEN
+	#qPKE := W#16#6001;
+	#qIND := W#16#0300;
+	// Если получен верный ответ на запрос.
+	IF ((#iPKE = W#16#4001) AND (#iIND = W#16#0300)) THEN
+	    #UPV := INT_TO_REAL(WORD_TO_INT(#iPWEh));
+	    #StateGraph := 3; // Переключение графа состояний.
+	END_IF;
+	END_IF;
+	
+	// Состояние №3 cчитать код последней ошибки P947.1
+	IF (#StateGraph = 3) THEN
+	#qPKE := W#16#63B3;
+	#qIND := W#16#0100;
+	// Если получен верный ответ на запрос.
+	IF ((#iPKE = W#16#43B3) AND (#iIND = W#16#0100)) THEN
+	    #Error1 := WORD_TO_INT(#iPWEh);
+	    #StateGraph := 4; // Переключение графа состояний.
+	END_IF;
+	END_IF;
+	
+	// Состояние №4 cчитать код предпоследней ошибки P947.9
+	IF (#StateGraph = 4) THEN
+	#qPKE := W#16#63B3;
+	#qIND := W#16#0900;
+	// Если получен верный ответ на запрос.
+	IF ((#iPKE = W#16#43B3) AND (#iIND = W#16#0900)) THEN
+	    #Error2 := WORD_TO_INT(#iPWEh);
+	    #StateGraph := 5; // Переключение графа состояний.
+	END_IF;
+	END_IF;
+	
+	// Состояние №5 cчитать код предпоследней ошибки P947.17
+	IF (#StateGraph = 5) THEN
+	#qPKE := W#16#63B3;
+	#qIND := W#16#1100;
+	// Если получен верный ответ на запрос.
+	IF ((#iPKE = W#16#43B3) AND (#iIND = W#16#1100)) THEN
+	    #Error3 := WORD_TO_INT(#iPWEh);
+	    #StateGraph := 0; // Переключение графа состояний.
+	END_IF;
+	END_IF;
+	
+	// Декодирование слова состояния дискретных входов DIWORD.
+	// Клемма STF.
+	#DiSTF  := ((#DIWORD AND W#2#0000_0000_0000_0001) = W#2#0000_0000_0000_0001);
+	// Клемма STR.
+	#DiSTR  := ((#DIWORD AND W#2#0000_0000_0000_0010) = W#2#0000_0000_0000_0010);
+	// Клемма RT.
+	#DiRT   := ((#DIWORD AND W#2#0000_0000_0000_1000) = W#2#0000_0000_0000_1000);
+	// Клемма RL.
+	#DiRL   := ((#DIWORD AND W#2#0000_0000_0001_0000) = W#2#0000_0000_0001_0000);
+	// Клемма RM.
+	#DiRM   := ((#DIWORD AND W#2#0000_0000_0010_0000) = W#2#0000_0000_0010_0000);
+	// Клемма RH.
+	#DiRH   := ((#DIWORD AND W#2#0000_0000_0100_0000) = W#2#0000_0000_0100_0000);
+	// Клемма JOG.
+	#DiJOG  := ((#DIWORD AND W#2#0000_0000_1000_0000) = W#2#0000_0000_1000_0000);
+	// Клемма STOP.
+	#DiSTOP := ((#DIWORD AND W#2#0000_0010_0000_0000) = W#2#0000_0010_0000_0000);
+	// Клемма RES.
+	#DiRES  := ((#DIWORD AND W#2#0000_0100_0000_0000) = W#2#0000_0100_0000_0000);
+	// Клемма CS.
+	#DiCS   := ((#DIWORD AND W#2#0000_1000_0000_0000) = W#2#0000_1000_0000_0000);
+	
+	// Декодирование слова состояния ZSW.
+	// Флаг ошибка FVD.
+	#Fault := ((#iZSW AND W#2#0000_0000_0000_1000) = W#2#0000_0000_0000_1000);
+	// Флаг сигнализация FVD.
+	#Alarm := ((#iZSW AND W#2#0000_0000_1000_0000) = W#2#0000_0000_1000_0000);
+	// Флаг FVD в работе.
+	#RUN   := ((#iZSW AND W#2#0000_1000_0000_0000) = W#2#0000_1000_0000_0000);
+	// Флаг вращение вперед.
+	#FWD   := ((#iZSW AND W#2#0001_0000_0000_0000) = W#2#0001_0000_0000_0000);
+	// Флаг вращение назад.
+	#REW   := ((#iZSW AND W#2#0010_0000_0000_0000) = W#2#0010_0000_0000_0000);
+	// Флаг FVD в режиме NET-управление по сети.
+	#NET   := ((#iZSW AND W#2#0100_0000_0000_0000) = W#2#0100_0000_0000_0000);
+	
+	// Кодирование слова управления STW.
+	
+	// SET VALUE NOT SUPPORT BITS
+	#qSTW := W#2#0000_0000_0111_0111;
+	
+	// PZD ENADLE
+	#qSTW := #qSTW OR W#2#0000_0100_0000_0000;
+	
+	// CONTROL ENABLE
+	#qSTW := #qSTW OR W#2#0000_0000_0000_1000;
+	
+	// Сброс ошибки
+	IF (#RST_ER) THEN
+	#qSTW := #qSTW OR  W#2#0000_0000_1000_0000;
+	ELSE
+	#qSTW := #qSTW AND W#2#1111_1111_0111_1111;
+	END_IF;
+	
+	// Включить вращение вперед.
+	IF (#STF) THEN
+	#qSTW := #qSTW OR  W#2#0000_1000_0000_0000;
+	ELSE
+	#qSTW := #qSTW AND W#2#1111_0111_1111_1111;
+	END_IF;
+	
+	// Включить вращение назад.
+	IF (#STR AND NOT(#STF)) THEN//при подаче STF=1 и STR=1 выполнится STF
+	#qSTW := #qSTW OR  W#2#0001_0000_0000_0000;
+	ELSE
+	#qSTW := #qSTW AND W#2#1110_1111_1111_1111;
+	END_IF;
+	
+	// Выключить IGBT (и через готовность ABC2 контактор двигателя).
+	IF (#MRS) THEN
+	#qSTW := #qSTW OR  W#2#0100_0000_0000_0000;
+	ELSE
+	#qSTW := #qSTW AND W#2#1011_1111_1111_1111;
+	END_IF;
+	
+	// Записать слов по сети.
+	// Если ADR=W#16#0200 то PQW512...PQW522.
+	%QW(#ADR_Q):P       := #qPKE;
+	%QW(#ADR_Q + 2):P   := #qIND;
+	// PQW[ADR_Q + 4] := qPWEl;
+	%QW(#ADR_Q + 6):P   := #qPWEh;
+	%QW(#ADR_Q + 8):P   := #qSTW;
+	%QW(#ADR_Q + 10):P  := #qHSW;
+	
+	(*
+	
+	-Описание.
+	Данная программа драйвер предназначена для сопряжения частотного преобразователя MITSUBISHI FR-A740, FR-A840 c программируемым логическим контроллером SIEMENS SIMATIC S7-300, S7-400 по сети PROFIBUS через плату связи FR-A7NP, FR-A8NP.
+	Программа написана на языке SLC и компилируется в SIEMENS SIMATIC STEP7 или PCS7.
+	Драйвер позволяет:
+	Включать/выключать двигатель, задавать/измерять частоту 3х фазной сети, про-сматривать ток двигателя,
+	просматривать биты состояния частотного преобразователя, просматривать со-стояние дискретных входов преобразователя.
+	PROFIBUS RS485 ADRESS=7 1.5Mbit/s красный провод "B+" желтый провод "A-".
+	Порт DB9 (мама) для соединения FR-A7NP c вилкой PROFIBUS 6ES7 972-0BA12-0XA0
+	Сеть: "D+"->"3" "D-"->"8"
+	Питание: "V-"->"5" "V+"->"6"
+	Заземление: оплетка по данным FR-A7NP соединяется на минус, по данным симатик на "корпус DB9"->"FG" однозначно не ясно.
+	PPO type1: 
+	PKW: PKE=PIW512(PQW512) IND=PIW514(PQW514) PWEL=PIW516(PQW516) PWEH=PIW518(PQW516).
+	PZD: PIW520=ZSW PIW522=HIW, PQW520=STW PQW522=HSW. 
+	FVD P340=10 см. Р79 режим после запуска NET и всегда можно перейти в режим PU и управлять вручную.
+	FVD P342=1 Запись заданной частоты в ОЗУ.
+	FVD ABC2 управляет КМ1 P196=11 преобразователь готов к работе.
+	FVD P77=2 запись параметров разрешена всегда.
+	FVD SOURSE: PC+ -> DI
+	FVD Использовать входные клеммы как удаленный ввод.
+	FVD P178=9999 STF
+	FVD P179=9999 STR
+	FVD P180=9999 RL
+	FVD P181=9999 RM
+	FVD P182=9999 RH
+	FVD P183=9999 RT
+	FVD AU Зарезервирован для датчика PTC температуры двигателя.
+	FVD P185=9999 JOG
+	FVD P186=9999 CS
+	FVD MRS Зарезервирован для безопасного режима и косвенного управления контактором двигателя.
+	FVD P188=9999 STOP
+	FVD P189=9999 RES
+	
+	-Результаты тестирования:
+	Делитель для измеренного значения тока зависит от типоразмера FVD необходимо уточнить по месту. 
+	При выключении FRA-740 контроллер S7-300 переходит в режим STOP, для устранения необходимо добавить OB82,OB86.
+	При выключении S7-300 преобразователь FRA-740 останавливается с ошибкой "E.OP3".
+	MRS=TRUE выключает IGBT и останавливает FVD на выбеге (и через ABC2 выключается контактор двигателя).
+	Встроенный в FVD PLC не работает в режиме FVD "NET".
+	
+	-Коды ошибок Error1, Error2, Error3.
+	0    Нет ошибок
+	16   E.OC1 Ток перегрузки при разгоне
+	17   E.OC2 Ток перегрузки при постоянной скорости вращения
+	18   E.OC3 Ток перегрузки при торможении или останове
+	32   E.OV1 Повышенное напряжение промежуточного контура при разгоне
+	33   E.OV2 Повышенное напряжение промежуточного контура при постоянной скорости вращения
+	34   E.OV3 Повышенное напряжение промежуточного контура при торможении
+	48   E.THT Перегрузка преобразователя частоты
+	49   E.THM Перегрузка двигателя
+	64   E.THM Перегрузка радиатора
+	80   E.IPF Отказ сети питания
+	81   E.UVT Пониженное напряжение
+	82   E.ILF Рассогласование входных фаз
+	96   E.OLT Отключающий контактор (защита двигателя от опрокидывания)
+	112  E.BE Неисправный тормозной транзистор/неисправность во внутренней переключающей цепи
+	128  E.GF Ток перегрузки вследствие замыкания на землю
+	129  E.LF Открытая выходная фаза
+	144  E.OHT Срабатывание  внешнего защитного выключателя двигателя
+	145  E.PTC Срабатывание PTC-терморезистора
+	160  E.OPT Неисправность  в соединении с внешним дополнительным
+	161  E.OP1 Неисправность встроенного (слот расширения) дополнительного устройства. (например, неисправно
+	163  E.OP3 Ошибка связи 3
+	176  E.PE Неисправность накопителя
+	177  E.PUE Неисправность соединения с панелью управления
+	178  E.RET Превышение допустимого количества попыток перезапуска
+	179  E.PE2 Отказ устройства хранения параметров
+	192  E.CPU Ошибка процессора
+	193  E.CTE Короткое замыкание в соединении с панелью управления. Короткое замыкание выходного напряжения
+	194  E.P24 Короткое замыкание выходного напряжения 24 В DC
+	196  CDO Превышение допустимого значения выходного тока
+	197  IOH Перегрев сопротивления включения      
+	198  SER Неисправность линии связи (преобразователь частоты)
+	199  AIE Неисправный аналоговый вход  
+	200  E.USB
+	208  E.OS
+	209  E.OSD  
+	210  E.ECT
+	211  E.OD
+	213  E.MB1
+	214  E.MB2
+	215  E.MB3     
+	216  E.MB4
+	217  E.MB5
+	218  E.MB6
+	219  E.MB7
+	220  E.EP
+	241  E.1 Опционный сигнал аварии (например, ошибка соединения или контакта) 1
+	242  E.2 Опционный сигнал аварии (например, ошибка соединения или контакта) 2
+	243  E.3 Опционный сигнал аварии (например, ошибка соединения или контакта) 3
+	246  E.6 Ошибка процессора. Ошибка 6
+	247  E.7 Ошибка процессора. Ошибка 7
+	251  E.11
+	253  E.13 Неисправность во внутренней схеме
+	
+	Файл описания PROFIBUS PD платы FR-A7NP привода MITSUBISHI FRA-740.
+	Данный файл скопировать в текстовый блокнот и переименовать.
+	Полученный файл загрузить в HardWare конфигуратор.
+	---Начало файла melc08fa.gsd (эту строчку не копировать)---
+	#Profibus_DP
+	GSD_Revision=1
+	Vendor_Name="Mitsubishi Electric"
+	Model_Name="FR-A7NP"
+	Revision="Revision1.00"
+	Ident_Number=0x08fa
+	Protocol_Ident=0
+	Station_Type=0
+	FMS_supp=0
+	Hardware_Release="BC101B376"
+	Software_Release="7732"
+	9.6_supp=1
+	19.2_supp=1
+	93.75_supp=1
+	187.5_supp=1
+	500_supp=1
+	1.5M_supp=1
+	3M_supp=1
+	6M_supp=1
+	12M_supp=1
+	MaxTsdr_9.6=60
+	MaxTsdr_19.2=60
+	MaxTsdr_93.75=60
+	MaxTsdr_187.5=60
+	MaxTsdr_500=100
+	MaxTsdr_1.5M=150
+	MaxTsdr_3M=250
+	MaxTsdr_6M=450
+	MaxTsdr_12M=800
+	Redundancy=0
+	Repeater_Ctrl_Sig=2
+	24V_Pins=0
+	Freeze_Mode_supp=1
+	Sync_Mode_supp=1
+	Auto_Baud_supp=1
+	Set_Slave_Add_Supp=0
+	Min_Slave_Intervall=1
+	Modular_Station=1
+	Max_Module=1
+	Max_Input_Len=28
+	Max_Output_Len=28
+	Max_Data_Len=56
+	Fail_Safe=0
+	Max_Diag_Data_Len=6
+	Slave_Family=1
+	;
+	;Prm-Text-Def-List
+	;
+	PrmText=1
+	Text(0)="No byte swapping"       ;"Byte swapping" = 0 -> "No byte swapping"
+	Text(1)="Byte swapping"          ;"Byte swapping" = 1 -> "Byte swapping"
+	EndPrmText
+	;
+	;Ext-User-Prm-Data-Def-List
+	;
+	ExtUserPrmData=1 "Byte swapping" ;Prm name = "Byte swapping"
+	Bit(0) 0 0-1                     ;Default = 0, Min = 0, Max = 1
+	Prm_Text_Ref=1                   ;0:"No byte swapping" ,1:"Byte swapping"
+	EndExtUserPrmData
+	;
+	Max_User_Prm_Data_Len=2
+	Ext_User_Prm_Data_Const(0)=0x01
+	Ext_User_Prm_Data_Const(1)=0x00
+	Ext_User_Prm_Data_Ref(1)=1       ;"Byte swapping"
+	;
+	;Module Select
+	;
+	Module="PPO type 1" 0xF3, 0xF1
+	EndModule
+	
+	Module="PPO type 2" 0xF3, 0xF5
+	EndModule
+	
+	Module="PPO type 3" 0xF1
+	EndModule
+	
+	Module="PPO type 4" 0xF5
+	EndModule
+	
+	Module="PPO type 5" 0xF3,0xF9
+	EndModule
+	
+	Module="500 series" 0x75
+	EndModule
+	
+	---Конец  файла melc08fa.gsd (эту строчку не копировать)---
+	
+	Файл описания PROFIBUS PD платы FR-A8NP привода MITSUBISHI FRA-840.
+	Данный файл скопировать в текстовый блокнот и переименовать.
+	Полученный файл загрузить в HardWare конфигуратор.
+	---Начало файла melc0EA8.gsd (эту строчку не копировать)---
+	;====================================
+	; GSD File Revision 1.00
+	;====================================
+	#Profibus_DP
+	; < General parameters >
+	GSD_Revision=1
+	Vendor_Name="Mitsubishi Electric"
+	Model_Name="FR-A8NP"
+	Revision="Revision1.00"
+	Ident_Number=0x0ea8
+	Protocol_Ident=0
+	Station_Type=0
+	FMS_supp=0
+	Hardware_Release="BC102B253"
+	Software_Release="8435"
+	9.6_supp=1
+	19.2_supp=1
+	93.75_supp=1
+	187.5_supp=1
+	500_supp=1
+	1.5M_supp=1
+	3M_supp=1
+	6M_supp=1
+	12M_supp=1
+	MaxTsdr_9.6=15
+	MaxTsdr_19.2=15
+	MaxTsdr_93.75=15
+	MaxTsdr_187.5=15
+	MaxTsdr_500=15
+	MaxTsdr_1.5M=25
+	MaxTsdr_3M=50
+	MaxTsdr_6M=100
+	MaxTsdr_12M=200
+	Redundancy=0
+	Repeater_Ctrl_Sig=2
+	24V_Pins=0
+	Implementation_Type  = "SPC3"
+	
+	; < Slave-Specification >
+	Freeze_Mode_supp=1
+	Sync_Mode_supp=1
+	Auto_Baud_supp=1
+	Set_Slave_Add_Supp=0
+	Min_Slave_Intervall=1
+	Modular_Station=1
+	Max_Module=1
+	Max_Input_Len=28
+	Max_Output_Len=28
+	Max_Data_Len=56
+	Fail_Safe=0
+	Max_Diag_Data_Len=6
+	Slave_Family=1
+	
+	; < Prm-Text-Def-List >
+	PrmText=1
+	Text(0)="No byte swapping"       ;"Byte swapping" = 0 -> "No byte swapping"
+	Text(1)="Byte swapping"          ;"Byte swapping" = 1 -> "Byte swapping"
+	EndPrmText
+	
+	; < Ext-User-Prm-Data-Def-List >
+	ExtUserPrmData=1 "Byte swapping" ;Prm name = "Byte swapping"
+	Bit(0) 0 0-1                     ;Default = 0, Min = 0, Max = 1
+	Prm_Text_Ref=1                   ;0:"No byte swapping" ,1:"Byte swapping"
+	EndExtUserPrmData
+	
+	
+	; < UserPrmData: Length and Preset >
+	Max_User_Prm_Data_Len=2
+	Ext_User_Prm_Data_Const(0)=0x01
+	Ext_User_Prm_Data_Const(1)=0x00
+	Ext_User_Prm_Data_Ref(1)=1       ;"Byte swapping"
+	
+	; < Module Definition List >
+	Module="PPO type 1" 0xF3, 0xF1
+	EndModule
+	
+	Module="PPO type 2" 0xF3, 0xF5
+	EndModule
+	
+	Module="PPO type 3" 0xF1
+	EndModule
+	
+	Module="PPO type 4" 0xF5
+	EndModule
+	
+	Module="PPO type 5" 0xF3,0xF9
+	EndModule
+	
+	Module="500 series" 0x75
+	EndModule
+	
+	---Конец  файла melc0EA8.gsd (эту строчку не копировать)---
+	*)
+	
+	// @COPYLEFT ALL WRONGS RESERVED :)
+	// Author: VA
+	// Contacts: DIY.PLC.314@gmail.com
+	// Date start LIB_PLC: 2014
+	// License: GNU GPL-2.0-or-later
+	// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+	// https://www.youtube.com/watch?v=n1F_MfLRlX0
+	// https://www.youtube.com/@DIY_PLC
+	// https://github.com/DIYPLC/LIB_PLC
+	// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+	// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+	// https://t.me/DIY_PLC
+	
+	
+END_FUNCTION_BLOCK
+

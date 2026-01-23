@@ -1,0 +1,57 @@
+﻿FUNCTION_BLOCK "FbDelayN"
+TITLE = Блок задержки сигнала на 100 тактов.
+{ S7_Optimized_Access := 'FALSE' }
+AUTHOR : VA
+FAMILY : LIB_PLC
+VERSION : 2.2
+   VAR_INPUT 
+      In : Real;   // Вход.
+   END_VAR
+
+   VAR_OUTPUT 
+      Out : Real;   // Выход.
+   END_VAR
+
+   VAR 
+      Buffer1 : Array[0..98] of Real;   // Буфер задержки сигнала.
+      Counter1 : Int;   // Счетчик.
+   END_VAR
+
+   VAR CONSTANT 
+      NUMBER : Int := 98;   // Размер массива Тактов 100 - 2 = 98.
+   END_VAR
+
+
+BEGIN
+	
+	
+	// Блок задержки сигнала на 100 тактов.
+	//      DbDelayN
+	//    +----------+
+	//    | FbDelayN |
+	// ->-|In     Out|->-
+	//    +----------+
+	
+	// W(Z)=Z^(-N), N=NUMBER+2
+	#Out := #Buffer1[#NUMBER];
+	FOR #Counter1 := #NUMBER TO 1 BY -1 DO
+	#Buffer1[#Counter1] := #Buffer1[#Counter1 - 1];
+	END_FOR;
+	#Buffer1[0] := #In;
+	
+	// @COPYLEFT ALL WRONGS RESERVED :)
+	// Author: VA
+	// Contacts: DIY.PLC.314@gmail.com
+	// Date start LIB_PLC: 2014
+	// License: GNU GPL-2.0-or-later
+	// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+	// https://www.youtube.com/watch?v=n1F_MfLRlX0
+	// https://www.youtube.com/@DIY_PLC
+	// https://github.com/DIYPLC/LIB_PLC
+	// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+	// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+	// https://t.me/DIY_PLC
+	
+	
+END_FUNCTION_BLOCK
+

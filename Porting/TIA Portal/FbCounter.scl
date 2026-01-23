@@ -1,0 +1,96 @@
+﻿FUNCTION_BLOCK "FbCounter"
+TITLE = Счетчик импульсов.
+{ S7_Optimized_Access := 'FALSE' }
+AUTHOR : VA
+FAMILY : LIB_PLC
+VERSION : 2.2
+   VAR_INPUT 
+      INC : Bool;   // Вход импульсов +1.
+      DEC : Bool;   // Вход импульсов -1.
+      RESET : Bool;   // Сбросить счетчик на 0.
+      SETVALUE : Bool;   // Установить на выходе значение VALUE.
+      VALUE : DInt;   // Предустановленное значение счета.
+   END_VAR
+
+   VAR_OUTPUT 
+      CNT : DInt;   // Выход счетчика.
+      OVERFLOW : Bool;   // Флаг переполнения счетчика.
+   END_VAR
+
+   VAR 
+      INCPrevios : Bool;   // Предыдущее состояние входа +1.
+      DECPrevios : Bool;   // Предыдущее состояние входа -1.
+   END_VAR
+
+   VAR CONSTANT 
+      LIMIT_MAX : DInt := 2147483647;   // Максимальное значение счетчика.
+      LIMIT_MIN : DInt := -2147483648;   // Минимальное значение счетчика.
+   END_VAR
+
+
+BEGIN
+	
+	
+	// Счетчик импульсов.
+	//         DbCounter
+	//    +-----------------+
+	//    |    FbCounter    |
+	// ->-|INC           CNT|->-
+	//   -|DEC      OVERFLOW|-
+	//   -|RESET            |
+	//   -|SETVALUE         |
+	//   -|VALUE            |
+	//    +-----------------+
+	
+	// Прямой счет по нарастающему фронту импульсов +1.
+	IF (#INC AND NOT(#INCPrevios)) THEN
+	    IF (#CNT >= #LIMIT_MAX) THEN // Ограничение сверху.
+	    #CNT := #LIMIT_MAX;
+	    #OVERFLOW := TRUE;
+	    ELSE //Прямой счет.
+	    #CNT := #CNT + 1;
+	    #OVERFLOW := FALSE;
+	    END_IF;
+	END_IF;
+	
+	// Обратный счет по нарастающему фронту импульсов -1.
+	IF (#DEC AND NOT(#DECPrevios)) THEN
+	    IF (#CNT <= #LIMIT_MIN) THEN // Ограничение снизу.
+	    #CNT := #LIMIT_MIN;
+	    #OVERFLOW := TRUE;
+	    ELSE //Обратный счет.
+	    #CNT := #CNT - 1;
+	    #OVERFLOW := FALSE;
+	    END_IF;
+	END_IF;
+	
+	// Установить значение счетчика.
+	IF (#SETVALUE) THEN
+	#CNT := #VALUE;
+	END_IF;
+	
+	// Сбросить счетчик.
+	IF (#RESET) THEN
+	#CNT := 0;
+	END_IF;
+	
+	// Запомнить предыдущее состояние входа.
+	#INCPrevios := #INC;
+	#DECPrevios := #DEC;
+	
+	// @COPYLEFT ALL WRONGS RESERVED :)
+	// Author: VA
+	// Contacts: DIY.PLC.314@gmail.com
+	// Date start LIB_PLC: 2014
+	// License: GNU GPL-2.0-or-later
+	// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+	// https://www.youtube.com/watch?v=n1F_MfLRlX0
+	// https://www.youtube.com/@DIY_PLC
+	// https://github.com/DIYPLC/LIB_PLC
+	// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+	// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+	// https://t.me/DIY_PLC
+	
+	
+END_FUNCTION_BLOCK
+

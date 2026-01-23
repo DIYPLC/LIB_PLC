@@ -1,0 +1,82 @@
+﻿FUNCTION_BLOCK "FbTask100ms"
+TITLE = Задача вызывается каждые 100ms.
+{ S7_Optimized_Access := 'FALSE' }
+AUTHOR : VA
+FAMILY : LIB_PLC
+VERSION : 2.1
+   VAR_INPUT 
+      Ts_ms : DInt := L#100;   // Шаг дискретизации по времени [мс].
+      Reset : Bool;   // Сброс при перезагрузке.
+   END_VAR
+
+   VAR 
+      DbBlink : "FbBlink";   // Мигающий светодиод.
+      DbFilterA : "FbFilterA";   // Фильтр апериодический.
+   END_VAR
+
+   VAR_TEMP 
+      Ts : Real;   // Шаг дискретизации по времени в секундах.
+   END_VAR
+
+
+BEGIN
+	
+	
+	// Задача вызывается каждые 100ms.
+	//      DbTask100ms
+	//    +-------------+
+	//    | FbTask100ms |
+	// ->-|Ts_ms        |
+	// ->-|Reset        |
+	//    +-------------+
+	
+	#Ts := DINT_TO_REAL(#Ts_ms) * 0.001; // Шаг дискретизации по времени в секундах.
+	
+	// *** Пример работы с дискретным алгоритмом. ***
+	// Мигающий светодиод.
+	//            DbBlink 
+	//    +---------------------+
+	//    |       FbBlink       |
+	//   -|TimeOn      BlinkLamp|->-
+	//   -|TimeOff              |
+	//   -|Ts_ms                |
+	//   -|Reset                |
+	//    +---------------------+
+	#DbBlink.TimeOn  := 2000             ; // Время включения лампочки [мс].
+	#DbBlink.TimeOff := 2000             ; // Время выключения лампочки [мс].
+	#DbBlink.Ts_ms   := #Ts_ms            ; // Шаг дискретизации по времени [мс].
+	#DbBlink.Reset   := #Reset            ; // Сброс при перезагрузке.
+	#DbBlink()                           ; // Мигающий светодиод.
+	//              := DbBlink.BlinkLamp; // Мигающая лампочка.
+	
+	// *** Пример работы с аналоговым алгоритмом. ***
+	// Фильтр апериодический.
+	//      DbFilterA
+	//    +-----------+
+	//    | FbFilterA |
+	// ->-|In      Out|->-
+	//   -|Tf         |
+	//   -|Ts         |
+	//    +-----------+
+	#DbFilterA.In := INT_TO_REAL(BOOL_TO_INT(#DbBlink.BlinkLamp)); // Входной сигнал до фильтрации.
+	#DbFilterA.Tf := 0.5                                        ; // Постоянная времени фильтра [с].
+	#DbFilterA.Ts := #Ts                                         ; // Шаг дискретизации по времени [с].
+	#DbFilterA()                                                ; // Фильтр апериодический.
+	//           := DbFilterA.Out                              ; // Выходной сигнал после фильтрации.
+	
+	// @COPYLEFT ALL WRONGS RESERVED :)
+	// Author: VA
+	// Contacts: DIY.PLC.314@gmail.com
+	// Date start LIB_PLC: 2014
+	// License: GNU GPL-2.0-or-later
+	// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+	// https://www.youtube.com/watch?v=n1F_MfLRlX0
+	// https://www.youtube.com/@DIY_PLC
+	// https://github.com/DIYPLC/LIB_PLC
+	// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+	// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+	// https://t.me/DIY_PLC
+	
+	
+END_FUNCTION_BLOCK
+

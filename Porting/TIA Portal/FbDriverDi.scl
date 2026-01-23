@@ -1,0 +1,55 @@
+﻿FUNCTION_BLOCK "FbDriverDi"
+TITLE = FbDriverDi
+{ S7_Optimized_Access := 'FALSE' }
+AUTHOR : VA
+FAMILY : LIB_PLC
+VERSION : 0.3
+   VAR_INPUT 
+      In : Bool;   // Дискретный вход ПЛК.
+      SimValue : Bool;   // Значение для Out при симуляции.
+      SimOn : Bool;   // Включить симуляцию.
+   END_VAR
+
+   VAR_OUTPUT 
+      Out : Bool;   // Выход дискретного сигнала.
+   END_VAR
+
+
+BEGIN
+	
+	
+	// Драйвер дискретного входа.
+	//          FbDriverDi
+	//    +--------------------+
+	//    |     FbDriverDi     |
+	// ->-|In               Out|->-
+	//   -|SimValue            |
+	//   -|SimOn               |
+	//    +--------------------+
+	
+	IF (#SimOn) THEN
+	// Симуляция включена.
+	// Режим используется для отладки и при нештатной работе.
+	#Out := #SimValue;
+	ELSE
+	// Симуляция выключена.
+	// Штатный режим работы.
+	#Out := #In;
+	END_IF;
+	
+	// @COPYLEFT ALL WRONGS RESERVED :)
+	// Author: VA
+	// Contacts: DIY.PLC.314@gmail.com
+	// Date start LIB_PLC: 2014
+	// License: GNU GPL-2.0-or-later
+	// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+	// https://www.youtube.com/watch?v=n1F_MfLRlX0
+	// https://www.youtube.com/@DIY_PLC
+	// https://github.com/DIYPLC/LIB_PLC
+	// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+	// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+	// https://t.me/DIY_PLC
+	
+	
+END_FUNCTION_BLOCK
+

@@ -1,0 +1,64 @@
+﻿ORGANIZATION_BLOCK "I/O_FLT1"
+TITLE = I/O Point Fault 1
+{ S7_Optimized_Access := 'FALSE' }
+AUTHOR : VA
+FAMILY : LIB_PLC
+VERSION : 2.1
+   VAR_TEMP 
+      OB82_EV_CLASS : Byte;   // 16#39, Event class 3, Entering event state, Internal fault event
+      OB82_FLT_ID : Byte;   // 16#XX, Fault identifcation code
+      OB82_PRIORITY : Byte;   // Priority of OB Execution
+      OB82_OB_NUMBR : Byte;   // 82 (Organization block 82, OB82)
+      OB82_RESERVED_1 : Byte;   // Reserved for system
+      OB82_IO_FLAG : Byte;   // Input (01010100), Output (01010101)
+      OB82_MDL_ADDR : Word;   // Base address of module with fault
+      OB82_MDL_DEFECT : Bool;   // Module defective
+      OB82_INT_FAULT : Bool;   // Internal fault
+      OB82_EXT_FAULT : Bool;   // External fault
+      OB82_PNT_INFO : Bool;   // Point information
+      OB82_EXT_VOLTAGE : Bool;   // External voltage low
+      OB82_FLD_CONNCTR : Bool;   // Field wiring connector missing
+      OB82_NO_CONFIG : Bool;   // Module has no configuration data
+      OB82_CONFIG_ERR : Bool;   // Module has configuration error
+      OB82_MDL_TYPE : Byte;   // Type of module
+      OB82_SUB_MDL_ERR : Bool;   // Sub-Module is missing or has error
+      OB82_COMM_FAULT : Bool;   // Communication fault
+      OB82_MDL_STOP : Bool;   // Module is stopped
+      OB82_WTCH_DOG_FLT : Bool;   // Watch dog timer stopped module
+      OB82_INT_PS_FLT : Bool;   // Internal power supply fault
+      OB82_PRIM_BATT_FLT : Bool;   // Primary battery is in fault
+      OB82_BCKUP_BATT_FLT : Bool;   // Backup battery is in fault
+      OB82_RESERVED_2 : Bool;   // Reserved for system
+      OB82_RACK_FLT : Bool;   // Rack fault, only for bus interface module
+      OB82_PROC_FLT : Bool;   // Processor fault
+      OB82_EPROM_FLT : Bool;   // EPROM fault
+      OB82_RAM_FLT : Bool;   // RAM fault
+      OB82_ADU_FLT : Bool;   // ADU fault
+      OB82_FUSE_FLT : Bool;   // Fuse fault
+      OB82_HW_INTR_FLT : Bool;   // Hardware interupt input in fault
+      OB82_RESERVED_3 : Bool;   // Reserved for system
+      OB82_DATE_TIME : Date_And_Time;   // Date and time OB82 started
+   END_VAR
+
+
+BEGIN
+	
+	
+	"DbDebug".OB82_CNT_ERR := "DbDebug".OB82_CNT_ERR + 1; // Счетчик вызовов обработчика ошибок OB82.
+	
+	// @COPYLEFT ALL WRONGS RESERVED :)
+	// Author: VA
+	// Contacts: DIY.PLC.314@gmail.com
+	// Date start LIB_PLC: 2014
+	// License: GNU GPL-2.0-or-later
+	// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+	// https://www.youtube.com/watch?v=n1F_MfLRlX0
+	// https://www.youtube.com/@DIY_PLC
+	// https://github.com/DIYPLC/LIB_PLC
+	// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+	// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+	// https://t.me/DIY_PLC
+	
+	
+END_ORGANIZATION_BLOCK
+

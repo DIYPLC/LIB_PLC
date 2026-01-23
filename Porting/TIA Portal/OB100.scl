@@ -1,0 +1,62 @@
+﻿ORGANIZATION_BLOCK "COMPLETE RESTART"
+TITLE = Программа первого скана.
+{ S7_Optimized_Access := 'FALSE' }
+AUTHOR : VA
+FAMILY : LIB_PLC
+VERSION : 2.1
+   VAR_TEMP 
+      OB100_EV_CLASS : Byte;   // 16#13, Event class 1, Entering event state, Event logged in diagnostic buffer
+      OB100_STRTUP : Byte;   // 16#81/82/83/84 Method of startup
+      OB100_PRIORITY : Byte;   // Priority of OB Execution
+      OB100_OB_NUMBR : Byte;   // 100 (Organization block 100, OB100)
+      OB100_RESERVED_1 : Byte;   // Reserved for system
+      OB100_RESERVED_2 : Byte;   // Reserved for system
+      OB100_STOP : Word;   // Event that caused CPU to stop (16#4xxx)
+      OB100_STRT_INFO : DWord;   // Information on how system started
+      OB100_DATE_TIME : Date_And_Time;   // Date and time OB100 started
+   END_VAR
+
+
+BEGIN
+	
+	
+	// Сброс при перезагрузке.
+	// Задача вызывается циклически.
+	//      DbTaskCyclic
+	//    +--------------+
+	//    | FbTaskCyclic |
+	// ->-|Ts_ms         |
+	// ->-|Reset         |
+	//    +--------------+
+	"DbTaskCyclic".Ts_ms := 0    ; // Шаг дискретизации по времени [мс].
+	"DbTaskCyclic".Reset := TRUE ; // Сброс при перезагрузке.
+	"DbTaskCyclic"(); // Задача вызывается циклически.
+	
+	// Сброс при перезагрузке.
+	// Задача вызывается каждые 100ms.
+	//      DbTask100ms
+	//    +-------------+
+	//    | FbTask100ms |
+	// ->-|Ts_ms        |
+	// ->-|Reset        |
+	//    +-------------+
+	"DbTask100ms".Ts_ms := 0   ; // Шаг дискретизации по времени [мс].
+	"DbTask100ms".Reset := TRUE; // Сброс при перезагрузке.
+	"DbTask100ms"(); // Задача вызывается каждые 100ms.
+	
+	// @COPYLEFT ALL WRONGS RESERVED :)
+	// Author: VA
+	// Contacts: DIY.PLC.314@gmail.com
+	// Date start LIB_PLC: 2014
+	// License: GNU GPL-2.0-or-later
+	// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+	// https://www.youtube.com/watch?v=n1F_MfLRlX0
+	// https://www.youtube.com/@DIY_PLC
+	// https://github.com/DIYPLC/LIB_PLC
+	// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+	// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+	// https://t.me/DIY_PLC
+	
+	
+END_ORGANIZATION_BLOCK
+

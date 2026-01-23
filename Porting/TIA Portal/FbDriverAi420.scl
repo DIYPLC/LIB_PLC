@@ -1,0 +1,92 @@
+﻿FUNCTION_BLOCK "FbDriverAi420"
+TITLE = Драйвер аналогово входа 4...20мА.
+{ S7_Optimized_Access := 'FALSE' }
+AUTHOR : VA
+FAMILY : LIB_PLC
+VERSION : 2.3
+   VAR_INPUT 
+      ADC : Word;   // АЦП Сигнал от датчика 0...27648.
+      OutMax : Real := 1.0e+2;   // Диаппазон датчика максимум.
+      OutMin : Real;   // Диаппазон датчика минимум.
+      ErrValue : Real;   // Значение для Out при ошибке датчика.
+      SimValue : Real;   // Значение для Out при симуляции.
+      SimOn : Bool;   // Включить симуляцию.
+   END_VAR
+
+   VAR_OUTPUT 
+      Out : Real;   // Выход в единицах датчика.
+      I_mA : Real;   // Ток на аналоговом входе 4...20мА.
+      Error : Bool;   // Ошибка аналогово входа или датчика.
+   END_VAR
+
+
+BEGIN
+	
+	
+	// Драйвер аналогово входа 4...20мА.
+	//            DbDriverAi420
+	//    +---------------------------+
+	//    |       FbDriverAi420       |
+	// ->-|ADC                     Out|->-
+	//   -|OutMax                 I_mA|-
+	//   -|OutMin                Error|-
+	//   -|ErrValue                   |
+	//   -|SimValue                   |
+	//   -|SimOn                      |
+	//    +---------------------------+
+	
+	// Ошибка аналогово входа или датчика.
+	#Error := (#ADC = W#16#7FFF) OR (#ADC = W#16#8000); // 32767,-32768
+	
+	// Ток на аналоговом входе 4...20мА.
+	IF (#Error) THEN
+	#I_mA := 0.0;
+	ELSE
+	// Масштабирование 0...27648 [АЦП] -> 4...20[мА]
+	#I_mA := ((INT_TO_REAL(WORD_TO_INT(#ADC)) * 16.0 ) / 27648.0) + 4.0;
+	END_IF;
+	
+	IF (#SimOn) THEN // Включена симуляция.
+	#Out := #SimValue; // Значение для Out при симуляции.
+	ELSE
+	    IF (#Error) THEN // Ошибка аналогово входа или датчика.
+	    #Out := #ErrValue; // Значение для Out при ошибке датчика.
+	    ELSE
+	    // Масштабирование 4...20[мА] -> OutMin...OutMax
+	    #Out := (#OutMax - #OutMin) * ((#I_mA - 4.0) / 16.0) + #OutMin;
+	    END_IF;
+	END_IF;
+	
+	// Амплитудный ограничитель диапазона датчика OutMin...OutMax
+	IF (#Out >= #OutMax) THEN // Ограничение выхода сверху.
+	#Out := #OutMax; 
+	ELSE
+	    IF (#Out <= #OutMin) THEN // Ограничение выхода снизу.
+	    #Out := #OutMin;
+	    ELSE
+	    // Выход без ограничений.
+	    #Out := #Out;
+	    END_IF;
+	END_IF;
+	
+	// Описание работы драйвера аналогово входа 4...20мА.
+	// 1.Сначала сигнал с АЦП 0...27648 преобразуется в токовый сигна 4...20мА.
+	// 2.Если не включена симуляция и нет ошибок сигнал 4...20мА преобразуется в сигнал датчика OutMin...OutMax.
+	// 3.Сигнал датчика ограничивается в пределах его диаппазона измерения OutMin...OutMax.
+	
+	// @COPYLEFT ALL WRONGS RESERVED :)
+	// Author: VA
+	// Contacts: DIY.PLC.314@gmail.com
+	// Date start LIB_PLC: 2014
+	// License: GNU GPL-2.0-or-later
+	// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+	// https://www.youtube.com/watch?v=n1F_MfLRlX0
+	// https://www.youtube.com/@DIY_PLC
+	// https://github.com/DIYPLC/LIB_PLC
+	// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+	// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+	// https://t.me/DIY_PLC
+	
+	
+END_FUNCTION_BLOCK
+

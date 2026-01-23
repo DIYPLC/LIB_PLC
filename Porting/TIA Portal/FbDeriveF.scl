@@ -1,0 +1,117 @@
+﻿FUNCTION_BLOCK "FbDeriveF"
+TITLE = Производная с фильтром.
+{ S7_Optimized_Access := 'FALSE' }
+AUTHOR : VA
+FAMILY : LIB_PLC
+VERSION : 2.2
+   VAR_INPUT 
+      In : Real;   // Входной сигнал.
+      Kdf : Real := 1.0e+0;   // Коэффициент фильтрации дифференциальный Kdf=1/Tdf.
+      Ts : Real := 1.0e-1;   // Шаг дискретизации по времени [с].
+   END_VAR
+
+   VAR_OUTPUT 
+      Out : Real;   // Выходной сигнал.
+   END_VAR
+
+   VAR 
+      Dintegral : Real;   // Интегратор.
+   END_VAR
+
+
+BEGIN
+	
+	
+	// Производная с фильтром.
+	//      DbDeriveF
+	//    +-----------+
+	//    | FbDeriveF |
+	// ->-|In      Out|->-
+	//   -|Kdf        |
+	//   -|Ts         |
+	//    +-----------+
+	
+	// W(s)=s/(1+Tdf*s) при Tdf=1/Kdf и Ts->0.
+	IF (#Kdf <= 0.0) THEN
+	#Dintegral := 0.0;
+	#Out := 0.0;
+	ELSE
+	#Out := (#In - #Dintegral) * #Kdf;
+	#Dintegral := #Dintegral + (#Ts * #Out);
+	END_IF;
+	
+	// Внутренняя схема фильтра.
+	//
+	//          Вычитание   Умножение
+	//            +---+     +------+
+	// In ----->--| + |     |      |
+	//            |   |-->--| *Kdf |-->----+-->-- Out
+	//      +-->--| - |     |      |       |
+	//      |     +---+     +------+       |
+	//      |                              |
+	//      |              Интегрирование  |
+	//      |              +----------+    |
+	//      |   Dintegral  |  Ts * z  |    |
+	//      +--------------| -------- |----+
+	//                     |   z - 1  |
+	//                     +----------+
+	
+	// Условное графическое обозначение (приближенное).
+	//
+	//    +-----------------+
+	//    |        s        |
+	// ->-| --------------- |->-
+	//    | (1/Kdf) * s + 1 |
+	//    +-----------------+
+	
+	// Электрическая схема фильтра.
+	//
+	// +    || C            +
+	// o----||----o---------o
+	//      ||    |          
+	//  U In      |     U Out
+	//           +-+         
+	//           | | R       
+	//           | |         
+	//           +-+         
+	//            |          
+	// -          |         -
+	// o----------o---------o
+	// Tf = 1/Kdf = R * C ([с] = [Ом] * [Ф])
+	
+	// Временная характеристика.
+	//
+	// ^ Out
+	// |
+	// 1*            Y(t) = 0 - exp(-(t/Tf))
+	// | *          
+	// |  *        
+	// |    *       
+	// |      *     
+	// 0---------***---> t[s]
+	//
+	// ^ In
+	// |
+	// 1************ X(t) = 1
+	// |            
+	// |            
+	// |            
+	// |            
+	// 0---------------> t[s]
+	
+	// @COPYLEFT ALL WRONGS RESERVED :)
+	// Author: VA
+	// Contacts: DIY.PLC.314@gmail.com
+	// Date start LIB_PLC: 2014
+	// License: GNU GPL-2.0-or-later
+	// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+	// https://www.youtube.com/watch?v=n1F_MfLRlX0
+	// https://www.youtube.com/@DIY_PLC
+	// https://github.com/DIYPLC/LIB_PLC
+	// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+	// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+	// https://t.me/DIY_PLC
+	
+	
+END_FUNCTION_BLOCK
+

@@ -1,0 +1,89 @@
+﻿FUNCTION_BLOCK "FbBitsToWord"
+TITLE = Преобразование 16 бит в слово.
+{ S7_Optimized_Access := 'FALSE' }
+AUTHOR : VA
+FAMILY : LIB_PLC
+VERSION : 2.2
+   VAR_INPUT 
+      In0 : Bool;   // Входной сигнал бит0.
+      In1 : Bool;   // Входной сигнал бит1.
+      In2 : Bool;   // Входной сигнал бит2.
+      In3 : Bool;   // Входной сигнал бит3.
+      In4 : Bool;   // Входной сигнал бит4.
+      In5 : Bool;   // Входной сигнал бит5.
+      In6 : Bool;   // Входной сигнал бит6.
+      In7 : Bool;   // Входной сигнал бит7.
+      In8 : Bool;   // Входной сигнал бит8.
+      In9 : Bool;   // Входной сигнал бит9.
+      In10 : Bool;   // Входной сигнал бит10.
+      In11 : Bool;   // Входной сигнал бит11.
+      In12 : Bool;   // Входной сигнал бит12.
+      In13 : Bool;   // Входной сигнал бит13.
+      In14 : Bool;   // Входной сигнал бит14.
+      In15 : Bool;   // Входной сигнал бит15.
+   END_VAR
+
+   VAR_OUTPUT 
+      Out : Word;   // Выходной сигнал.
+   END_VAR
+
+
+BEGIN
+	
+	
+	// Преобразование 16 бит в слово.
+	//      DbBitsToWord
+	//    +--------------+
+	//    | FbBitsToWord |
+	// ->-|In0        Out|->-
+	// ->-|In1           |
+	// ->-|In2           |
+	// ->-|In3           |
+	// ->-|In4           |
+	// ->-|In5           |
+	// ->-|In6           |
+	// ->-|In7           |
+	// ->-|In8           |
+	// ->-|In9           |
+	// ->-|In10          |
+	// ->-|In11          |
+	// ->-|In12          |
+	// ->-|In13          |
+	// ->-|In14          |
+	// ->-|In15          |
+	//    +--------------+
+	
+	#Out:=0;
+	IF (#In0 ) THEN #Out:=(#Out OR 2#0000000000000001); END_IF;
+	IF (#In1 ) THEN #Out:=(#Out OR 2#0000000000000010); END_IF;
+	IF (#In2 ) THEN #Out:=(#Out OR 2#0000000000000100); END_IF;
+	IF (#In3 ) THEN #Out:=(#Out OR 2#0000000000001000); END_IF;
+	IF (#In4 ) THEN #Out:=(#Out OR 2#0000000000010000); END_IF;
+	IF (#In5 ) THEN #Out:=(#Out OR 2#0000000000100000); END_IF;
+	IF (#In6 ) THEN #Out:=(#Out OR 2#0000000001000000); END_IF;
+	IF (#In7 ) THEN #Out:=(#Out OR 2#0000000010000000); END_IF;
+	IF (#In8 ) THEN #Out:=(#Out OR 2#0000000100000000); END_IF;
+	IF (#In9 ) THEN #Out:=(#Out OR 2#0000001000000000); END_IF;
+	IF (#In10) THEN #Out:=(#Out OR 2#0000010000000000); END_IF;
+	IF (#In11) THEN #Out:=(#Out OR 2#0000100000000000); END_IF;
+	IF (#In12) THEN #Out:=(#Out OR 2#0001000000000000); END_IF;
+	IF (#In13) THEN #Out:=(#Out OR 2#0010000000000000); END_IF;
+	IF (#In14) THEN #Out:=(#Out OR 2#0100000000000000); END_IF;
+	IF (#In15) THEN #Out:=(#Out OR 2#1000000000000000); END_IF;
+	
+	// @COPYLEFT ALL WRONGS RESERVED :)
+	// Author: VA
+	// Contacts: DIY.PLC.314@gmail.com
+	// Date start LIB_PLC: 2014
+	// License: GNU GPL-2.0-or-later
+	// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+	// https://www.youtube.com/watch?v=n1F_MfLRlX0
+	// https://www.youtube.com/@DIY_PLC
+	// https://github.com/DIYPLC/LIB_PLC
+	// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+	// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+	// https://t.me/DIY_PLC
+	
+	
+END_FUNCTION_BLOCK
+

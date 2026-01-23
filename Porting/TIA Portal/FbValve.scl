@@ -1,0 +1,183 @@
+﻿FUNCTION_BLOCK "FbValve"
+TITLE = Пневмоцилиндр с концевиками.
+{ S7_Optimized_Access := 'FALSE' }
+AUTHOR : VA
+FAMILY : LIB_PLC
+VERSION : 2.2
+   VAR_INPUT 
+      CommandOpen : Bool;   // Команда открыть клапан.
+      FeedbackOpen : Bool;   // Датчик обратной связи "Клапан открылся".
+      FeedbackClose : Bool;   // Датчик обратной связи "Клапан закрылся".
+      OnFeedbackOpen : Bool;   // Включить датчик обратной связи "Клапан открылся".
+      OnFeedbackClose : Bool;   // Включить датчик обратной связи "Клапан закрылся".
+      Reset : Bool;   // Сброс драйвера в исходное состояние.
+      TimeOpen : DInt := L#5000;   // Время открытия клапана [мс].
+      TimeClose : DInt := L#5000;   // Время закрытия клапана [мс].
+      Ts_ms : DInt := L#100;   // Шаг дискретизации по времени [мс].
+   END_VAR
+
+   VAR_OUTPUT 
+      CoilOpen : Bool;   // Сигнал на электромагнит "Открыть клапан".
+      StateOpen : Bool;   // Сосотение "Клапан открыт".
+      StateClose : Bool;   // Сосотение "Клапан закрыт".
+      Error : Bool;   // Ошибка "Неисправность клапана".
+   END_VAR
+
+   VAR 
+      Timer1 : DInt;   // Таймер [мс].
+      State1 : Int;   // Граф состояния.
+   END_VAR
+
+   VAR CONSTANT 
+      STATE_RESET : Int;   // Сброс алгоритма.
+      STATE_VALVE_CLOSING : Int := 1;   // Закрытие клапана.
+      STATE_VALVE_CLOSE : Int := 2;   // Клапан закрыт.
+      STATE_VALVE_OPENING : Int := 3;   // Открытие клапана.
+      STATE_VALVE_OPEN : Int := 4;   // Клапан открыт.
+      STATE_ERROR_CLOSE : Int := 5;   // Клапан не закрылся.
+      STATE_ERROR_OPEN : Int := 6;   // Клапан не открылся.
+   END_VAR
+
+
+BEGIN
+	
+	
+	// Пневмоцилиндр с концевиками.
+	//                DbValve
+	//    +-----------------------------+
+	//    |           FbValve           |
+	// ->-|CommandOpen          CoilOpen|->-
+	//   -|FeedbackOpen        StateOpen|-
+	//   -|FeedbackClose      StateClose|-
+	//   -|OnFeedbackOpen          Error|-
+	//   -|OnFeedbackClose              |
+	//   -|Reset                        |
+	//   -|TimeOpen                     |
+	//   -|TimeClose                    |
+	//   -|Ts_ms                        |
+	//    +-----------------------------+
+	
+	#CoilOpen := #CommandOpen; // Это основная часть блока все остальное нужно для удобства использования.
+	
+	// Сброс алгоритма.
+	IF (#Reset) THEN
+	#State1 := #STATE_RESET;
+	END_IF;
+	
+	// Граф состояний.
+	CASE #State1 OF
+	
+	#STATE_RESET: // Сброс алгоритма.
+	#Timer1     := 0;
+	#StateOpen  := FALSE;
+	#StateClose := FALSE;
+	#Error      := FALSE;
+	// Смотрим куда надо перейти на закрытие или открытие.
+	IF (#CommandOpen) THEN
+	#State1 := #STATE_VALVE_OPENING;
+	ELSE
+	#State1 := #STATE_VALVE_CLOSING;
+	END_IF;
+	
+	#STATE_VALVE_CLOSING: // Закрытие клапана.
+	#Timer1     := #Timer1 + #Ts_ms;
+	#StateOpen  := FALSE;
+	#StateClose := FALSE;
+	#Error      := FALSE;
+	// Если доехали до датчика то переходим в состояние закрыто.
+	// Если нет обратной связи по датчику то переходим в состояние закрыто по таймеру.
+	IF (#FeedbackClose OR (NOT(#OnFeedbackClose) AND (#Timer1>=#TimeClose)) ) THEN
+	#State1 := #STATE_VALVE_CLOSE;
+	END_IF;
+	// Если клапан заклинил и не доехал до датчика за заданное время уходим в состояние ошибки.
+	IF (#OnFeedbackClose AND (#Timer1>=#TimeClose) ) THEN
+	#State1 := #STATE_ERROR_CLOSE;
+	END_IF;
+	// Если во время закрытия пришла команда на открытие переходим в режим открытие.
+	IF (#CommandOpen) THEN
+	#State1 := #STATE_VALVE_OPENING;
+	END_IF;
+	
+	#STATE_VALVE_CLOSE: // Клапан закрыт.
+	#Timer1     := 0;
+	#StateOpen  := FALSE;
+	#StateClose := TRUE;
+	#Error      := FALSE;
+	// Если пришла команда на открытие то переходим в состояние открытие.
+	IF (#CommandOpen) THEN
+	#State1 := #STATE_VALVE_OPENING;
+	END_IF;
+	
+	#STATE_VALVE_OPENING: // Открытие клапана.
+	#Timer1     := #Timer1 + #Ts_ms;
+	#StateOpen  := FALSE;
+	#StateClose := FALSE;
+	#Error      := FALSE;
+	// Если доехали до датчика то переходим в состояние открыто.
+	// Если нет обратной связи по датчику то переходим в состояние открыто по таймеру.
+	IF (#FeedbackOpen OR (NOT(#OnFeedbackOpen) AND (#Timer1>=#TimeClose)) ) THEN
+	#State1 := #STATE_VALVE_OPEN;
+	END_IF;
+	// Если клапан заклинил и не доехал до датчика за заданное время уходим в состояние ошибки.
+	IF (#OnFeedbackOpen AND (#Timer1>=#TimeClose) ) THEN
+	#State1 := #STATE_ERROR_OPEN;
+	END_IF;
+	// Если во время открытия пришла команда на закрытие переходим в режим закрытие.
+	IF NOT(#CommandOpen) THEN
+	#State1 := #STATE_VALVE_CLOSING;
+	END_IF;
+	
+	#STATE_VALVE_OPEN: // Клапан открыт.
+	#Timer1     := 0;
+	#StateOpen  := TRUE;
+	#StateClose := FALSE;
+	#Error      := FALSE;
+	// Если пришла команда на закрытие то переходим в состояние закрытие.
+	IF NOT(#CommandOpen) THEN
+	#State1 := #STATE_VALVE_CLOSING;
+	END_IF;
+	
+	#STATE_ERROR_CLOSE: // Клапан не закрылся.
+	#Timer1     := 0;
+	#StateOpen  := FALSE;
+	#StateClose := FALSE;
+	#Error      := TRUE;
+	// Если все таки доехали до датчика то сброс для перехода на правильное состояние.
+	// Если пришла команда на отрытие то сброс для перехода на правильное состояние.
+	// Если выключили контроль обратной связи то сброс для перехода на правильное состояние.
+	IF (#FeedbackClose OR #CommandOpen OR NOT(#OnFeedbackClose)) THEN
+	#State1 := #STATE_RESET;
+	END_IF;
+	
+	#STATE_ERROR_OPEN: // Клапан не открылся.
+	#Timer1     := 0;
+	#StateOpen  := FALSE;
+	#StateClose := FALSE;
+	#Error      := TRUE;
+	// Если все таки доехали до датчика то сброс для перехода на правильное состояние.
+	// Если пришла команда на закрытие то сброс для перехода на правильное состояние.
+	// Если выключили контроль обратной связи то сброс для перехода на правильное состояние.
+	IF (#FeedbackOpen OR NOT(#CommandOpen) OR NOT(#OnFeedbackOpen)) THEN
+	#State1 := #STATE_RESET;
+	END_IF;
+	
+	ELSE // СТОП при неопределенном состоянии.
+	#State1 := #STATE_RESET;
+	END_CASE;
+	
+	// @COPYLEFT ALL WRONGS RESERVED :)
+	// Author: VA
+	// Contacts: DIY.PLC.314@gmail.com
+	// Date start LIB_PLC: 2014
+	// License: GNU GPL-2.0-or-later
+	// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+	// https://www.youtube.com/watch?v=n1F_MfLRlX0
+	// https://www.youtube.com/@DIY_PLC
+	// https://github.com/DIYPLC/LIB_PLC
+	// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+	// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+	// https://t.me/DIY_PLC
+	
+	
+END_FUNCTION_BLOCK
+

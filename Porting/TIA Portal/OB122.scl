@@ -1,0 +1,41 @@
+﻿ORGANIZATION_BLOCK "MOD_ERR"
+TITLE = Вызывается если вытаскиваем модули: AO.
+{ S7_Optimized_Access := 'FALSE' }
+AUTHOR : VA
+FAMILY : LIB_PLC
+VERSION : 2.1
+   VAR_TEMP 
+      OB122_EV_CLASS : Byte;   // 16#29, Event class 2, Entering event state, Internal fault event
+      OB122_SW_FLT : Byte;   // 16#XX Software error code
+      OB122_PRIORITY : Byte;   // Priority of OB Execution
+      OB122_OB_NUMBR : Byte;   // 122 (Organization block 122, OB122)
+      OB122_BLK_TYPE : Byte;   // 16#88/8C/8E Type of block fault occured in
+      OB122_MEM_AREA : Byte;   // Memory area where access error occured
+      OB122_MEM_ADDR : Word;   // Memory address where access error occured
+      OB122_BLK_NUM : Word;   // Block number in which error occured
+      OB122_PRG_ADDR : Word;   // Program address where error occured
+      OB122_DATE_TIME : Date_And_Time;   // Date and time OB1 started
+   END_VAR
+
+
+BEGIN
+	
+	
+	"DbDebug".OB122_CNT_ERR := "DbDebug".OB122_CNT_ERR + 1; // Счетчик вызовов обработчика ошибок OB122.
+	
+	// @COPYLEFT ALL WRONGS RESERVED :)
+	// Author: VA
+	// Contacts: DIY.PLC.314@gmail.com
+	// Date start LIB_PLC: 2014
+	// License: GNU GPL-2.0-or-later
+	// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+	// https://www.youtube.com/watch?v=n1F_MfLRlX0
+	// https://www.youtube.com/@DIY_PLC
+	// https://github.com/DIYPLC/LIB_PLC
+	// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+	// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+	// https://t.me/DIY_PLC
+	
+	
+END_ORGANIZATION_BLOCK
+

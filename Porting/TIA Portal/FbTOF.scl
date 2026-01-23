@@ -1,0 +1,94 @@
+﻿FUNCTION_BLOCK "FbTOF"
+TITLE = Таймер с задержкой на выключение.
+{ S7_Optimized_Access := 'FALSE' }
+AUTHOR : VA
+FAMILY : LIB_PLC
+VERSION : 2.2
+   VAR_INPUT 
+      In : Bool;   // Вход таймера.
+      TimeDelayOff : DInt := L#5000;   // Время задержки выключения [мс].
+      Ts_ms : DInt := L#100;   // Шаг дискретизации по времени [мс].
+   END_VAR
+
+   VAR_OUTPUT 
+      Out : Bool;   // Выход таймера.
+   END_VAR
+
+   VAR 
+      Timer1 : DInt;   // Текущее время таймер1 [мс].
+   END_VAR
+
+
+BEGIN
+	
+	
+	// Таймер с задержкой на выключение.
+	//          DbTOF
+	//    +----------------+
+	//    |     FbTOF      |
+	// ->-|In           Out|->-
+	//   -|TimeDelayOff    |
+	//   -|Ts_ms           |
+	//    +----------------+
+	
+	IF (#TimeDelayOff > 0) THEN // Таймер включен.
+	  IF (#In) THEN // На входе 1 то на выходе тоже 1.
+	  #Out := TRUE;
+	  #Timer1 := 0;   
+	  ELSE // Если на входе 0.
+	    IF (#Out) THEN // На выходе 1.       
+	      IF (#Timer1 >= #TimeDelayOff) THEN // Задержка включения закончилась.
+	      #Out := FALSE;
+	      #Timer1 := 0;
+	      ELSE // Задержка включения активна.
+	      #Out := TRUE;
+	      #Timer1 := #Timer1 + #Ts_ms;
+	      END_IF;
+	    ELSE // На выходе 0.
+	    #Out := FALSE;
+	    #Timer1 := 0;
+	    END_IF;
+	  END_IF;
+	ELSE // Таймер выключен.
+	#Out := #In;
+	#Timer1 := 0;
+	END_IF;
+	
+	// Применение.
+	//
+	// Блок может применятся как фильтр дребезга контактов и как расширитель им-пульсов.
+	
+	// Временная характеристика.
+	//
+	//  In
+	//  ^
+	//  |     TimeDelayOff          TimeDelayOff
+	//  |       |<--->|               |<--->|
+	// 1|   *****     |     ***** *** *     |
+	//  |   *   *     |     *   * * * *     |
+	// 0*****---*************---***-*************----> t[s]
+	//
+	//  Out
+	//  ^
+	//  |     TimeDelayOff          TimeDelayOff
+	//  |       |<--->|               |<--->|
+	// 1|   ***********     *****************
+	//  |   *         *     *               *
+	// 0*****---------*******---------------*****----> t[s]
+	
+	// @COPYLEFT ALL WRONGS RESERVED :)
+	// Author: VA
+	// Contacts: DIY.PLC.314@gmail.com
+	// Date start LIB_PLC: 2014
+	// License: GNU GPL-2.0-or-later
+	// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+	// https://www.youtube.com/watch?v=n1F_MfLRlX0
+	// https://www.youtube.com/@DIY_PLC
+	// https://github.com/DIYPLC/LIB_PLC
+	// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+	// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+	// https://t.me/DIY_PLC
+	
+	
+END_FUNCTION_BLOCK
+

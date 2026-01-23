@@ -1,0 +1,124 @@
+﻿FUNCTION_BLOCK "FbLimit"
+TITLE = Амплитудный ограничитель.
+{ S7_Optimized_Access := 'FALSE' }
+AUTHOR : VA
+FAMILY : LIB_PLC
+VERSION : 2.1
+   VAR_INPUT 
+      In : Real;   // Вход амплитудного ограничителя.
+      OutMax : Real := 1.0e+2;   // Максимальное значение выхода.
+      OutMin : Real;   // Минимальное значение выхода.
+   END_VAR
+
+   VAR_OUTPUT 
+      Out : Real;   // Выход амплитудного ограничителя.
+   END_VAR
+
+
+BEGIN
+	
+	
+	// Амплитудный ограничитель.
+	//       DbLimit
+	//    +-----------+
+	//    |  FbLimit  |
+	// ->-|In      Out|->-
+	//   -|OutMax     |
+	//   -|OutMin     |
+	//    +-----------+
+	
+	// Амплитудный ограничитель.
+	IF (#In >= #OutMax) THEN
+	#Out := #OutMax; // Ограничение выхода сверху.
+	ELSE
+	    IF (#In <= #OutMin) THEN
+	    #Out := #OutMin; // Ограничение выхода снизу.
+	    ELSE
+	    #Out := #In; // Выход без ограничений.
+	    END_IF;
+	END_IF;
+	
+	// Условное графическое обозначение.
+	//
+	//         OutMax
+	//      +-----------+
+	//      |           |
+	//      |       +-- |
+	//      |      /    |
+	// In->-|     /     |->-Out
+	//      |    /      |
+	//      | --+       |
+	//      |           |
+	//      +-----------+
+	//         OutMin
+	
+	// Статическая характеристика.
+	//
+	//                +Out
+	//                  |
+	//                  |     ********
+	//                  |    *   |
+	//                  |   *    |
+	//                  |  *     | OutMax
+	//                  | *      |
+	//                  |*       |
+	// -In <------------+------------> +In
+	//         |       *|
+	//         |      * |
+	//  OutMin |     *  |
+	//         |    *   |
+	//         |   *    |
+	//     ********     |
+	//                  |
+	//                -Out
+	
+	// Временная характеристика.
+	//
+	// +In
+	// |            *
+	// |           * *
+	// |----------*---* -----------------
+	// |         *     *               |
+	// |        *       *              | OutMax
+	// |       *         *             |
+	// +------*-----------*----------------------> t[s]
+	// |     *             *           |
+	// |    *               *          | OutMin
+	// |   *                 *         |
+	// |--*-------------------*----------
+	// | *                     *
+	// |*                       *
+	// -In
+	//
+	// +Out
+	// |
+	// |
+	// |----------***** -----------------
+	// |         *     *               |
+	// |        *       *              | OutMax
+	// |       *         *             |
+	// +------*-----------*----------------------> t[s]
+	// |     *             *           |
+	// |    *               *          | OutMin
+	// |   *                 *         |
+	// |***-------------------***--------
+	// |
+	// |
+	// -Out
+	
+	// @COPYLEFT ALL WRONGS RESERVED :)
+	// Author: VA
+	// Contacts: DIY.PLC.314@gmail.com
+	// Date start LIB_PLC: 2014
+	// License: GNU GPL-2.0-or-later
+	// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+	// https://www.youtube.com/watch?v=n1F_MfLRlX0
+	// https://www.youtube.com/@DIY_PLC
+	// https://github.com/DIYPLC/LIB_PLC
+	// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+	// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+	// https://t.me/DIY_PLC
+	
+	
+END_FUNCTION_BLOCK
+

@@ -1,0 +1,50 @@
+﻿ORGANIZATION_BLOCK "CYC_INT5"
+TITLE = Прерывание каждые 100мс.
+{ S7_Optimized_Access := 'FALSE' }
+AUTHOR : VA
+FAMILY : LIB_PLC
+VERSION : 2.1
+   VAR_TEMP 
+      OB35_EV_CLASS : Byte;   // Bits 0-3 = 1 (Coming event), Bits 4-7 = 1 (Event class 1)
+      OB35_STRT_INF : Byte;   // 16#36 (OB 35 has started)
+      OB35_PRIORITY : Byte;   // Priority of OB Execution
+      OB35_OB_NUMBR : Byte;   // 35 (Organization block 35, OB35)
+      OB35_RESERVED_1 : Byte;   // Reserved for system
+      OB35_RESERVED_2 : Byte;   // Reserved for system
+      OB35_PHASE_OFFSET : Word;   // Phase offset (msec)
+      OB35_RESERVED_3 : Int;   // Reserved for system
+      OB35_EXC_FREQ : Int;   // Frequency of execution (msec)
+      OB35_DATE_TIME : Date_And_Time;   // Date and time OB35 started
+   END_VAR
+
+
+BEGIN
+	
+	
+	// Задача вызывается каждые 100ms.
+	//      DbTask100ms
+	//    +-------------+
+	//    | FbTask100ms |
+	// ->-|Ts_ms        |
+	// ->-|Reset        |
+	//    +-------------+
+	"DbTask100ms".Ts_ms := INT_TO_DINT(#OB35_EXC_FREQ); // Шаг дискретизации по времени [мс].
+	"DbTask100ms".Reset := FALSE                     ; // Сброс при перезагрузке.
+	"DbTask100ms"()                      ; // Задача вызывается каждые 100ms.
+	
+	// @COPYLEFT ALL WRONGS RESERVED :)
+	// Author: VA
+	// Contacts: DIY.PLC.314@gmail.com
+	// Date start LIB_PLC: 2014
+	// License: GNU GPL-2.0-or-later
+	// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+	// https://www.youtube.com/watch?v=n1F_MfLRlX0
+	// https://www.youtube.com/@DIY_PLC
+	// https://github.com/DIYPLC/LIB_PLC
+	// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+	// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+	// https://t.me/DIY_PLC
+	
+	
+END_ORGANIZATION_BLOCK
+

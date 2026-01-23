@@ -1,0 +1,50 @@
+﻿ORGANIZATION_BLOCK "CYCL_EXC"
+TITLE = Циклическая программа.
+{ S7_Optimized_Access := 'FALSE' }
+AUTHOR : VA
+FAMILY : LIB_PLC
+VERSION : 2.1
+   VAR_TEMP 
+      OB1_EV_CLASS : Byte;   // Bits 0-3 = 1 (Coming event), Bits 4-7 = 1 (Event class 1)
+      OB1_SCAN_1 : Byte;   // 1 (Cold restart scan 1 of OB 1), 3 (Scan 2-n of OB 1)
+      OB1_PRIORITY : Byte;   // Priority of OB Execution
+      OB1_OB_NUMBR : Byte;   // 1 (Organization block 1, OB1)
+      OB1_RESERVED_1 : Byte;   // Reserved for system
+      OB1_RESERVED_2 : Byte;   // Reserved for system
+      OB1_PREV_CYCLE : Int;   // Cycle time of previous OB1 scan (milliseconds)
+      OB1_MIN_CYCLE : Int;   // Minimum cycle time of OB1 (milliseconds)
+      OB1_MAX_CYCLE : Int;   // Maximum cycle time of OB1 (milliseconds)
+      OB1_DATE_TIME : Date_And_Time;   // Date and time OB1 started
+   END_VAR
+
+
+BEGIN
+	
+	
+	// Задача вызывается циклически.
+	//      DbTaskCyclic
+	//    +--------------+
+	//    | FbTaskCyclic |
+	// ->-|Ts_ms         |
+	// ->-|Reset         |
+	//    +--------------+
+	"DbTaskCyclic".Ts_ms := INT_TO_DINT(#OB1_PREV_CYCLE); // Шаг дискретизации по времени [мс].
+	"DbTaskCyclic".Reset := FALSE                      ; // Сброс при перезагрузке.
+	"DbTaskCyclic"()                      ; // Задача вызывается циклически.
+	
+	// @COPYLEFT ALL WRONGS RESERVED :)
+	// Author: VA
+	// Contacts: DIY.PLC.314@gmail.com
+	// Date start LIB_PLC: 2014
+	// License: GNU GPL-2.0-or-later
+	// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+	// https://www.youtube.com/watch?v=n1F_MfLRlX0
+	// https://www.youtube.com/@DIY_PLC
+	// https://github.com/DIYPLC/LIB_PLC
+	// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+	// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+	// https://t.me/DIY_PLC
+	
+	
+END_ORGANIZATION_BLOCK
+

@@ -1,0 +1,110 @@
+﻿FUNCTION_BLOCK "FbFilterA"
+TITLE = Фильтр апериодический.
+{ S7_Optimized_Access := 'FALSE' }
+AUTHOR : VA
+FAMILY : LIB_PLC
+VERSION : 2.1
+   VAR_INPUT 
+      In : Real;   // Входной сигнал до фильтрации.
+      Tf : Real := 1.0e+0;   // Постоянная времени фильтра [с].
+      Ts : Real := 1.0e-1;   // Шаг дискретизации по времени [с].
+   END_VAR
+
+   VAR_OUTPUT 
+      Out : Real;   // Выходной сигнал после фильтрации.
+   END_VAR
+
+   VAR_TEMP 
+      Tmp : Real;   // Временная переменная вход интегратора.
+   END_VAR
+
+
+BEGIN
+	
+	
+	// Фильтр апериодический.
+	//      DbFilterA
+	//    +-----------+
+	//    | FbFilterA |
+	// ->-|In      Out|->-
+	//   -|Tf         |
+	//   -|Ts         |
+	//    +-----------+
+	
+	// W(s) = 1 / (1 + Tf * s) при Ts->0.
+	IF (#Tf <= 0.0) THEN
+	#Out := #In;
+	ELSE
+	#Tmp := (#In - #Out) / #Tf;
+	#Out := #Out + #Tmp * #Ts;
+	END_IF;
+	
+	// Внутренняя схема фильтра.
+	//
+	//          Вычитание   Деление      Интегрирование
+	//            +---+     +------+     +----------+
+	// In ----->--| + |     |   1  | Tmp |  Ts * z  |
+	//            |   |-->--| ---- |-->--| -------- |--+-->-- Out
+	//      +-->--| - |     |  Tf  |     |   z - 1  |  |
+	//      |     +---+     +------+     +----------+  |
+	//      |                                          |
+	//      +------------------------------------------+
+	
+	// Условное графическое обозначение (приближенное).
+	//
+	//    +--------------+
+	//    |      1       |
+	// ->-| ------------ |->-
+	//    |  Tf * s + 1  |
+	//    +--------------+
+	
+	// Электрическая схема фильтра.
+	//
+	//         R                  
+	// +    +-----+              +
+	// o----|     |----o---------o
+	//      +-----+    |          
+	//                 | C        
+	//               -----        
+	// U In          -----   U Out
+	//                 |          
+	// -               |         -
+	// o---------------o---------o
+	// Tf = R * C ([с] = [Ом] * [Ф])
+	
+	// Временная характеристика.
+	//
+	// ^ Out
+	// |
+	// 1         *** Y(t) = 1 - exp(-(t/Tf))
+	// |      *     
+	// |    *       
+	// |  *         
+	// | *          
+	// 0---------------> t[s]
+	//
+	// ^ In
+	// |
+	// 1************ X(t) = 1
+	// |            
+	// |            
+	// |            
+	// |            
+	// 0---------------> t[s]
+	
+	// @COPYLEFT ALL WRONGS RESERVED :)
+	// Author: VA
+	// Contacts: DIY.PLC.314@gmail.com
+	// Date start LIB_PLC: 2014
+	// License: GNU GPL-2.0-or-later
+	// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+	// https://www.youtube.com/watch?v=n1F_MfLRlX0
+	// https://www.youtube.com/@DIY_PLC
+	// https://github.com/DIYPLC/LIB_PLC
+	// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+	// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+	// https://t.me/DIY_PLC
+	
+	
+END_FUNCTION_BLOCK
+

@@ -1,0 +1,118 @@
+﻿FUNCTION_BLOCK "FbSoftPWM"
+TITLE = ШИМ генератор двухканальный.
+{ S7_Optimized_Access := 'FALSE' }
+AUTHOR : VA
+FAMILY : LIB_PLC
+VERSION : 2.1
+   VAR_INPUT 
+      DutyCucle : Real := 5.0e+1;   // Коэффициент заполнения -100...0...100 [%].
+      PeriodPositive : Real := 1.0e+1;   // Период ШИМ для положительного коэффициента заполнения [с].
+      PeriodNegative : Real := 1.0e+1;   // Период ШИМ для отрицательного коэффициента заполнения [с].
+      DBMAX : Real := 1.0e-3;   // dead band - Зона нечувствительности, верхняя граница [%].
+      DBMIN : Real := -1.0e-3;   // dead band - Зона нечувствительности, нижняя граница [%].
+      Ts : Real := 1.0e-1;   // Шаг дискретизации по времени [с].
+   END_VAR
+
+   VAR_OUTPUT 
+      PWMPOS : Bool;   // Выход ШИМ для положительных значений входа.
+      PWMNEG : Bool;   // Выход ШИМ для отрицательных значений входа.
+   END_VAR
+
+   VAR 
+      TimerPositive : Real;   // Таймер для положительного коэффициента заполнения [с].
+      TimerNegative : Real;   // Таймер для отрицательного коэффициента заполнения [с].
+   END_VAR
+
+   VAR_TEMP 
+      Percent : Real;   // Входной сигнал после зоны нечувствительности и амплитудного ограничителя -100..
+      TimePulsePositive : Real;   // Время импульса для положительного коэффициента заполнения [с].
+      TimePulseNegative : Real;   // Время импульса для отрицательного коэффициента заполнения [с].
+   END_VAR
+
+
+BEGIN
+	
+	
+	// ШИМ генератор двухканальный.
+	//            DbSoftPWM
+	//     +---------------------+
+	//     |      FbSoftPWM      |
+	//  ->-|DutyCucle      PWMPOS|->-
+	//    -|PeriodPositive PWMNEG|->-
+	//    -|PeriodNegative       |
+	//    -|DBMAX                |
+	//    -|DBMIN                |
+	//    -|Ts                   |
+	//     +---------------------+
+	
+	// Зона нечувствительности для входного сигнала.
+	IF ((#DBMIN<#DutyCucle)AND(#DutyCucle<#DBMAX)) THEN
+	#Percent:=0.0;
+	ELSE
+	#Percent:=#DutyCucle;
+	END_IF;
+	
+	// Амплитудный ограничитель входного сигнала от -100% до 100%.
+	IF (#Percent>=100.0) THEN
+	#Percent:=100.0;
+	END_IF;
+	IF (#Percent<=-100.0) THEN
+	#Percent:=-100.0;
+	END_IF;
+	
+	// Формирование импульсов на открытие.
+	IF (#Percent>0.0) THEN
+	#PWMNEG:=FALSE;
+	#TimerNegative:=0.0;
+	#TimePulsePositive:=#PeriodPositive*#Percent*0.01;
+	    IF (#TimerPositive<=#TimePulsePositive) THEN
+	    #PWMPOS:=TRUE;
+	    ELSE
+	    #PWMPOS:=FALSE;
+	    END_IF;
+	#TimerPositive:=#TimerPositive+#Ts;
+	    IF (#TimerPositive>=#PeriodPositive) THEN
+	    #TimerPositive:=0.0;
+	    END_IF;
+	END_IF;
+	
+	// Формирование импульсов на закрытие.
+	IF (#Percent<0.0) THEN
+	#PWMPOS:=FALSE;
+	#TimerPositive:=0.0;
+	#TimePulseNegative:=#PeriodNegative*#Percent*(-0.01);
+	    IF (#TimerNegative<=#TimePulseNegative) THEN
+	    #PWMNEG:=TRUE;
+	    ELSE
+	    #PWMNEG:=FALSE;
+	    END_IF;
+	#TimerNegative:=#TimerNegative+#Ts;
+	    IF (#TimerNegative>=#PeriodNegative) THEN
+	    #TimerNegative:=0.0;
+	    END_IF;
+	END_IF;
+	
+	// Нет импульсов.
+	IF (#Percent=0.0) THEN
+	#PWMPOS:=FALSE;
+	#PWMNEG:=FALSE;
+	#TimerPositive:=0.0;
+	#TimerNegative:=0.0;
+	END_IF;
+	
+	// @COPYLEFT ALL WRONGS RESERVED :)
+	// Author: VA
+	// Contacts: DIY.PLC.314@gmail.com
+	// Date start LIB_PLC: 2014
+	// License: GNU GPL-2.0-or-later
+	// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+	// https://www.youtube.com/watch?v=n1F_MfLRlX0
+	// https://www.youtube.com/@DIY_PLC
+	// https://github.com/DIYPLC/LIB_PLC
+	// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+	// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+	// https://t.me/DIY_PLC
+	
+	
+END_FUNCTION_BLOCK
+

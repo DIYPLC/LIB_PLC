@@ -1,0 +1,64 @@
+﻿FUNCTION_BLOCK "FbSubstReal"
+TITLE = Замещение аналогово сигнала для PCS7v9
+{ S7_Optimized_Access := 'FALSE' }
+AUTHOR : VA
+FAMILY : LIB_PLC
+VERSION : 1.1
+   VAR_INPUT 
+      In : Struct
+         Value : Real;   // Вход.
+         ST : Byte := B#16#80;   // Статус сигнала в норме 16#80.
+      END_STRUCT;
+      Subs : Struct
+         Value : Real;   // Замещающее значение.
+         ST : Byte := B#16#80;   // Статус сигнала в норме 16#80.
+      END_STRUCT;
+      SubsOn : Bool;   // Включить замещающее значение на выходе.
+   END_VAR
+
+   VAR_OUTPUT 
+      Out : Struct
+         Value : Real;   // Выход.
+         ST : Byte := B#16#80;   // Статус сигнала в норме 16#80.
+      END_STRUCT;
+   END_VAR
+
+
+BEGIN
+	
+	
+	//-----------------------------------------------------------------------------------------------
+	
+	// VA 22-03-2023
+	// Функциональный блок для замещения аналогово сигнала для PCS7 v9.1 + APL.
+	// Function block Substitution struct Real value.
+	// Первое применение это надо сделать симуляцию с SCADA на время ревизии датчиков.
+	// Второе применение это надо чтобы датчики показывали 0 когда выключены.
+	// Если замещающее значение не требуется передавать в скаду то снять флажки OCM в CFC.
+	
+	IF (#SubsOn) THEN // Substitution (замещение).
+	#Out.Value := #Subs.Value;
+	#Out.ST := #Subs.ST;
+	ELSE
+	#Out.Value := #In.Value;
+	#Out.ST := #In.ST;
+	END_IF;
+	
+	//-----------------------------------------------------------------------------------------------
+	
+	// @COPYLEFT ALL WRONGS RESERVED :)
+	// Author: VA
+	// Contacts: DIY.PLC.314@gmail.com
+	// Date start LIB_PLC: 2014
+	// License: GNU GPL-2.0-or-later
+	// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+	// https://www.youtube.com/watch?v=n1F_MfLRlX0
+	// https://www.youtube.com/@DIY_PLC
+	// https://github.com/DIYPLC/LIB_PLC
+	// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+	// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+	// https://t.me/DIY_PLC
+	
+	
+END_FUNCTION_BLOCK
+
