@@ -1,0 +1,312 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19" creationDateTime="2026-01-26T16:58:57.9430319" />
+  <contentHeader name="PLC_ODOT.project" modificationDateTime="2026-01-26T16:51:59.9229809">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation />
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="FbGSS" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Amplitude">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Амплитуда выходного сигнала.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Period">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="10" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Период выходного сигнала [с].</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Phase">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Фаза выходного сигнала [рад].</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Offset">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Постоянная составляющая выходного сигнала.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PulseTime">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Время импульса [с].</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Ts">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Шаг дискретизации по времени [с].</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Sine">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Синусоидальный сигнал.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Cosine">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Косинусоидальный сигнал.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RectangleR">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Прямоугольный сигнал вещественный.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RectangleB">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Прямоугольный сигнал булевый.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Triangle">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Треугольный, линейно нарастающий и убывающий сигнал.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Prnd">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Псевдослучайные числа в диапазоне 0...1.</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="CurrentTime">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Текущее время расчета [с].</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IntegratorTriangle">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Интегратор для треугольных импульсов.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SummatorRnd">
+              <type>
+                <DINT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Сумматор для псевдослучайных чисел.</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <tempVars>
+            <variable name="Tmp">
+              <type>
+                <DWORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Временная переменная для псевдослучайных чисел.</xhtml>
+              </documentation>
+            </variable>
+          </tempVars>
+          <localVars constant="true">
+            <variable name="PI">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="3.1415926535897931" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Число Пи.</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">//             DbGSS
+//     +--------------------+
+//     |       FbGSS        |
+//    -|Amplitude       Sine|-&gt;-
+//    -|Period        Cosine|-&gt;-
+//    -|Phase     RectangleR|-&gt;-
+//    -|Offset    RectangleB|-&gt;-
+//    -|PulseTime   Triangle|-&gt;-
+//    -|Ts              Prnd|-&gt;-
+//     +--------------------+
+
+Sine   := Amplitude*SIN(2*PI*(1.0/Period)*CurrentTime+Phase) + Offset; //Синус.
+Cosine := Amplitude*COS(2*PI*(1.0/Period)*CurrentTime+Phase) + Offset; //Косинус.
+
+IF (CurrentTime &lt; PulseTime) THEN //Прямоугольные импульсы.
+RectangleR := Amplitude + Offset;
+RectangleB := TRUE;
+ELSE
+RectangleR := Offset;
+RectangleB := FALSE;
+END_IF;
+
+IF (CurrentTime &lt;= (Period * 0.5)) THEN //Треугольные импульсы.
+IntegratorTriangle := IntegratorTriangle + Ts;
+ELSE
+IntegratorTriangle := IntegratorTriangle - Ts;
+END_IF;
+IF (Period &lt;&gt; 0.0) THEN
+Triangle := (((IntegratorTriangle*2.0)/Period)*Amplitude) + Offset;
+END_IF;
+
+//Псевдослучайные числа линейный конгруэнтный метод.
+SummatorRnd := SummatorRnd * 1103515245 + 12345;
+//принудительно отбрасывающей младшие 16 и один старший разряд.
+Tmp := DINT_TO_DWORD(SummatorRnd) AND 2#01111111111111110000000000000000;
+//Арифметический сдвиг вправо на 16бит.
+Tmp := SHR(Tmp, 16);
+//Масштабирование 0...32767 -&gt; 0...1
+Prnd := (DINT_TO_REAL(DWORD_TO_DINT(Tmp))/32767.0)*Amplitude+Offset;
+
+CurrentTime := CurrentTime+Ts; //Формирование периода.
+IF (CurrentTime &gt;= Period) THEN
+CurrentTime := 0.0;
+IntegratorTriangle := 0.0;
+END_IF;
+
+//  +---------+
+//  | GNU GPL |
+//  +---------+
+//  |
+//  |
+//  .= .-_-. =.
+// ((_/)o o(\_))
+//  `-'(. .)`-'
+//  |/| \_/ |\
+//  ( |     | )
+//  /"\_____/"\
+//  \__)   (__/
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// License: GNU GPL v2
+//
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>588384e8-6ce4-4ce2-949a-ccdd7e357a46</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="LIB_PLC">
+          <Object Name="FbGSS" ObjectId="588384e8-6ce4-4ce2-949a-ccdd7e357a46" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

@@ -1,0 +1,260 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19" creationDateTime="2026-01-26T16:59:36.3702007" />
+  <contentHeader name="PLC_ODOT.project" modificationDateTime="2026-01-26T16:51:59.9229809">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation />
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="FbBlink" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="TimeOn">
+              <type>
+                <DINT />
+              </type>
+              <initialValue>
+                <simpleValue value="2000" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Время включения лампочки [мс].</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimeOff">
+              <type>
+                <DINT />
+              </type>
+              <initialValue>
+                <simpleValue value="2000" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Время выключения лампочки [мс].</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Ts_ms">
+              <type>
+                <DINT />
+              </type>
+              <initialValue>
+                <simpleValue value="100" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Шаг дискретизации по времени [мс].</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Сброс при перезагрузке.</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="BlinkLamp">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Мигающая лампочка.</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="Timer1">
+              <type>
+                <DINT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Таймер1 [мс].</xhtml>
+              </documentation>
+            </variable>
+            <variable name="State1">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Граф состояний.</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <localVars constant="true">
+            <variable name="STATE_RESET">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Константы.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="STATE_ON">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+            </variable>
+            <variable name="STATE_OFF">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+            </variable>
+          </localVars>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">//            DbBlink 
+//    +---------------------+
+//    |       FbBlink       |
+//   -|TimeOn      BlinkLamp|-&gt;-
+//   -|TimeOff              |
+//   -|Ts_ms                |
+//   -|Reset                |
+//    +---------------------+
+
+//Пример построения универсального кроссплатформенного графа состояний.
+//Использую этот код как заготовку под более сложные алгоритмы.
+//Данный алгоритм гораздо быстрее разрабатывать чем конечный автомат с памятьтю.
+
+IF (Reset) THEN //Сброс при перезагрузке.
+State1 := STATE_RESET;
+END_IF;
+
+CASE (State1) OF //Граф состояний.
+
+STATE_RESET: //Сброс.
+BlinkLamp := FALSE;
+Timer1    := 0;
+State1 := STATE_ON;
+
+STATE_ON: //Включить лампочку на заданное время.
+BlinkLamp := TRUE;
+Timer1 := Timer1 + Ts_ms;
+IF (Timer1 &gt;= TimeOn) THEN
+State1 := STATE_OFF;
+Timer1 := 0;
+END_IF;    
+
+STATE_OFF: //Выключить лампочку на заданное время.
+BlinkLamp := FALSE;
+Timer1 := Timer1 + Ts_ms;
+IF (Timer1 &gt;= TimeOff) THEN
+State1 := STATE_ON;
+Timer1 := 0;
+END_IF;    
+
+ELSE //RESET при неопределенном состоянии.
+State1 := STATE_RESET;
+END_CASE; //CASE (State1) OF
+
+// Граф состояний.
+//
+//            |
+//           -+- Reset
+//            |
+//            V
+//  +-------------------+
+//  | State1 =          |
+//  | STATE_RESET       |
+//  | BlinkLamp = 0     |
+//  +-------------------+
+//            |
+//            |
+//            |
+//            |
+//            V
+//  +-------------------+
+//  | State1 =          |
+//  | STATE_ON          |&lt;--------------+
+//  | BlinkLamp = 1     |               |
+//  +-------------------+               |
+//            |                         |
+//            |                         |
+//           -+- Timer1 &gt;= TimeOn      -+- Timer1 &gt;= TimeOff
+//            |                         |
+//            V                         |
+//  +-------------------+               |
+//  | State1 =          |               |
+//  | STATE_OFF         |---------------+
+//  | BlinkLamp = 0     |
+//  +-------------------+
+
+//  +---------+
+//  | GNU GPL |
+//  +---------+
+//  |
+//  |
+//  .= .-_-. =.
+// ((_/)o o(\_))
+//  `-'(. .)`-'
+//  |/| \_/ |\
+//  ( |     | )
+//  /"\_____/"\
+//  \__)   (__/
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// License: GNU GPL v2
+//
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>02718eb5-7e2f-430a-b169-d8a25f916c03</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="LIB_PLC">
+          <Object Name="FbBlink" ObjectId="02718eb5-7e2f-430a-b169-d8a25f916c03" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

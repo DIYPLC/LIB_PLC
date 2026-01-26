@@ -1,0 +1,712 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19" creationDateTime="2026-01-26T16:56:47.8781561" />
+  <contentHeader name="PLC_ODOT.project" modificationDateTime="2026-01-26T16:51:59.9229809">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation />
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="FbPIDcontrol" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="PV">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Измеренное значение регулируемого параметра.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SP">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Заданное значение регулируемого параметра.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Kp">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Коэффициент усиления пропорциональный.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Ki">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.01" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Коэффициент усиления интегральный.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Kd">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Коэффициент усиления дифференциальный.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Kdf">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Коэффициент фильтрации дифференциальный Kdf=1/Tdf.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ERMAX">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.001" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Зона нечувствительности к ошибке регулирования, максимум.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ERMIN">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="-0.001" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Зона нечувствительности к ошибке регулирования, минимум.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MVMAX">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="100" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Максимальное значение сигнала управления.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MVMIN">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Минимальное значение сигнала управления.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Ts">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Шаг дискретизации по времени в секундах.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Manual">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="25" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Сигнал управления в ручном режиме работы.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OnMan">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Включить ручной режим работы регулятора.</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="MV">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Сигнал управления на исполнительный механизм.</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="ER">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ошибка регулирования.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Ppart">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Пропорциональная составляющая регулятора.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Ipart">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Интегратор интегральной составляющей регулятора.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Dpart">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Дифференциальная составляющая регулятора.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Dintegral">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Интегратор дифференциальной составляющей регулятора.</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <tempVars>
+            <variable name="Auto">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Выход ПИД- алгоритма и вход переключателя режимов работы.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Sw">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Выход с переключателя режимов работы.</xhtml>
+              </documentation>
+            </variable>
+          </tempVars>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">//         DbPIDcontrol
+//    +--------------------+
+//    |    FbPIDcontrol    |
+// -&gt;-|PV                MV|-&gt;-
+//   -|SP                  |
+//   -|Kp                  |
+//   -|Ki                  |
+//   -|Kd                  |
+//   -|Kdf                 |
+//   -|ERMAX               |
+//   -|ERMIN               |
+//   -|MVMAX               |
+//   -|MVMIN               |
+//   -|Ts                  |
+//   -|Manual              |
+//   -|OnMan               |
+//    +--------------------+
+
+//Ошибка регулирования.
+ER := SP - PV;
+
+//Зона нечувствительности к ошибке.
+IF ((ERMIN &lt; ER) AND (ER &lt; ERMAX)) THEN
+ER := 0.0;
+END_IF;
+
+//Пропорциональная составляющая.
+Ppart := Kp * ER;
+
+//Интегральная составляющая.
+IF (Ki = 0.0) THEN
+Ipart := 0.0;
+ELSE
+Ipart := Ipart + Ki * ER * Ts;
+END_IF;
+
+//Дифференциальная составляющая.
+IF (Kd = 0.0) THEN
+Dpart := 0.0;
+Dintegral := 0.0;
+ELSE
+Dpart := (ER * Kd - Dintegral) * Kdf;
+Dintegral := Dintegral + Dpart * Ts;
+END_IF;
+
+//Сигнал управления.
+Auto := Ppart + Ipart + Dpart;
+
+//Переключение режима работы "Ручной / Автоматический".
+IF (OnMan) THEN
+Sw := Manual;
+ELSE
+Sw := Auto;
+END_IF;
+
+//Амплитудный ограничитель- максимум.
+IF (Sw &gt;= MVMAX) THEN
+MV := MVMAX;
+//Ограничение интегральной составляющей методом обратного вычисления.
+Ipart := MV - (Ppart + Dpart);
+END_IF;
+
+//Амплитудный ограничитель- минимум.
+IF (Sw &lt;= MVMIN) THEN
+MV := MVMIN;
+//Ограничение интегральной составляющей методом обратного вычисления.
+Ipart := MV - (Ppart + Dpart);
+END_IF;
+
+//Амплитудный ограничитель- без ограничений.
+IF ((MVMIN &lt; Sw) AND (Sw &lt; MVMAX)) THEN
+MV := Sw;
+  IF (OnMan) THEN
+  //Ограничение интегральной составляющей методом обратного вычисления.
+  Ipart := MV - (Ppart + Dpart);
+  END_IF;
+END_IF;
+
+// Передаточная функция регулятора (при Ts -&gt; 0):
+//
+//          MV(s)               1              s
+// W(s) = -------- = Kp + Ki * --- + Kd * -------------
+//          ER(s)               s          Tdf * s + 1
+//
+// ER(s) = SP(s) - PV(s).
+// Tdf = 1 / Kdf
+
+// Передаточная функция интегратора:
+//
+//         Ts * z
+// W(z) = --------
+//         z - 1
+//
+// Численное интегрирование методом прямоугольников.
+// y = y + x * Ts;
+
+// Перечень сокращений.
+//
+// Fb          - Function block       - Функциональный блок.
+// Db          - Data block           - Блок данных.
+// PIDcontrol  - PID Controller       - ПИД- регулятор (пропорционально интегрально дифференциальный регулятор).
+// SP          - Set Point            - Заданное значение.
+// PV          - Process Variable     - Измеренное значение.
+// MV          - Manipulated Variable - Сигнал управления.
+// ER          - Error                - Ошибка регулирования, рассогласование.
+// ERMAX       - Erorr maximum        - Максимум зоны нечувствительности.
+// ERMIN       - Erorr minimum        - Минимум зоны нечувствительности.
+// MVMAX       - MV maximum           - Максимум сигнала управления.
+// MVMIN       - MV minimum           - Минимум сигнала управления.
+// Ts          - Sample Time          - Шаг дискретизации по времени.
+// ManOn       - Manual on            - Включить ручной режим управления.
+// Sw          - Switch               - Переключатель.
+// CW          - Control Word         - Слово (ui16 бит) управления (по битам).
+// SW          - Status Word          - Слово (ui16 бит) состояния (по битам).
+// EW          - Error Word           - Слово (ui16 бит) ошибок (по битам).
+// Альтернативные варианты имен.
+// CV          - Control Variable     - Измеренное значение.
+// PV          - Process Value        - Измеренное значение.
+// CS          - Control Signal       - Сигнал управления.
+// MV          - Manipulated Value    - Сигнал управления.
+// OP          - Output Power         - Сигнал управления.
+
+// Характеристики ПИД- регулятора.
+//
+// Ограничение интегральной составляющей методом обратного вычисления.
+// Зона нечувствительности к ошибке регулирования для устранения небольших колебаний регулятора в установившемся режиме работы.
+// Амплитудное ограничение выходного сигнала для предотвращения подачи сигнала управления, который превышает физические возможности исполнительного механизма.
+// Встроенный в дифференциальную составляющую фильтр низких частот, для устранения дифференцирования шумов измерения.
+// Фильтр шума- дискретное апериодическое звено первого порядка.
+// Переключение режимов управления РУЧНОЙ / АВТОМАТ.
+// Безударный переход из ручного режима в автоматический.
+// Безударный переход из автоматического режима в ручной.
+// Принудительное обнуление интегратора интегральной составляющей при Ki=0.
+// Принудительное обнуление интегратора дифференциальной составляющей при Kd=0.
+// Численное интегрирование методом прямоугольников.
+// Нет ни одной операции деления.
+// Протестировано на PLC SIEMENS SIMATIC S7-300 в блоке OB35 (Ts=0,1c).
+
+// Известные недостатки ПИД- регулятора.
+//
+// При переходе из автоматического режима в ручной безударный переход отсутствует, если не подвязать через внешний тег переменную выхода MV к входу MANUAL.
+// Безударный переход работает только если Ki не равен нолю.
+// Необходимо следить, чтобы верхняя граница зоны нечувствительности была больше или равна нижней.
+// Необходимо следить, чтобы верхняя граница амплитудного ограничителя была больше нижней.
+// Необходимо следить, чтобы коэффициент Kdf был больше ноля.
+// Необходимо помнить, что коэффициент Kdf обратно пропорционален постоянной времени фильтра.
+// Прямоугольный интегратор имеет меньшую точность, чем трапецеидальный.
+// Арифметика с плавающей точкой работает медленнее целочисленной.
+// Точность вычислений не контролируется.
+// Необходимо следить при наладке, чтобы не было слишком малых измеренных значений и интегральной составляющей при большом выходном сигнале.
+// Иначе интегрирование может остановиться и за того, что мы пытаемся прибавить очень маленькое число к очень большому, а точность типа данных не позволяет это сделать.
+// ПИ- закон регулирования с апериодическим объектом управления по определе-нию не может безошибочно «отрабатывать» линейно нарастающий сигнал задания.
+// Сигналы SP и PV нужно ограничивать вне регулятора,
+// диаппазоны ограничения для SP и PV должны быть одинаковыми,
+// если этого не сделать то будут проблемы в автоматическом режиме работы при активной работе амплитудного ограничителя,
+// например SP=90% PV=110% ожидаем MV=0%, но при изменении PV возрастает MV хотя должно быть MV=0%.
+
+//Структура регулятора:
+//
+// Ошибка регулирования.
+//      +---+
+//      |   |
+// SP-&gt;-|+  |
+//      |   |-&gt;-ER
+// PV-&gt;-|-  |
+//      |   |
+//      +---+
+//
+// Зона нечувствительности к ошибке.
+//          ERMAX
+//      +-----------+
+//      |           |
+//      |       /   |
+//      |      /    |
+//      |      |    |
+// ER-&gt;-|   +--+    |-&gt;-ER
+//      |   |       |
+//      |  /        |
+//      | /         |
+//      |           |
+//      +-----------+
+//          ERMIN
+//
+// Пропорциональная составляющая.
+//      +---+
+//      |   |
+// ER-&gt;-|   |
+//      | * |-&gt;-Ppart
+// Kp-&gt;-|   |
+//      |   |
+//      +---+
+//
+// Интегральная составляющая.
+//      +---+   +----------+
+//      |   |   |          |
+// ER-&gt;-|   |   |  Z * Ts  |
+//      | * |-&gt;-| -------- |-&gt;-Ipart
+// Kp-&gt;-|   |   |  Z - 1   |
+//      |   |   |          |
+//      +---+   +----------+
+//
+// Дифференциальная составляющая.
+//                        +---+
+//                        |   |
+//      +---+       Kdf-&gt;-|   |
+//      |   |     +---+   |   |
+// ER-&gt;-|   |     |   |   | * |----------------+--&gt;-Dpart
+//      | * |---&gt;-|+  |   |   |                |
+// Kd-&gt;-|   |     |   |-&gt;-|   |                |
+//      |   | +-&gt;-|-  |   |   | +----------+   |
+//      +---+ |   |   |   +---+ |          |   |
+//            |   +---+         |  Z * Ts  |   |
+//            +-----------------| -------- |-&lt;-+
+//                              |  Z - 1   |
+//                              |          |
+//                              +----------+
+//
+// Сигнал управления.
+//         +---+
+//         |   |
+// Ppart-&gt;-|+  |
+//         |   |
+// Ipart-&gt;-|+  |-&gt;-Auto
+//         |   |
+// Dpart-&gt;-|+  |
+//         |   |
+//         +---+
+//
+// Переключение режима работы "Ручной / Автоматический".
+//          +-----+
+//          |     |
+// Auto---&gt;-|-+   |
+//          |  \  |
+//          |   +-|-&gt;-Sw
+//          |     |
+// Manual-&gt;-|-+   |
+//          |     |
+//          +-----+
+//             |
+// OnMan--&gt;----+
+//
+// Амплитудный ограничитель.
+//          MVMAX
+//      +-----------+
+//      |           |
+//      |       +-- |
+//      |      /    |
+// Sw-&gt;-|     /     |-&gt;-MV
+//      |    /      |
+//      | --+       |
+//      |           |
+//      +-----------+
+//          MVMIN
+
+
+// Реакция разомкнутого контура регулятора на единичное спупечатое воздействие по каналу управления.
+//
+// ^ ER
+// |
+// 1************ ER(t) = 1
+// |            
+// 0---1---2---3---&gt; t[s]
+//
+// ^ Ppart
+// |
+// |************ Ppart(t) = Kp * ER
+// |            
+// |            
+// |            
+// 0---1---2---3---&gt; t[s]
+//
+// ^ Ipart
+// |
+// 3           * Ipart(t) = Ki * t
+// |         *  
+// 2       *    
+// |     *      
+// 1   *        
+// | *          
+// 0---1---2---3---&gt; t[s]
+//
+// ^ Dpart
+// |
+// 1*            Dpart(t) = Kd * (0 - exp(-(t/Tf)))
+// | *          
+// |  *        
+// |    *       
+// |      *     
+// 0---------***---&gt; t[s]
+//
+// ^ MV
+// |
+// |                               *
+// |                             *
+// |                           *
+// |                         *
+// |                       *
+// |                     *
+// |*                  *
+// | *               *
+// |  *            *
+// |    *        *
+// |      *    *
+// |        **
+// |
+// |
+// 0------------------------------------&gt; t[s]
+
+// Интерфейс пользователя SCADA, HMI.
+//
+// Шрифт: Arial 12pt
+// Цвет фона: R212 G208 B200
+// Цвет тени: R169 G169 B169
+// Цвет "Заданное значение"  : R0 G0 B255
+// Цвет "Измеренное значение": R0 G176 B80
+// Цвет "Сигнал управления"  : R255 G0 B0
+//
+// +------------------------------------------------------+---+
+// | 1PIRCA1 ПИД Регулятор давления воды.                 | X |
+// +------------------------------------------------------+---+
+// | +-------+ +--------------------------------------------+ |
+// | | 10.00 | | Заданное значение           0...10 [Bar] B | |
+// | +-------+ +--------------------------------------------+ |
+// | +-------+ +--------------------------------------------+ |
+// | | 10.01 | | Измеренное значение         0...10 [Bar] G | |
+// | +-------+ +--------------------------------------------+ |
+// | +-------+ +--------------------------------------------+ |
+// | |  50.0 | | Сигнал управления           0...100 [Hz] R | |
+// | +-------+ +--------------------------------------------+ |
+// | +---------+ +--------+ +------+ +--------+ +-----------+ |
+// | | АВТОМАТ | | РУЧНОЙ | | СТОП | | ТРЕНДЫ | | НАСТРОЙКИ | |
+// | +---------+ +--------+ +------+ +--------+ +-----------+ |
+// | Код ошибки: 0 (OK).                                      |
+// +----------------------------------------------------------+
+//
+// +-------------------------------------------+---+
+// | 1PIRCA1 Тренды.                           | X |
+// +-------------------------------------------+---+
+// | Заданное значение   [Bar] B                   |
+// | Измеренное значение [Bar] G                   |
+// | Сигнал управления   [Hz ] R                   |
+// |   ^                                           |
+// |   |                                           |
+// |100+                                           |
+// |   |                                           |
+// |   |            **********************         |
+// |   |           *                               |
+// |   |          *                                |
+// | 50+    +----*------------------------         |
+// |   |    |   *  +++++++++++++++++++++++         |
+// |   |    |  *  +                                |
+// |   |    | *  +                                 |
+// |   |    |*  +                                  |
+// |   +----+----+----+----+----+----+----+-&gt; t[s] |
+// |   0   10   20   30   40   50   60   70        |
+// +-----------------------------------------------+
+//
+// +-------------------------------------------+---+
+// | 1PIRCA1 Настройки ПИД регулятора.         | X |
+// +-------------------------------------------+---+
+// | +-------+ +---------------------------------+ |
+// | | 0.001 | | Kp                              | |
+// | +-------+ +---------------------------------+ |
+// | +-------+ +---------------------------------+ |
+// | | 0.001 | | Ki                              | |
+// | +-------+ +---------------------------------+ |
+// | +-------+ +---------------------------------+ |
+// | |   0.0 | | Kd                              | |
+// | +-------+ +---------------------------------+ |
+// | +-------+ +---------------------------------+ |
+// | | 1.000 | | Kdf                             | |
+// | +-------+ +---------------------------------+ |
+// | +-------+ +---------------------------------+ |
+// | | 0.001 | | ERMAX                           | |
+// | +-------+ +---------------------------------+ |
+// | +-------+ +---------------------------------+ |
+// | |-0.001 | | ERMIN                           | |
+// | +-------+ +---------------------------------+ |
+// | +-------+ +---------------------------------+ |
+// | | 100.0 | | MVMAX                           | |
+// | +-------+ +---------------------------------+ |
+// | +-------+ +---------------------------------+ |
+// | |   0.0 | | MVMIN                           | |
+// | +-------+ +---------------------------------+ |
+// +-----------------------------------------------+
+
+// Пересчет коэффициентов регулятора "CONT_C" 
+// в коэффициенты ПИД- регулятора MATLAB SIMULINK PID Controller.
+//
+// Передаточная функция регулятора SIMATIC FB 41 "CONT_C":
+//
+//         LMN(s)                   1      (TD / TM_LAG) * s
+// W(s) = -------- = GAIN * (1 + ------ + -------------------)
+//          ER(s)                TI * s      TM_LAG * s + 1
+//
+// Единицы измерения.
+// ER(s) = SP_INT(s) - PV_IN(s). 0...100[%]
+// TI,TD,TM_LAG [s].
+// Итого получаем формулы для пересчета настроек:
+// P = Kp  = GAIN
+// I = Ki  = GAIN / TI
+// D = Kd  = (TD / TM_LAG) * GAIN
+// N = Kdf = 1 / TM_LAG
+// Так же необходимо учесть что данные настройки актуальны
+// только для диаппазонов входного и выходного сигнала 0...100[%].
+// Время необходимо привести в секунды.
+
+//  +---------+
+//  | GNU GPL |
+//  +---------+
+//  |
+//  |
+//  .= .-_-. =.
+// ((_/)o o(\_))
+//  `-'(. .)`-'
+//  |/| \_/ |\
+//  ( |     | )
+//  /"\_____/"\
+//  \__)   (__/
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// License: GNU GPL v2
+//
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>d5cfed98-e7c2-48c0-af40-6a736e01bfe1</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="LIB_PLC">
+          <Object Name="FbPIDcontrol" ObjectId="d5cfed98-e7c2-48c0-af40-6a736e01bfe1" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>
