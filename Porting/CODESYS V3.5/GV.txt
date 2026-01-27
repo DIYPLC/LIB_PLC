@@ -1,0 +1,135 @@
+{attribute 'qualified_only'}
+VAR_GLOBAL
+
+//CT-121F SLOT 1 Digital input
+Di0_0 AT %IX0.0 :BOOL := FALSE; //Digital input.
+Di0_1 AT %IX0.1 :BOOL := FALSE; //Digital input.
+Di0_2 AT %IX0.2 :BOOL := FALSE; //Digital input.
+Di0_3 AT %IX0.3 :BOOL := FALSE; //Digital input.
+Di0_4 AT %IX0.4 :BOOL := FALSE; //Digital input.
+Di0_5 AT %IX0.5 :BOOL := FALSE; //Digital input.
+Di0_6 AT %IX0.6 :BOOL := FALSE; //Digital input.
+Di0_7 AT %IX0.7 :BOOL := FALSE; //Digital input.
+Di1_0 AT %IX1.0 :BOOL := FALSE; //Digital input.
+Di1_1 AT %IX1.1 :BOOL := FALSE; //Digital input.
+Di1_2 AT %IX1.2 :BOOL := FALSE; //Digital input.
+Di1_3 AT %IX1.3 :BOOL := FALSE; //Digital input.
+Di1_4 AT %IX1.4 :BOOL := FALSE; //Digital input.
+Di1_5 AT %IX1.5 :BOOL := FALSE; //Digital input.
+Di1_6 AT %IX1.6 :BOOL := FALSE; //Digital input.
+Di1_7 AT %IX1.7 :BOOL := FALSE; //Digital input.
+
+//CT-222F SLOT 2 Digital output
+Do0_0 AT %QX0.0 :BOOL := FALSE; //Digital output.
+Do0_1 AT %QX0.1 :BOOL := FALSE; //Digital output.
+Do0_2 AT %QX0.2 :BOOL := FALSE; //Digital output.
+Do0_3 AT %QX0.3 :BOOL := FALSE; //Digital output.
+Do0_4 AT %QX0.4 :BOOL := FALSE; //Digital output.
+Do0_5 AT %QX0.5 :BOOL := FALSE; //Digital output.
+Do0_6 AT %QX0.6 :BOOL := FALSE; //Digital output.
+Do0_7 AT %QX0.7 :BOOL := FALSE; //Digital output.
+Do1_0 AT %QX1.0 :BOOL := FALSE; //Digital output.
+Do1_1 AT %QX1.1 :BOOL := FALSE; //Digital output.
+Do1_2 AT %QX1.2 :BOOL := FALSE; //Digital output.
+Do1_3 AT %QX1.3 :BOOL := FALSE; //Digital output.
+Do1_4 AT %QX1.4 :BOOL := FALSE; //Digital output.
+Do1_5 AT %QX1.5 :BOOL := FALSE; //Digital output.
+Do1_6 AT %QX1.6 :BOOL := FALSE; //Digital output.
+Do1_7 AT %QX1.7 :BOOL := FALSE; //Digital output.
+
+//CT-3238 SLOT 3 Analog input
+Ai1 AT %IW1 :INT := 0; //Analog input
+Ai2 AT %IW2 :INT := 0; //Analog input
+Ai3 AT %IW3 :INT := 0; //Analog input
+Ai4 AT %IW4 :INT := 0; //Analog input
+Ai5 AT %IW5 :INT := 0; //Analog input
+Ai6 AT %IW6 :INT := 0; //Analog input
+Ai7 AT %IW7 :INT := 0; //Analog input
+Ai8 AT %IW8 :INT := 0; //Analog input
+
+//CT-4234 SLOT 4 Analog output
+Ao1 AT %QW1 :INT := 0; //Analog output
+Ao2 AT %QW2 :INT := 0; //Analog output
+Ao3 AT %QW3 :INT := 0; //Analog output
+Ao4 AT %QW4 :INT := 0; //Analog output
+
+//MODBUS TCP SERVER IP=192.168.0.15 TCP=502 MODBUS_ADR=1
+MB_TCP_SL1_HR0 AT %QW5 :WORD := 0; //Ethernet Network
+MB_TCP_SL1_HR1 AT %QW6 :WORD := 0; //Ethernet Network
+MB_TCP_SL1_HR2 AT %QW7 :WORD := 0; //Ethernet Network
+MB_TCP_SL1_HR3 AT %QW8 :WORD := 0; //Ethernet Network
+MB_TCP_SL1_HR4 AT %QW9 :WORD := 0; //Ethernet Network
+MB_TCP_SL1_HR5 AT %QW10 :WORD := 0; //Ethernet Network
+MB_TCP_SL1_HR6 AT %QW11 :WORD := 0; //Ethernet Network
+MB_TCP_SL1_HR7 AT %QW12 :WORD := 0; //Ethernet Network
+MB_TCP_SL1_HR8 AT %QW13 :WORD := 0; //Ethernet Network
+MB_TCP_SL1_HR9 AT %QW14 :WORD := 0; //Ethernet Network
+
+//MODBUS TCP CLIENT IP=192.168.0.15 TCP=502 MODBUS_ADR=1
+MB_TCP_MA1_HR0 AT %IW10 :WORD := 0; //Ethernet Network
+MB_TCP_MA1_HR1 AT %IW11 :WORD := 0; //Ethernet Network
+MB_TCP_MA1_HR2 AT %IW12 :WORD := 0; //Ethernet Network
+MB_TCP_MA1_HR3 AT %IW13 :WORD := 0; //Ethernet Network
+MB_TCP_MA1_HR4 AT %QW17 :WORD := 0; //Ethernet Network
+MB_TCP_MA1_HR5 AT %QW18 :WORD := 0; //Ethernet Network
+MB_TCP_MA1_HR6 AT %QW19 :WORD := 0; //Ethernet Network
+MB_TCP_MA1_HR7 AT %QW20 :WORD := 0; //Ethernet Network
+
+//MODBUS RTU SLAVE COM2 9600bod 8N1 MODBUS_ADR=1
+MB_RTU_SL1_HR0 AT %QW17 :WORD := 0; //RS485 Network
+MB_RTU_SL1_HR1 AT %QW18 :WORD := 0; //RS485 Network
+MB_RTU_SL1_HR2 AT %QW19 :WORD := 0; //RS485 Network
+MB_RTU_SL1_HR3 AT %QW20 :WORD := 0; //RS485 Network
+MB_RTU_SL1_HR4 AT %QW21 :WORD := 0; //RS485 Network
+MB_RTU_SL1_HR5 AT %QW22 :WORD := 0; //RS485 Network
+MB_RTU_SL1_HR6 AT %QW23 :WORD := 0; //RS485 Network
+MB_RTU_SL1_HR7 AT %QW24 :WORD := 0; //RS485 Network
+MB_RTU_SL1_HR8 AT %QW25 :WORD := 0; //RS485 Network
+MB_RTU_SL1_HR9 AT %QW26 :WORD := 0; //RS485 Network
+
+//MODBUS RTU MASTER COM1 9600bod 8N1 MODBUS_ADR=1
+MB_RTU_MA1_HR0 AT %IW14 :WORD := 0; //RS485 Network
+MB_RTU_MA1_HR1 AT %IW15 :WORD := 0; //RS485 Network
+MB_RTU_MA1_HR2 AT %IW16 :WORD := 0; //RS485 Network
+MB_RTU_MA1_HR3 AT %IW17 :WORD := 0; //RS485 Network
+MB_RTU_MA1_HR29 AT %QW33 :WORD := 0; //RS485 Network
+MB_RTU_MA1_HR30 AT %QW34 :WORD := 0; //RS485 Network
+MB_RTU_MA1_HR31 AT %QW35 :WORD := 0; //RS485 Network
+MB_RTU_MA1_HR32 AT %QW36 :WORD := 0; //RS485 Network
+
+//System.
+Reset :BOOL := TRUE; //Сброс при перезагрузке.
+Ts_ms :DINT := 100; //PLC_PRG Шаг дискретизации по времени [мс].
+Ts :REAL := 0.1; //PLC_PRG Шаг дискретизации по времени в секундах.
+Uptime_ms :DINT := 0; //Время в работе [мс].
+Version :STRING := 'v5.0 06-jan-2024'; //Версия и дата последней правки.
+
+//RTC аппаратно не поддерживается на данном ПЛК!
+//Year        :UINT := 0; //Текущее время- Год 20xx.
+//Month       :UINT := 0; //Текущее время- Месяц 1...12.
+//Day         :UINT := 0; //Текущее время- День 1...31.
+//Hour        :UINT := 0; //Текущее время- Час 0...23.
+//Minute      :UINT := 0; //Текущее время- Минута 0...59.
+//Second      :UINT := 0; //Текущее время- Секунда 0...59.
+//Millisecond :UINT := 0; //Текущее время- Миллисекунды 0...999.
+
+//For debug.
+DebugBool      :BOOL  := FALSE; // Debug 1 bit.
+DebugByte      :BYTE  := 0; // Debug 8 bit.
+DebugSint      :SINT  := 0; // Debug 8 bit.
+DebugUsint     :USINT := 0; // Debug 8 bit.
+DebugWord      :WORD  := 0; // Debug 16 bit.
+DebugInt       :INT   := 0; // Debug 16 bit.
+DebugUint      :UINT  := 0; // Debug 16 bit.
+DebugDword     :DWORD := 0; // Debug 32 bit.
+DebugDint      :DINT  := 0; // Debug 32 bit.
+DebugUdint     :UDINT := 0; // Debug 32 bit.
+DebugLint      :LINT  := 0; // Debug 64 bit.
+DebugUlint     :ULINT := 0; // Debug 64 bit.
+DebugReal      :REAL  := 0; // Debug 32 bit IEEE 754.
+DebugLreal     :LREAL := 0; // Debug 64 bit IEEE 754.
+DebugBitArray  :ARRAY [0..7] OF BOOL; // Debug 1 bit.
+DebugRealArray :ARRAY [0..7] OF REAL; // Debug 32 bit IEEE 754.
+DebugString :STRING := 'DIY.PLC.314@gmail.com'; //
+
+END_VAR

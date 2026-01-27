@@ -1,0 +1,144 @@
+FUNCTION_BLOCK Fb1PC1
+
+VAR_INPUT
+ADC_Pressure      :WORD := 0    ; //Датчик давления 0...27648[АЦП].
+Ts_ms             :DINT := 100  ; //Шаг дискретизации по времени [мс].
+Reset             :BOOL := FALSE; //Сброс при перезагрузке.
+END_VAR
+
+VAR_OUTPUT
+DAC_Frequency :WORD := 0    ; //Частотный привод: Сигнал задания частоты 0...27648[ЦАП].
+END_VAR
+
+VAR
+Ts :REAL := 0.1; //Шаг дискретизации по времени [с].
+DbRealTo2Word : FbRealTo2Word;
+Db2WordToReal : Fb2WordToReal;
+DbDriverAi420_PV : FbDriverAi420;
+DbPIDcontrol1 : FbPIDcontrol;
+DbDriverAo420_MV : FbDriverAo420;
+END_VAR
+
+IF (Reset) THEN //MODBUS <- RETAIN
+DbRealTo2Word.In := GVP.Fb1PC1_SP       ;
+DbRealTo2Word()                         ;
+GV.MB_TCP_SL1_HR0 := DbRealTo2Word.OutLo;
+GV.MB_TCP_SL1_HR1 := DbRealTo2Word.OutHi;
+
+DbRealTo2Word.In := GVP.Fb1PC1_PV       ;
+DbRealTo2Word()                         ;
+GV.MB_TCP_SL1_HR2 := DbRealTo2Word.OutLo;
+GV.MB_TCP_SL1_HR3 := DbRealTo2Word.OutHi;
+
+DbRealTo2Word.In := GVP.Fb1PC1_MV       ;
+DbRealTo2Word()                         ;
+GV.MB_TCP_SL1_HR4 := DbRealTo2Word.OutLo;
+GV.MB_TCP_SL1_HR5 := DbRealTo2Word.OutHi;
+
+GV.MB_TCP_SL1_HR6 := GVP.Fb1PC1_CW; 
+END_IF;
+
+//Шаг дискретизации по времени [с].
+Ts := DINT_TO_REAL(Ts_ms) * 0.001;
+
+//Датчик давления 4...20[мА] -> 0...10[Бар].
+//            DbDriverAi420
+//    +---------------------------+
+//    |       FbDriverAi420       |
+// ->-|ADC               SensValue|->-
+//   -|SensMax             Current|-
+//   -|SensMin               Error|-
+//   -|ErrValue                   |
+//   -|SimValue                   |
+//   -|SimOn                      |
+//    +---------------------------+
+DbDriverAi420_PV.ADC      := ADC_Pressure              ; //АЦП Сигнал от датчика 0...27648.
+DbDriverAi420_PV.SensMax  := 10.0                     ; //Диаппазон датчика максимум.
+DbDriverAi420_PV.SensMin  := 0.0                       ; //Диаппазон датчика минимум.
+DbDriverAi420_PV.ErrValue := 0.0                       ; //Значение для SensorValue при ошибке датчика.
+DbDriverAi420_PV.SimValue := 0.0                       ; //Значение для SensorValue при симуляции.
+DbDriverAi420_PV.SimOn    := FALSE                     ; //Включить симуляцию.
+DbDriverAi420_PV()                                     ; //Драйвер аналогово входа 4...20мА.
+GVP.Fb1PC1_PV             := DbDriverAi420_PV.SensValue; //Выход в единицах датчика.
+//                        := DbDriverAi420_PV.Current  ; //Ток на аналоговом входе 4...20мА.
+//                        := DbDriverAi420_PV.Error    ; //Ошибка аналогово входа или датчика.
+
+// PV MODBUS <- RETAIN
+DbRealTo2Word.In := GVP.Fb1PC1_PV       ;
+DbRealTo2Word()                         ;
+GV.MB_TCP_SL1_HR2 := DbRealTo2Word.OutLo;
+GV.MB_TCP_SL1_HR3 := DbRealTo2Word.OutHi;
+
+// SP RETAIN <- MODBUS
+Db2WordToReal.InLo := GV.MB_TCP_SL1_HR0 ;
+Db2WordToReal.InHi := GV.MB_TCP_SL1_HR1 ;
+Db2WordToReal()                         ;
+GVP.Fb1PC1_SP       := Db2WordToReal.Out;
+
+// MV RETAIN <- MODBUS
+Db2WordToReal.InLo := GV.MB_TCP_SL1_HR4;
+Db2WordToReal.InHi := GV.MB_TCP_SL1_HR5;
+Db2WordToReal()                        ;
+GVP.Fb1PC1_MV := Db2WordToReal.Out     ;
+
+// CW RETAIN <- MODBUS
+GVP.Fb1PC1_CW := GV.MB_TCP_SL1_HR6;
+
+//Стабилизация давления жидкости 0...10[Бар] -> 0...50[Гц].
+//                       DbPIDcontrol
+//                  +--------------------+
+//                  |    FbPIDcontrol    |
+//  GVP.Fb1PC1_PV->-|PV                MV|->- GVP.Fb1PC1_MV
+//  GVP.Fb1PC1_SP  -|SP                  |
+//                 -|Kp                  |
+//                 -|Ki                  |
+//                 -|Kd                  |
+//                 -|Kdf                 |
+//                 -|ERMAX               |
+//                 -|ERMIN               |
+//                 -|MVMAX               |
+//                 -|MVMIN               |
+//                 -|Ts                  |
+//   GVP.Fb1PC1_MV -|Manual              |
+//                 -|OnMan               |
+//                  +--------------------+
+DbPIDcontrol1.PV     := GVP.Fb1PC1_PV   ; //Измеренное значение регулируемого параметра.
+DbPIDcontrol1.SP     := GVP.Fb1PC1_SP   ; //Заданное значение регулируемого параметра.
+DbPIDcontrol1.Kp     := GVP.Fb1PC1_Kp   ; //Коэффициент усиления пропорциональный.
+DbPIDcontrol1.Ki     := GVP.Fb1PC1_Ki   ; //Коэффициент усиления интегральный.
+DbPIDcontrol1.Kd     := GVP.Fb1PC1_Kd   ; //Коэффициент усиления дифференциальный.
+DbPIDcontrol1.Kdf    := GVP.Fb1PC1_Kdf  ; //Коэффициент фильтрации дифференциальный Kdf=1/Tdf.
+DbPIDcontrol1.ERMAX  := GVP.Fb1PC1_ERMAX; //Зона нечувствительности к ошибке регулирования, максимум.
+DbPIDcontrol1.ERMIN  := GVP.Fb1PC1_ERMIN; //Зона нечувствительности к ошибке регулирования, минимум.
+DbPIDcontrol1.MVMAX  := GVP.Fb1PC1_MVMAX; //Максимальное значение сигнала управления.
+DbPIDcontrol1.MVMIN  := GVP.Fb1PC1_MVMIN; //Минимальное значение сигнала управления.
+DbPIDcontrol1.Ts     := Ts              ; //Шаг дискретизации по времени в секундах.
+DbPIDcontrol1.Manual := GVP.Fb1PC1_MV   ; //Сигнал управления в ручном режиме работы.
+DbPIDcontrol1.OnMan  := GVP.Fb1PC1_CW<>0; //Включить ручной режим работы регулятора.
+DbPIDcontrol1()                         ; //ПИД-регулятор.
+GVP.Fb1PC1_MV        := DbPIDcontrol1.MV; //Сигнал управления на исполнительный механизм.
+
+// MV MODBUS <- RETAIN
+DbRealTo2Word.In := GVP.Fb1PC1_MV       ;
+DbRealTo2Word()                         ;
+GV.MB_TCP_SL1_HR4 := DbRealTo2Word.OutLo;
+GV.MB_TCP_SL1_HR5 := DbRealTo2Word.OutHi;
+
+//Задание частоты на привод 0...50[Гц] 4...20[мА].
+//          DbDriverAo420
+//    +-----------------------+
+//    |     FbDriverAo420     |
+// ->-|In                  DAC|->-
+//   -|InMax           Current|-
+//   -|InMin                  |
+//   -|SimValue               |
+//   -|SimOn                  |
+//    +-----------------------+
+DbDriverAo420_MV.In       := GVP.Fb1PC1_MV           ; //Вход сигнала на исполнительный механизм.
+DbDriverAo420_MV.InMax    := 50.0                    ; //Исполнительный механизм максимум.
+DbDriverAo420_MV.InMin    := 0.0                     ; //Исполнительный механизм минимум.
+DbDriverAo420_MV.SimValue := 0.0                     ; //Значение для исполнительного механизма при симуляции.
+DbDriverAo420_MV.SimOn    := FALSE                   ; //Включить симуляцию.
+DbDriverAo420_MV()                                   ; //Драйвер аналогово выхода 4...20мА.
+DAC_Frequency             := DbDriverAo420_MV.DAC    ; //ЦАП Сигнал на исполнительный механизм 0...27648.
+//                        := DbDriverAo420_MV.Current; //Ток на аналоговом выходе 4...20мА.

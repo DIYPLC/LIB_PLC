@@ -1,0 +1,26 @@
+PROGRAM PLC_PRG
+
+VAR
+DbTask100ms : FbTask100ms;
+DbTaskCFC : FbTaskCFC;
+DbSampleTime : FbSampleTime;
+END_VAR
+
+DbSampleTime.Reset := GV.Reset;
+DbSampleTime();
+GV.Ts_ms := DbSampleTime.Ts_ms; //TODO UDINT
+GV.Ts :=  DbSampleTime.Ts;
+
+GV.Uptime_ms := GV.Uptime_ms + 100;
+
+DbTask100ms.Ts_ms := GV.Ts_ms;
+DbTask100ms.Reset := GV.Reset;
+DbTask100ms();
+
+DbTaskCFC.Ts_ms := GV.Ts_ms;
+DbTaskCFC.Reset := GV.Reset;
+DbTaskCFC();
+
+IF (GV.Reset) THEN
+GV.Reset := FALSE;
+END_IF

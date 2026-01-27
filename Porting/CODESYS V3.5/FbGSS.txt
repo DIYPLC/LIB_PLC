@@ -1,0 +1,99 @@
+FUNCTION_BLOCK FbGSS //Генератор сигналов и псевдослучайных чисел.
+
+VAR_INPUT //Входные переменные, сохраняемые.
+Amplitude :REAL := 1.0;  //Амплитуда выходного сигнала.
+Period    :REAL := 10.0; //Период выходного сигнала [с].
+Phase     :REAL := 0.0;  //Фаза выходного сигнала [рад].
+Offset    :REAL := 0.0;  //Постоянная составляющая выходного сигнала.
+PulseTime :REAL := 5.0;  //Время импульса [с].
+Ts        :REAL := 0.1;  //Шаг дискретизации по времени [с].
+END_VAR
+
+VAR_OUTPUT //Выходные переменные, сохраняемые.
+Sine       :REAL:=0.0;   //Синусоидальный сигнал.
+Cosine     :REAL:=0.0;   //Косинусоидальный сигнал.
+RectangleR :REAL:=0.0;   //Прямоугольный сигнал вещественный.
+RectangleB :BOOL:=FALSE; //Прямоугольный сигнал булевый.
+Triangle   :REAL:=0.0;   //Треугольный, линейно нарастающий и убывающий сигнал.
+Prnd       :REAL:=0.0;   //Псевдослучайные числа в диапазоне 0...1.
+END_VAR
+
+VAR //Внутренние переменные, сохраняемые.
+CurrentTime        :REAL := 0.0; //Текущее время расчета [с].
+IntegratorTriangle :REAL := 0.0; //Интегратор для треугольных импульсов.
+SummatorRnd        :DINT := 1;   //Сумматор для псевдослучайных чисел.
+END_VAR
+
+VAR_TEMP //Временные переменные, несохраняемые.
+Tmp :DWORD; //Временная переменная для псевдослучайных чисел.
+END_VAR
+
+VAR CONSTANT //Константы.
+PI :REAL := 3.14159265358979323846; //Число Пи.
+END_VAR
+
+//             DbGSS
+//     +--------------------+
+//     |       FbGSS        |
+//    -|Amplitude       Sine|->-
+//    -|Period        Cosine|->-
+//    -|Phase     RectangleR|->-
+//    -|Offset    RectangleB|->-
+//    -|PulseTime   Triangle|->-
+//    -|Ts              Prnd|->-
+//     +--------------------+
+
+Sine   := Amplitude*SIN(2*PI*(1.0/Period)*CurrentTime+Phase) + Offset; //Синус.
+Cosine := Amplitude*COS(2*PI*(1.0/Period)*CurrentTime+Phase) + Offset; //Косинус.
+
+IF (CurrentTime < PulseTime) THEN //Прямоугольные импульсы.
+RectangleR := Amplitude + Offset;
+RectangleB := TRUE;
+ELSE
+RectangleR := Offset;
+RectangleB := FALSE;
+END_IF;
+
+IF (CurrentTime <= (Period * 0.5)) THEN //Треугольные импульсы.
+IntegratorTriangle := IntegratorTriangle + Ts;
+ELSE
+IntegratorTriangle := IntegratorTriangle - Ts;
+END_IF;
+IF (Period <> 0.0) THEN
+Triangle := (((IntegratorTriangle*2.0)/Period)*Amplitude) + Offset;
+END_IF;
+
+//Псевдослучайные числа линейный конгруэнтный метод.
+SummatorRnd := SummatorRnd * 1103515245 + 12345;
+//принудительно отбрасывающей младшие 16 и один старший разряд.
+Tmp := DINT_TO_DWORD(SummatorRnd) AND 2#01111111111111110000000000000000;
+//Арифметический сдвиг вправо на 16бит.
+Tmp := SHR(Tmp, 16);
+//Масштабирование 0...32767 -> 0...1
+Prnd := (DINT_TO_REAL(DWORD_TO_DINT(Tmp))/32767.0)*Amplitude+Offset;
+
+CurrentTime := CurrentTime+Ts; //Формирование периода.
+IF (CurrentTime >= Period) THEN
+CurrentTime := 0.0;
+IntegratorTriangle := 0.0;
+END_IF;
+
+//  +---------+
+//  | GNU GPL |
+//  +---------+
+//  |
+//  |
+//  .= .-_-. =.
+// ((_/)o o(\_))
+//  `-'(. .)`-'
+//  |/| \_/ |\
+//  ( |     | )
+//  /"\_____/"\
+//  \__)   (__/
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// License: GNU GPL v2
+//
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC

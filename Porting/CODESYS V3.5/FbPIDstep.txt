@@ -1,0 +1,313 @@
+FUNCTION_BLOCK FbPIDstep //ПИД- регулятор с двумя дискретными выходами.
+
+VAR_INPUT
+PV       :REAL := 0.0  ; //Измеренное значение регулируемого параметра 0...100[%].
+SP       :REAL := 0.0  ; //Заданное значение регулируемого параметра 0...100[%].
+COM_RST  :BOOL := FALSE; //Полная перезагрузка.
+LMNR_HS  :BOOL := FALSE; //Датчик обранной связи клапан открыт.
+LMNR_LS  :BOOL := FALSE; //Датчик обранной связи клапан закрыт.
+LMNS_ON  :BOOL := FALSE; //Включить ружной режим управления.
+LMNUP    :BOOL := FALSE; //Команда открыть в ручном режиме. 
+LMNDN    :BOOL := FALSE; //Команда закрыть в ручном режиме. 
+GAIN     :REAL := 2.0  ; //Пропорциональное усиление ошибки регулирования.
+TI       :REAL := 20.0 ; //Время интегрирования [с].
+DEADB_W  :REAL := 0.5  ; //Зона нечувствительности к ошибке регулирования [%].
+PULSE_TM :REAL := 1.0  ; //Минимальное время выходного импульса [с].
+BREAK_TM :REAL := 1.0  ; //Минимально время между выходными импульсами [с].
+MTR_TM   :REAL := 55.0 ; //Время открытия исполнительного механизма с 0 до 100 [с].
+DISV     :REAL := 0.0  ; //Возмущающее воздействие к ошибке регулирования [%].
+CYCLE    :REAL := 0.1  ; //Шаг дискретизации по времени [с].
+END_VAR
+
+VAR_OUTPUT
+QLMNUP :BOOL :=  FALSE; //Открыть задвижку.
+QLMNDN :BOOL :=  FALSE; //Закрыть задвижку.
+END_VAR
+
+VAR
+ER          :REAL := 0.0  ; //Ошибка регулирования [%].
+LMNRS_ON    :BOOL := FALSE; //
+LMNRSVAL    :REAL := 0.0  ; //
+LMNR_SIM    :REAL := 0.0  ; //
+sFbPVal     :REAL := 0.0  ; //Меняется во время регулирования.
+sThrOn      :REAL := 0.0  ; //Иногда меняется во время регулирования (похоже на адаптивный гистерезис).
+siImpAus    :INT  := 0    ; //-100...0...+100
+stImpDauer  :REAL := 0.0  ; //
+stPausDauer :REAL := 0.0  ; //
+END_VAR
+
+VAR_TEMP
+Hvar     :REAL ; //вспомогательная переменная
+ErKp     :REAL ; //вспомогательная переменная
+rTi      :REAL ; //время интегрирования в real !!! не удалять !!!
+AdapIn1  :REAL ; //Eingang 1 der Adaption der Ansprechschwelle
+AdapIn2  :REAL ; //Eingang 2 der Adaption der Ansprechschwelle
+iImpEin  :INT  ; //Eingang des Impulsformers
+rThrOff  :REAL ; //Abschaltschwelle
+dInteg   :REAL ; //Eingang des Integrierers in der Rьckfьhrung
+dThrStIn :REAL ; //three - step element input
+LmnrSim  :REAL ; //simulierte Stellungsrьckmeldung
+END_VAR
+
+//             DbPIDstep
+//    +-------------------------+
+//    |        FbPIDstep        |
+// ->-|PV                 QLMNUP|->-
+//   -|SP                 QLMNDN|->-
+//   -|COM_RST                  |
+//   -|LMNR_HS                  |
+//   -|LMNR_LS                  |
+//   -|LMNS_ON                  |
+//   -|LMNUP                    |
+//   -|LMNDN                    |
+//   -|GAIN                     |
+//   -|TI                       |
+//   -|DEADB_W                  |
+//   -|PULSE_TM                 |
+//   -|BREAK_TM                 |
+//   -|MTR_TM                   |
+//   -|DISV                     |
+//   -|CYCLE                    |
+//    +-------------------------+
+
+IF COM_RST
+THEN 
+    LMNR_SIM    := LMNRSVAL;
+    QLMNUP      := 0       ;
+    QLMNDN      := 0       ;
+    PV          := 0.0     ;
+    ER          := 0.0     ;
+    LMNRS_ON    := 0       ;
+    LMNRSVAL    := 0.0     ;
+    LMNR_SIM    := 0.0     ;
+    sFbPVal     := 0.0     ;
+    sThrOn      := 0.0     ;
+    siImpAus    := 0       ;
+    stImpDauer  := 0.0     ;
+    stPausDauer := 0.0     ;
+ELSE
+    ErKp := SP - PV;
+    IF    ErKp < ( -DEADB_W) THEN  ER := ErKp + DEADB_W;
+    ELSIF ErKp > DEADB_W      THEN  ER := ErKp - DEADB_W;
+    ELSE  ER := 0.0; END_IF;
+    ErKp := ER * GAIN;
+    rTi := TI;
+    IF rTi < CYCLE * 0.5 THEN rTi := CYCLE * 0.5; END_IF; 
+    Hvar := rTi - ABS(0.01 * ErKp * MTR_TM);
+    IF Hvar < (rTi * 0.1)THEN rTi := rTi * 0.1; ELSE rTi := Hvar; END_IF;
+    IF LMNS_ON 
+    THEN 
+        sFbPVal := 0.0;
+    ELSE  
+        IF siImpAus <> 0 
+        THEN  
+            dInteg := DINT_TO_REAL(INT_TO_DINT(siImpAus)) * CYCLE / MTR_TM;
+        ELSE 
+            IF (ErKp > 0.0 AND LMNR_HS) OR (ErKp < 0.0 AND LMNR_LS) OR (TI = 0.0)
+            THEN 
+                dInteg := 0.0;
+            ELSE    
+                dInteg  := (-ErKp) * CYCLE / rTi;
+            END_IF;
+        END_IF;
+        sFbPVal := sFbPVal + dInteg;
+        IF TI = 0.0
+        THEN  
+            IF    sFbPVal > 100.0 THEN sFbPVal := 100.0;
+            ELSIF sFbPVal < 0.0   THEN sFbPVal := 0.0;
+            END_IF;
+        END_IF;
+    END_IF;
+    dThrStIn := ErKp - sFbPVal + DISV;
+    AdapIn1 := ErKp;
+    AdapIn2 := sFbPVal;
+    rThrOff := 55.0 / MTR_TM * CYCLE;
+    IF PULSE_TM > CYCLE
+    THEN
+    Hvar := PULSE_TM;
+    ELSE
+    Hvar := CYCLE;
+    END_IF;
+    Hvar := 100.0 * Hvar / MTR_TM;
+    IF NOT(LMNR_HS OR LMNR_LS)
+    THEN
+        IF NOT (QLMNUP OR QLMNDN)
+        THEN
+            IF TI <> 0.0
+            THEN
+                IF ABS(AdapIn1) < ABS(AdapIn2)
+                THEN
+                    sThrOn := AdapIn1;
+                ELSE
+                    sThrOn := AdapIn2; 
+                END_IF;
+            ELSE
+                IF PV = 0.0
+                THEN
+                    sThrOn := Hvar;
+                ELSE 
+                    sThrOn := ABS(ErKp) * 0.5;
+                END_IF;
+            END_IF;
+            IF sThrOn > 10.0 THEN sThrOn := 10.0; END_IF;
+            IF sThrOn < Hvar THEN sThrOn := Hvar; END_IF;
+        END_IF;
+    ELSE
+        sThrOn := Hvar;
+    END_IF;
+    IF (siImpAus = 100 AND dThrStIn > rThrOff) OR (dThrStIn >= sThrOn)             THEN iImpEin := 100;
+    ELSIF (siImpAus = -100 AND dThrStIn < ( -rThrOff)) OR (dThrStIn <= ( -sThrOn)) THEN iImpEin := -100;
+    ELSE                                                                                iImpEin := 0;
+    END_IF;
+    IF LMNS_ON
+    THEN
+        IF LMNUP XOR LMNDN
+        THEN
+            IF LMNUP
+            THEN
+                iImpEin := 100;
+            ELSE
+                iImpEin := -100;
+            END_IF;
+        ELSE
+            iImpEin := 0;
+        END_IF;
+    END_IF;
+    IF (iImpEin = 100 AND LMNR_HS) OR (iImpEin = -100 AND LMNR_LS) THEN iImpEin := 0; END_IF;
+    IF (siImpAus = -100 AND iImpEin = 100) OR (siImpAus = 100 AND iImpEin = -100)THEN iImpEin := 0; END_IF;
+    IF siImpAus <> iImpEin
+    THEN
+        IF iImpEin = 0
+        THEN
+            IF stImpDauer <= 0.0
+            THEN 
+                siImpAus := 0;
+                stPausDauer := BREAK_TM;
+            END_IF;
+        ELSE
+            siImpAus := iImpEin;
+            stImpDauer := PULSE_TM;
+        END_IF;
+    END_IF;
+    IF stImpDauer > 0.0
+    THEN
+    stImpDauer := stImpDauer - CYCLE;
+    ELSE
+    stImpDauer := 0.0;
+    END_IF;
+    IF stPausDauer > 0.0
+    THEN
+    stPausDauer := stPausDauer - CYCLE;
+    ELSE
+    stPausDauer := 0.0;
+    END_IF;
+    IF ((siImpAus = 100) AND LMNR_HS) OR ((siImpAus = -100) AND LMNR_LS)
+    THEN 
+      siImpAus := 0;
+      stImpDauer := 0.0;
+    END_IF;
+    IF NOT LMNRS_ON
+    THEN
+        LmnrSim := LMNRSVAL;
+    ELSE
+        LmnrSim := DINT_TO_REAL(INT_TO_DINT(siImpAus)) * CYCLE / MTR_TM + LMNR_SIM;
+        IF LmnrSim >= 100.0
+        THEN
+            LmnrSim := 100.0;
+        ELSIF  LmnrSim <= 0.0
+        THEN
+            LmnrSim := 0.0;
+        END_IF;
+    END_IF;
+    LMNR_SIM := LmnrSim;
+    IF siImpAus = 0
+    THEN
+        QLMNUP := 0;
+        QLMNDN := 0;
+    ELSIF siImpAus = 100
+    THEN 
+        QLMNUP := 1;
+        QLMNDN := 0;
+    ELSE 
+        QLMNUP := 0;
+        QLMNDN := 1;
+    END_IF;
+END_IF;
+
+// src CONT_S FB42
+// reversed by komatic
+// cross platforms by VA
+//https://web.archive.org/web/20220322202418/http://plc4good.org.ua/view_post.php?id=65
+//https://github.com/komatic1/SCL_regulation_control/blob/main/CONT_S.scl
+
+(*
+Добавлен: 1exan    Дата: 2020-04-26
+
+В этом месте есть отличия от TCONT и там похоже реализация более правильная:
+Здесь:
+IF iImpEin=0
+THEN
+IF stImpDauer<=T#0MS
+THEN
+siImpAus:=0;
+stPausDauer:=BREAK_TM;
+END_IF;
+ELSE
+siImpAus:=iImpEin;
+stImpDauer:=PULSE_TM;
+END_IF;
+В TCONT:
+IF iImpEin = 0 THEN
+IF stImpDauer <= 0.0 THEN
+siImpAus := 0 ; stPausDauer := BREAK_TM ;
+END_IF ;
+ELSIF stPausDauer <= 0.0 THEN
+siImpAus := iImpEin ; stImpDauer := PULSE_TM ; END_IF ;
+
+Добавлен: 1exan    Дата: 2020-04-26
+
+Конкретно вот эта строка:
+ELSIF stPausDauer <= 0.0 (или T#0s) THEN
+должна быть вместо простого
+ELSE
+
+Добавлен: Roman    Дата: 2021-12-02
+
+Правильные строки:
+sThrOn:=ABS(AdapIn1);
+sThrOn:=ABS(AdapIn2);
+
+IF iImpEin=0
+THEN
+IF stImpDauer<=T#0MS
+THEN
+siImpAus:=0;
+stPausDauer:=BREAK_TM;
+END_IF;
+ELSE IF stPausDauer<=T#0MS
+THEN
+siImpAus:=iImpEin;
+stImpDauer:=PULSE_TM;
+END_IF; END_IF;
+
+*)
+
+//  +---------+
+//  | GNU GPL |
+//  +---------+
+//  |
+//  |
+//  .= .-_-. =.
+// ((_/)o o(\_))
+//  `-'(. .)`-'
+//  |/| \_/ |\
+//  ( |     | )
+//  /"\_____/"\
+//  \__)   (__/
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// License: GNU GPL v2
+//
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC

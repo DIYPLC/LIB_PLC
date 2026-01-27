@@ -1,0 +1,49 @@
+FUNCTION_BLOCK FbRealTo2Word //float32 -> uint16 + uint16
+
+VAR_INPUT
+In :REAL := 0; //In
+END_VAR
+
+VAR_OUTPUT
+OutLo :WORD := 0; //Out Lo
+OutHi :WORD := 0; //Out Hi
+END_VAR
+
+VAR
+REAL_IN :REAL := 0.0; //
+DWORD_IN :DWORD := 0; //
+PtReal : POINTER TO REAL; //
+PtDword : POINTER TO DWORD; //
+END_VAR
+
+//MODBUS DATA TYPE CONVERTER
+REAL_IN := In;
+
+PtDword := ADR(DWORD_IN);
+PtReal := ADR(REAL_IN);
+PtDword := PtReal;
+
+DWORD_IN := PtDword^;
+
+OutLo := DWORD_TO_WORD(DWORD_IN AND 16#0000FFFF);
+OutHi := DWORD_TO_WORD(SHR(DWORD_IN,16) AND 16#0000FFFF);
+
+//  +---------+
+//  | GNU GPL |
+//  +---------+
+//  |
+//  |
+//  .= .-_-. =.
+// ((_/)o o(\_))
+//  `-'(. .)`-'
+//  |/| \_/ |\
+//  ( |     | )
+//  /"\_____/"\
+//  \__)   (__/
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// License: GNU GPL v2
+//
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC

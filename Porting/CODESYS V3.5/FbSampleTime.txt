@@ -1,0 +1,48 @@
+FUNCTION_BLOCK FbSampleTime
+VAR_INPUT //Входные переменные, сохраняемые.
+Reset       :BOOL := FALSE; //Сброс при перезагрузке.
+END_VAR
+
+VAR_OUTPUT //Выходные переменные, сохраняемые.
+Ts_ms     :DINT := 0    ; //Шаг дискретизации по времени [мс].
+Ts        :REAL := 0.0  ; //Шаг дискретизации по времени [с].
+Ts_max    :DINT := 0    ; //Максимальное время скана [мс].
+Uptime_ms :DINT := 0; //Время в работе [мс].
+END_VAR
+
+VAR //Внутренние переменные, сохраняемые.
+Time_ms_current :DWORD := 0; //
+Time_ms_previous :DWORD := 0; //
+END_VAR
+
+//Запомнить предидущее время.
+Time_ms_previous := Time_ms_current;
+
+//millis()
+Time_ms_current := TIME_TO_DWORD(TIME());
+
+//Инициализируем время при перезагрузке.
+IF (Reset) THEN
+Time_ms_previous := Time_ms_current;
+Ts_max := 0;
+END_IF
+
+//Время скана не может быть больше 1000ms
+//Защита на случай если ПЛК переведут в стоп на длительное время.
+//Защита от внезапной корректировки времени RTC.
+//Защита от неверных входных данных.
+Ts_ms := DWORD_TO_DINT(Time_ms_current - Time_ms_previous);
+IF ((Ts_ms >= 1000) OR (Ts_ms < 0)) THEN
+Ts_ms := 0;
+END_IF;
+
+//Шаг дискретизации по времени [с].
+Ts := DINT_TO_REAL(Ts_ms) * 0.001;
+
+//Максимальное время скана [мс].
+IF (Ts_ms >= Ts_max) THEN
+Ts_max := Ts_ms;
+END_IF;
+
+//Время в работе [мс].
+Uptime_ms := Uptime_ms + Ts_ms;

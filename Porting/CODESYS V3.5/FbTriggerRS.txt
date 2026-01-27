@@ -1,0 +1,49 @@
+FUNCTION_BLOCK FbTriggerRS //RS- Триггер с приоритетом на сброс.
+
+VAR_INPUT //Входные переменные, сохраняемые.
+Set :BOOL := FALSE; //Set — установить единицу.
+Rst :BOOL := FALSE; //Reset — сбросить на ноль.
+END_VAR
+
+VAR_OUTPUT //Выходные переменные, сохраняемые.
+Out :BOOL := FALSE; //Выход триггера.
+END_VAR
+
+//       DbTriggerRS
+//     +-------------+
+//     | FbTriggerRS |
+//  ->-|S           Q|->-
+//  ->-|R            |
+//     +-------------+
+
+//RS- Триггер.
+Out := (Out OR Set) AND (NOT(Rst));
+
+//   Релейная интерпритация. 
+//  |                       |
+//  |  Rst     Set     Out  |
+//  +--|/|--+--| |--+--( )--+
+//  |       |       |       |
+//  |       |  Out  |       |
+//  |       +--| |--+       |
+//  |                       |
+
+//  +---------+
+//  | GNU GPL |
+//  +---------+
+//  |
+//  |
+//  .= .-_-. =.
+// ((_/)o o(\_))
+//  `-'(. .)`-'
+//  |/| \_/ |\
+//  ( |     | )
+//  /"\_____/"\
+//  \__)   (__/
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// License: GNU GPL v2
+//
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC

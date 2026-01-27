@@ -1,0 +1,44 @@
+FUNCTION_BLOCK FbEdgePos //Детектор нарастающего фронта.
+
+VAR_INPUT //Входные переменные, сохраняемые.
+In :BOOL := FALSE; //Вход.
+END_VAR
+
+VAR_OUTPUT //Выходные переменные, сохраняемые.
+Out :BOOL := FALSE; //Выход.
+END_VAR
+
+VAR //Внутренние переменные, сохраняемые.
+In_previos :BOOL := FALSE; //Предыдущее состояние входа.
+END_VAR
+
+//       DbEdgePos
+//     +-----------+
+//     | FbEdgePos |
+//  ->-|In      Out|->-
+//     +-----------+
+
+//Детектор нарастающего фронта.
+Out := In AND NOT(In_previos);
+//Запомнить предыдущее состояние входа.
+In_previos := In;
+
+//  +---------+
+//  | GNU GPL |
+//  +---------+
+//  |
+//  |
+//  .= .-_-. =.
+// ((_/)o o(\_))
+//  `-'(. .)`-'
+//  |/| \_/ |\
+//  ( |     | )
+//  /"\_____/"\
+//  \__)   (__/
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// License: GNU GPL v2
+//
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC

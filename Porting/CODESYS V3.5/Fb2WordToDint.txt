@@ -1,0 +1,45 @@
+FUNCTION_BLOCK Fb2WordToDint //uint16 + uint16 -> int32
+
+VAR_INPUT
+InLo :WORD := 0; //In Lo
+InHi :WORD := 0; //In Hi
+END_VAR
+
+VAR_OUTPUT
+Out :DINT := 0; //Out
+END_VAR
+
+VAR
+DWORD_LO :DWORD := 0; //
+DWORD_HI :DWORD := 0; //
+DWORD_OUT :DWORD := 0; //
+END_VAR
+
+//MODBUS DATA TYPE CONVERTER
+DWORD_LO := WORD_TO_DWORD(InLo) AND 16#0000FFFF;
+
+DWORD_HI := WORD_TO_DWORD(InHi) AND 16#0000FFFF;
+DWORD_HI := SHL(DWORD_HI,16) AND 16#FFFF0000;
+
+DWORD_OUT := DWORD_HI OR DWORD_LO;
+Out := DWORD_TO_DINT(DWORD_OUT);
+
+//  +---------+
+//  | GNU GPL |
+//  +---------+
+//  |
+//  |
+//  .= .-_-. =.
+// ((_/)o o(\_))
+//  `-'(. .)`-'
+//  |/| \_/ |\
+//  ( |     | )
+//  /"\_____/"\
+//  \__)   (__/
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// License: GNU GPL v2
+//
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC
