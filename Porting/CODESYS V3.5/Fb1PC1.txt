@@ -20,22 +20,22 @@ DbDriverAo420_MV : FbDriverAo420;
 END_VAR
 
 IF (Reset) THEN //MODBUS <- RETAIN
-DbRealTo2Word.In := GVP.Fb1PC1_SP       ;
+DbRealTo2Word.In := GVR.Fb1PC1_SP       ;
 DbRealTo2Word()                         ;
 GV.MB_TCP_SL1_HR0 := DbRealTo2Word.OutLo;
 GV.MB_TCP_SL1_HR1 := DbRealTo2Word.OutHi;
 
-DbRealTo2Word.In := GVP.Fb1PC1_PV       ;
+DbRealTo2Word.In := GVR.Fb1PC1_PV       ;
 DbRealTo2Word()                         ;
 GV.MB_TCP_SL1_HR2 := DbRealTo2Word.OutLo;
 GV.MB_TCP_SL1_HR3 := DbRealTo2Word.OutHi;
 
-DbRealTo2Word.In := GVP.Fb1PC1_MV       ;
+DbRealTo2Word.In := GVR.Fb1PC1_MV       ;
 DbRealTo2Word()                         ;
 GV.MB_TCP_SL1_HR4 := DbRealTo2Word.OutLo;
 GV.MB_TCP_SL1_HR5 := DbRealTo2Word.OutHi;
 
-GV.MB_TCP_SL1_HR6 := GVP.Fb1PC1_CW; 
+GV.MB_TCP_SL1_HR6 := GVR.Fb1PC1_CW; 
 END_IF;
 
 //Шаг дискретизации по времени [с].
@@ -59,12 +59,12 @@ DbDriverAi420_PV.ErrValue := 0.0                       ; //Значение дл
 DbDriverAi420_PV.SimValue := 0.0                       ; //Значение для SensorValue при симуляции.
 DbDriverAi420_PV.SimOn    := FALSE                     ; //Включить симуляцию.
 DbDriverAi420_PV()                                     ; //Драйвер аналогово входа 4...20мА.
-GVP.Fb1PC1_PV             := DbDriverAi420_PV.SensValue; //Выход в единицах датчика.
+GVR.Fb1PC1_PV             := DbDriverAi420_PV.SensValue; //Выход в единицах датчика.
 //                        := DbDriverAi420_PV.Current  ; //Ток на аналоговом входе 4...20мА.
 //                        := DbDriverAi420_PV.Error    ; //Ошибка аналогово входа или датчика.
 
 // PV MODBUS <- RETAIN
-DbRealTo2Word.In := GVP.Fb1PC1_PV       ;
+DbRealTo2Word.In := GVR.Fb1PC1_PV       ;
 DbRealTo2Word()                         ;
 GV.MB_TCP_SL1_HR2 := DbRealTo2Word.OutLo;
 GV.MB_TCP_SL1_HR3 := DbRealTo2Word.OutHi;
@@ -73,16 +73,16 @@ GV.MB_TCP_SL1_HR3 := DbRealTo2Word.OutHi;
 Db2WordToReal.InLo := GV.MB_TCP_SL1_HR0 ;
 Db2WordToReal.InHi := GV.MB_TCP_SL1_HR1 ;
 Db2WordToReal()                         ;
-GVP.Fb1PC1_SP       := Db2WordToReal.Out;
+GVR.Fb1PC1_SP       := Db2WordToReal.Out;
 
 // MV RETAIN <- MODBUS
 Db2WordToReal.InLo := GV.MB_TCP_SL1_HR4;
 Db2WordToReal.InHi := GV.MB_TCP_SL1_HR5;
 Db2WordToReal()                        ;
-GVP.Fb1PC1_MV := Db2WordToReal.Out     ;
+GVR.Fb1PC1_MV := Db2WordToReal.Out     ;
 
 // CW RETAIN <- MODBUS
-GVP.Fb1PC1_CW := GV.MB_TCP_SL1_HR6;
+GVR.Fb1PC1_CW := GV.MB_TCP_SL1_HR6;
 
 //Стабилизация давления жидкости 0...10[Бар] -> 0...50[Гц].
 //                       DbPIDcontrol
@@ -102,24 +102,24 @@ GVP.Fb1PC1_CW := GV.MB_TCP_SL1_HR6;
 //   GVP.Fb1PC1_MV -|Manual              |
 //                 -|OnMan               |
 //                  +--------------------+
-DbPIDcontrol1.PV     := GVP.Fb1PC1_PV   ; //Измеренное значение регулируемого параметра.
-DbPIDcontrol1.SP     := GVP.Fb1PC1_SP   ; //Заданное значение регулируемого параметра.
-DbPIDcontrol1.Kp     := GVP.Fb1PC1_Kp   ; //Коэффициент усиления пропорциональный.
-DbPIDcontrol1.Ki     := GVP.Fb1PC1_Ki   ; //Коэффициент усиления интегральный.
-DbPIDcontrol1.Kd     := GVP.Fb1PC1_Kd   ; //Коэффициент усиления дифференциальный.
-DbPIDcontrol1.Kdf    := GVP.Fb1PC1_Kdf  ; //Коэффициент фильтрации дифференциальный Kdf=1/Tdf.
-DbPIDcontrol1.ERMAX  := GVP.Fb1PC1_ERMAX; //Зона нечувствительности к ошибке регулирования, максимум.
-DbPIDcontrol1.ERMIN  := GVP.Fb1PC1_ERMIN; //Зона нечувствительности к ошибке регулирования, минимум.
-DbPIDcontrol1.MVMAX  := GVP.Fb1PC1_MVMAX; //Максимальное значение сигнала управления.
-DbPIDcontrol1.MVMIN  := GVP.Fb1PC1_MVMIN; //Минимальное значение сигнала управления.
+DbPIDcontrol1.PV     := GVR.Fb1PC1_PV   ; //Измеренное значение регулируемого параметра.
+DbPIDcontrol1.SP     := GVR.Fb1PC1_SP   ; //Заданное значение регулируемого параметра.
+DbPIDcontrol1.Kp     := GVR.Fb1PC1_Kp   ; //Коэффициент усиления пропорциональный.
+DbPIDcontrol1.Ki     := GVR.Fb1PC1_Ki   ; //Коэффициент усиления интегральный.
+DbPIDcontrol1.Kd     := GVR.Fb1PC1_Kd   ; //Коэффициент усиления дифференциальный.
+DbPIDcontrol1.Kdf    := GVR.Fb1PC1_Kdf  ; //Коэффициент фильтрации дифференциальный Kdf=1/Tdf.
+DbPIDcontrol1.ERMAX  := GVR.Fb1PC1_ERMAX; //Зона нечувствительности к ошибке регулирования, максимум.
+DbPIDcontrol1.ERMIN  := GVR.Fb1PC1_ERMIN; //Зона нечувствительности к ошибке регулирования, минимум.
+DbPIDcontrol1.MVMAX  := GVR.Fb1PC1_MVMAX; //Максимальное значение сигнала управления.
+DbPIDcontrol1.MVMIN  := GVR.Fb1PC1_MVMIN; //Минимальное значение сигнала управления.
 DbPIDcontrol1.Ts     := Ts              ; //Шаг дискретизации по времени в секундах.
-DbPIDcontrol1.Manual := GVP.Fb1PC1_MV   ; //Сигнал управления в ручном режиме работы.
-DbPIDcontrol1.OnMan  := GVP.Fb1PC1_CW<>0; //Включить ручной режим работы регулятора.
+DbPIDcontrol1.Manual := GVR.Fb1PC1_MV   ; //Сигнал управления в ручном режиме работы.
+DbPIDcontrol1.OnMan  := GVR.Fb1PC1_CW<>0; //Включить ручной режим работы регулятора.
 DbPIDcontrol1()                         ; //ПИД-регулятор.
-GVP.Fb1PC1_MV        := DbPIDcontrol1.MV; //Сигнал управления на исполнительный механизм.
+GVR.Fb1PC1_MV        := DbPIDcontrol1.MV; //Сигнал управления на исполнительный механизм.
 
 // MV MODBUS <- RETAIN
-DbRealTo2Word.In := GVP.Fb1PC1_MV       ;
+DbRealTo2Word.In := GVR.Fb1PC1_MV       ;
 DbRealTo2Word()                         ;
 GV.MB_TCP_SL1_HR4 := DbRealTo2Word.OutLo;
 GV.MB_TCP_SL1_HR5 := DbRealTo2Word.OutHi;
@@ -134,7 +134,7 @@ GV.MB_TCP_SL1_HR5 := DbRealTo2Word.OutHi;
 //   -|SimValue               |
 //   -|SimOn                  |
 //    +-----------------------+
-DbDriverAo420_MV.In       := GVP.Fb1PC1_MV           ; //Вход сигнала на исполнительный механизм.
+DbDriverAo420_MV.In       := GVR.Fb1PC1_MV           ; //Вход сигнала на исполнительный механизм.
 DbDriverAo420_MV.InMax    := 50.0                    ; //Исполнительный механизм максимум.
 DbDriverAo420_MV.InMin    := 0.0                     ; //Исполнительный механизм минимум.
 DbDriverAo420_MV.SimValue := 0.0                     ; //Значение для исполнительного механизма при симуляции.
