@@ -6,7 +6,7 @@
  *** Name: FbPIDcontrol
  *** Description: ПИД-регулятор.
  *** Version:
- ***     1.1: 2026-03-06/VA - LIB_PLC -
+ ***     3.6: 2026-03-06/VA - LIB_PLC -
  *************************************************************************/
 
 #include "FbPIDcontrol_fbt.h"
