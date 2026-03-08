@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType Name="FbBlink" Comment="Мигающий светодиод.">
+	<Identification Standard="61499-1" Description="Мигающий светодиод.&#10;Simple FB with one algorithm">
+	</Identification>
+	<VersionInfo Organization="LIB_PLC" Version="1.2" Author="VA" Date="2026-03-08">
+	</VersionInfo>
+	<CompilerInfo>
+	</CompilerInfo>
+	<InterfaceList>
+		<EventInputs>
+			<Event Name="REQ" Type="Event" Comment="Normal Execution Request">
+				<With Var="TimeOn"/>
+				<With Var="TimeOff"/>
+				<With Var="Ts_ms"/>
+				<With Var="Reset"/>
+			</Event>
+		</EventInputs>
+		<EventOutputs>
+			<Event Name="CNF" Type="Event" Comment="Execution Confirmation">
+				<With Var="BlinkLamp"/>
+			</Event>
+		</EventOutputs>
+		<InputVars>
+			<VarDeclaration Name="TimeOn" Type="UDINT" Comment="Время включения лампочки [мс]." InitialValue="2000"/>
+			<VarDeclaration Name="TimeOff" Type="UDINT" Comment="Время выключения лампочки [мс]." InitialValue="2000"/>
+			<VarDeclaration Name="Ts_ms" Type="UDINT" Comment="Шаг дискретизации по времени [мс]." InitialValue="100"/>
+			<VarDeclaration Name="Reset" Type="BOOL" Comment="Сброс при перезагрузке." InitialValue="FALSE"/>
+		</InputVars>
+		<OutputVars>
+			<VarDeclaration Name="BlinkLamp" Type="BOOL" Comment="Мигающая лампочка." InitialValue="FALSE"/>
+		</OutputVars>
+	</InterfaceList>
+	<SimpleFB>
+		<InternalVars>
+			<VarDeclaration Name="Timer1" Type="UDINT" Comment="Таймер1 [мс]." InitialValue="0"/>
+			<VarDeclaration Name="State1" Type="UINT" Comment="Граф состояний." InitialValue="0"/>
+		</InternalVars>
+		<InternalConstVars>
+			<VarDeclaration Name="STATE_RESET" Type="UINT" Comment="Сброс при перезагрузке." InitialValue="0"/>
+			<VarDeclaration Name="STATE_ON" Type="UINT" Comment="Включить лампочку на заданное время." InitialValue="1"/>
+			<VarDeclaration Name="STATE_OFF" Type="UINT" Comment="Выключить лампочку на заданное время." InitialValue="2"/>
+		</InternalConstVars>
+		<ECState Name="REQ">
+			<ECAction Algorithm="REQ" Output="CNF"/>
+		</ECState>
+		<Algorithm Name="REQ">
+			<ST><![CDATA[ALGORITHM REQ
+IF (Reset) THEN // Сброс при перезагрузке.
+	State1 := STATE_RESET;
+END_IF;
+
+CASE (State1) OF // Граф состояний.
+	STATE_RESET : // Сброс.
+		BlinkLamp := FALSE;
+		Timer1 := 0;
+		State1 := STATE_ON;
+
+	STATE_ON : // Включить лампочку на заданное время.
+		BlinkLamp := TRUE;
+		Timer1 := Timer1 + Ts_ms;
+		IF (Timer1 >= TimeOn) THEN
+			State1 := STATE_OFF;
+			Timer1 := 0;
+		END_IF;
+
+	STATE_OFF : // Выключить лампочку на заданное время.
+		BlinkLamp := FALSE;
+		Timer1 := Timer1 + Ts_ms;
+		IF (Timer1 >= TimeOff) THEN
+			State1 := STATE_ON;
+			Timer1 := 0;
+		END_IF;
+
+	ELSE // RESET при неопределенном состоянии.
+		State1 := STATE_RESET;
+END_CASE; // CASE (State1) OF
+END_ALGORITHM
+
+]]></ST>
+		</Algorithm>
+	</SimpleFB>
+	<Attribute Name="Documentation" Type="CDATA"><![CDATA[<pre>
+// Мигающий светодиод.
+//            DbBlink 
+//    +---------------------+
+//    |       FbBlink       |
+//   -|TimeOn      BlinkLamp|-&gt;-
+//   -|TimeOff              |
+//   -|Ts_ms                |
+//   -|Reset                |
+//    +---------------------+
+
+// Пример построения универсального кроссплатформенного графа состояний.
+// Использую этот код как заготовку под более сложные алгоритмы.
+// Данный алгоритм гораздо быстрее разрабатывать чем конечный автомат с памятью.
+
+// Граф состояний.
+//
+//            |
+//           -+- Reset
+//            |
+//            V
+//  +-------------------+
+//  | State1 =          |
+//  | STATE_RESET       |
+//  | BlinkLamp = 0     |
+//  +-------------------+
+//            |
+//            |
+//            |
+//            |
+//            V
+//  +-------------------+
+//  | State1 =          |
+//  | STATE_ON          |&lt;--------------+
+//  | BlinkLamp = 1     |               |
+//  +-------------------+               |
+//            |                         |
+//            |                         |
+//           -+- Timer1 &gt;= TimeOn      -+- Timer1 &gt;= TimeOff
+//            |                         |
+//            V                         |
+//  +-------------------+               |
+//  | State1 =          |               |
+//  | STATE_OFF         |---------------+
+//  | BlinkLamp = 0     |
+//  +-------------------+
+
+</pre>
+]]></Attribute>
+</FBType>
