@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType Name="FbPIDstep" Comment="ПИД-регулятор с двумя дискретными выходами.">
+	<Identification Standard="61499-1" Description="ПИД-регулятор с двумя дискретными выходами.&#10;Simple FB with one algorithm">
+	</Identification>
+	<VersionInfo Organization="LIB_PLC" Version="1.8" Author="VA" Date="2026-03-13">
+	</VersionInfo>
+	<CompilerInfo>
+	</CompilerInfo>
+	<InterfaceList>
+		<EventInputs>
+			<Event Name="REQ" Type="Event" Comment="Normal Execution Request">
+				<With Var="PV"/>
+				<With Var="SP"/>
+				<With Var="COM_RST"/>
+				<With Var="LMNR_HS"/>
+				<With Var="LMNR_LS"/>
+				<With Var="LMNS_ON"/>
+				<With Var="LMNUP"/>
+				<With Var="LMNDN"/>
+				<With Var="GAIN"/>
+				<With Var="TI"/>
+				<With Var="DEADB_W"/>
+				<With Var="PULSE_TM"/>
+				<With Var="BREAK_TM"/>
+				<With Var="MTR_TM"/>
+				<With Var="DISV"/>
+				<With Var="CYCLE"/>
+			</Event>
+		</EventInputs>
+		<EventOutputs>
+			<Event Name="CNF" Type="Event" Comment="Execution Confirmation">
+				<With Var="QLMNUP"/>
+				<With Var="QLMNDN"/>
+			</Event>
+		</EventOutputs>
+		<InputVars>
+			<VarDeclaration Name="PV" Type="REAL" Comment="Измеренное значение регулируемого параметра 0...100[%]." InitialValue="0.0"/>
+			<VarDeclaration Name="SP" Type="REAL" Comment="Заданное значение регулируемого параметра 0...100[%]." InitialValue="0.0"/>
+			<VarDeclaration Name="COM_RST" Type="BOOL" Comment="Полная перезагрузка." InitialValue="FALSE"/>
+			<VarDeclaration Name="LMNR_HS" Type="BOOL" Comment="Датчик обранной связи клапан открыт." InitialValue="FALSE"/>
+			<VarDeclaration Name="LMNR_LS" Type="BOOL" Comment="Датчик обранной связи клапан закрыт." InitialValue="FALSE"/>
+			<VarDeclaration Name="LMNS_ON" Type="BOOL" Comment="Включить ружной режим управления." InitialValue="FALSE"/>
+			<VarDeclaration Name="LMNUP" Type="BOOL" Comment="Команда открыть в ручном режиме." InitialValue="FALSE"/>
+			<VarDeclaration Name="LMNDN" Type="BOOL" Comment="Команда закрыть в ручном режиме." InitialValue="FALSE"/>
+			<VarDeclaration Name="GAIN" Type="REAL" Comment="Пропорциональное усиление ошибки регулирования." InitialValue="2.0"/>
+			<VarDeclaration Name="TI" Type="REAL" Comment="Время интегрирования [с]." InitialValue="20.0"/>
+			<VarDeclaration Name="DEADB_W" Type="REAL" Comment="Зона нечувствительности к ошибке регулирования [%]." InitialValue="0.5"/>
+			<VarDeclaration Name="PULSE_TM" Type="REAL" Comment="Минимальное время выходного импульса [с]." InitialValue="1.0"/>
+			<VarDeclaration Name="BREAK_TM" Type="REAL" Comment="Минимально время между выходными импульсами [с]." InitialValue="1.0"/>
+			<VarDeclaration Name="MTR_TM" Type="REAL" Comment="Время открытия исполнительного механизма с 0 до 100 [с]." InitialValue="55.0"/>
+			<VarDeclaration Name="DISV" Type="REAL" Comment="Возмущающее воздействие к ошибке регулирования [%]." InitialValue="0.0"/>
+			<VarDeclaration Name="CYCLE" Type="REAL" Comment="Шаг дискретизации по времени [с]." InitialValue="0.1"/>
+		</InputVars>
+		<OutputVars>
+			<VarDeclaration Name="QLMNUP" Type="BOOL" Comment="Открыть задвижку." InitialValue="FALSE"/>
+			<VarDeclaration Name="QLMNDN" Type="BOOL" Comment="Закрыть задвижку." InitialValue="FALSE"/>
+		</OutputVars>
+	</InterfaceList>
+	<SimpleFB>
+		<InternalVars>
+			<VarDeclaration Name="ER" Type="REAL" Comment="Ошибка регулирования [%]." InitialValue="0.0"/>
+			<VarDeclaration Name="LMNRS_ON" Type="BOOL" InitialValue="FALSE"/>
+			<VarDeclaration Name="LMNRSVAL" Type="REAL" InitialValue="0.0"/>
+			<VarDeclaration Name="LMNR_SIM" Type="REAL" InitialValue="0.0"/>
+			<VarDeclaration Name="sFbPVal" Type="REAL" Comment="Меняется во время регулирования." InitialValue="0.0"/>
+			<VarDeclaration Name="sThrOn" Type="REAL" Comment="Иногда меняется во время регулирования (похоже на адаптивный гистерезис)." InitialValue="0.0"/>
+			<VarDeclaration Name="siImpAus" Type="INT" Comment="-100...0...+100" InitialValue="0"/>
+			<VarDeclaration Name="stImpDauer" Type="REAL" InitialValue="0.0"/>
+			<VarDeclaration Name="stPausDauer" Type="REAL" InitialValue="0.0"/>
+			<VarDeclaration Name="Hvar" Type="REAL" Comment="Вспомогательная переменная" InitialValue="0.0"/>
+			<VarDeclaration Name="ErKp" Type="REAL" Comment="Вспомогательная переменная" InitialValue="0.0"/>
+			<VarDeclaration Name="rTi" Type="REAL" Comment="Время интегрирования в real !!! не удалять !!!" InitialValue="0.0"/>
+			<VarDeclaration Name="AdapIn1" Type="REAL" Comment="Eingang 1 der Adaption der Ansprechschwelle" InitialValue="0.0"/>
+			<VarDeclaration Name="AdapIn2" Type="REAL" Comment="Eingang 2 der Adaption der Ansprechschwelle" InitialValue="0.0"/>
+			<VarDeclaration Name="iImpEin" Type="INT" Comment="Eingang des Impulsformers" InitialValue="0"/>
+			<VarDeclaration Name="rThrOff" Type="REAL" Comment="Abschaltschwelle" InitialValue="0.0"/>
+			<VarDeclaration Name="dInteg" Type="REAL" Comment="Eingang des Integrierers in der Rьckfьhrung" InitialValue="0.0"/>
+			<VarDeclaration Name="dThrStIn" Type="REAL" Comment="Three - step element input" InitialValue="0.0"/>
+			<VarDeclaration Name="LmnrSim" Type="REAL" Comment="Simulierte Stellungsrьckmeldung" InitialValue="0.0"/>
+		</InternalVars>
+		<ECState Name="REQ">
+			<ECAction Algorithm="REQ" Output="CNF"/>
+		</ECState>
+		<Algorithm Name="REQ">
+			<ST><![CDATA[ALGORITHM REQ
+IF COM_RST THEN
+	LMNR_SIM := LMNRSVAL;
+	QLMNUP := 0;
+	QLMNDN := 0;
+	ER := 0.0;
+	LMNRS_ON := 0;
+	LMNRSVAL := 0.0;
+	LMNR_SIM := 0.0;
+	sFbPVal := 0.0;
+	sThrOn := 0.0;
+	siImpAus := 0;
+	stImpDauer := 0.0;
+	stPausDauer := 0.0;
+ELSE
+	ErKp := SP - PV;
+	IF    ErKp < (-DEADB_W) THEN
+		ER := ErKp + DEADB_W;
+	ELSIF ErKp > DEADB_W THEN
+		ER := ErKp - DEADB_W;
+	ELSE
+		ER := 0.0;
+	END_IF;
+	ErKp := ER * GAIN;
+	rTi := TI;
+	IF rTi < CYCLE * 0.5 THEN
+		rTi := CYCLE * 0.5;
+	END_IF;
+	Hvar := rTi - ABS(0.01 * ErKp * MTR_TM);
+	IF Hvar < (rTi * 0.1) THEN
+		rTi := rTi * 0.1;
+	ELSE
+		rTi := Hvar;
+	END_IF;
+	IF LMNS_ON THEN
+		sFbPVal := 0.0;
+	ELSE
+		IF siImpAus <> 0 THEN
+			dInteg := INT_TO_REAL(siImpAus) * CYCLE / MTR_TM;
+		ELSE
+			IF (ErKp > 0.0 AND LMNR_HS) OR (ErKp < 0.0 AND LMNR_LS) OR (TI = 0.0) THEN
+				dInteg := 0.0;
+			ELSE
+				dInteg := (-ErKp) * CYCLE / rTi;
+			END_IF;
+		END_IF;
+		sFbPVal := sFbPVal + dInteg;
+		IF TI = 0.0 THEN
+			IF    sFbPVal > 100.0 THEN
+				sFbPVal := 100.0;
+			ELSIF sFbPVal < 0.0 THEN
+				sFbPVal := 0.0;
+			END_IF;
+		END_IF;
+	END_IF;
+	dThrStIn := ErKp - sFbPVal + DISV;
+	AdapIn1 := ErKp;
+	AdapIn2 := sFbPVal;
+	rThrOff := 55.0 / MTR_TM * CYCLE;
+	IF PULSE_TM > CYCLE THEN
+		Hvar := PULSE_TM;
+	ELSE
+		Hvar := CYCLE;
+	END_IF;
+	Hvar := 100.0 * Hvar / MTR_TM;
+	IF NOT (LMNR_HS OR LMNR_LS) THEN
+		IF NOT (QLMNUP OR QLMNDN) THEN
+			IF TI <> 0.0 THEN
+				IF ABS(AdapIn1) < ABS(AdapIn2) THEN
+					sThrOn := AdapIn1;
+				ELSE
+					sThrOn := AdapIn2;
+				END_IF;
+			ELSE
+				IF PV = 0.0 THEN
+					sThrOn := Hvar;
+				ELSE
+					sThrOn := ABS(ErKp) * 0.5;
+				END_IF;
+			END_IF;
+			IF sThrOn > 10.0 THEN
+				sThrOn := 10.0;
+			END_IF;
+			IF sThrOn < Hvar THEN
+				sThrOn := Hvar;
+			END_IF;
+		END_IF;
+	ELSE
+		sThrOn := Hvar;
+	END_IF;
+	IF (siImpAus = 100 AND dThrStIn > rThrOff) OR (dThrStIn >= sThrOn) THEN
+		iImpEin := 100;
+	ELSIF (siImpAus = -100 AND dThrStIn < (-rThrOff)) OR (dThrStIn <= (-sThrOn)) THEN
+		iImpEin := -100;
+	ELSE
+		iImpEin := 0;
+	END_IF;
+	IF LMNS_ON THEN
+		IF LMNUP XOR LMNDN THEN
+			IF LMNUP THEN
+				iImpEin := 100;
+			ELSE
+				iImpEin := -100;
+			END_IF;
+		ELSE
+			iImpEin := 0;
+		END_IF;
+	END_IF;
+	IF (iImpEin = 100 AND LMNR_HS) OR (iImpEin = -100 AND LMNR_LS) THEN
+		iImpEin := 0;
+	END_IF;
+	IF (siImpAus = -100 AND iImpEin = 100) OR (siImpAus = 100 AND iImpEin = -100) THEN
+		iImpEin := 0;
+	END_IF;
+	IF siImpAus <> iImpEin THEN
+		IF iImpEin = 0 THEN
+			IF stImpDauer <= 0.0 THEN
+				siImpAus := 0;
+				stPausDauer := BREAK_TM;
+			END_IF;
+		ELSE
+			siImpAus := iImpEin;
+			stImpDauer := PULSE_TM;
+		END_IF;
+	END_IF;
+	IF stImpDauer > 0.0 THEN
+		stImpDauer := stImpDauer - CYCLE;
+	ELSE
+		stImpDauer := 0.0;
+	END_IF;
+	IF stPausDauer > 0.0 THEN
+		stPausDauer := stPausDauer - CYCLE;
+	ELSE
+		stPausDauer := 0.0;
+	END_IF;
+	IF ((siImpAus = 100) AND LMNR_HS) OR ((siImpAus = -100) AND LMNR_LS) THEN
+		siImpAus := 0;
+		stImpDauer := 0.0;
+	END_IF;
+	IF NOT LMNRS_ON THEN
+		LmnrSim := LMNRSVAL;
+	ELSE
+		LmnrSim := INT_TO_REAL(siImpAus) * CYCLE / MTR_TM + LMNR_SIM;
+		IF LmnrSim >= 100.0 THEN
+			LmnrSim := 100.0;
+		ELSIF  LmnrSim <= 0.0 THEN
+			LmnrSim := 0.0;
+		END_IF;
+	END_IF;
+	LMNR_SIM := LmnrSim;
+	IF siImpAus = 0 THEN
+		QLMNUP := 0;
+		QLMNDN := 0;
+	ELSIF siImpAus = 100 THEN
+		QLMNUP := 1;
+		QLMNDN := 0;
+	ELSE
+		QLMNUP := 0;
+		QLMNDN := 1;
+	END_IF;
+END_IF;
+
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// Date start LIB_PLC: 2014
+// License: GNU GPL-2.0-or-later
+// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+// https://www.youtube.com/watch?v=n1F_MfLRlX0
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC/LIB_PLC
+// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+// https://t.me/DIY_PLC
+END_ALGORITHM
+
+]]></ST>
+		</Algorithm>
+	</SimpleFB>
+	<Attribute Name="Documentation" Type="CDATA"><![CDATA[<pre>
+// ПИД-регулятор с двумя дискретными выходами.
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; DbPIDstep
+// &nbsp; &nbsp;+-------------------------+
+// &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp;FbPIDstep &nbsp; &nbsp; &nbsp; &nbsp;|
+// -&gt;-|PV &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; QLMNUP|-&gt;-
+// &nbsp; -|SP &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; QLMNDN|-&gt;-
+// &nbsp; -|COM_RST &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; -|LMNR_HS &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; -|LMNR_LS &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; -|LMNS_ON &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; -|LMNUP &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; -|LMNDN &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; -|GAIN &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; -|TI &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; -|DEADB_W &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; -|PULSE_TM &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; -|BREAK_TM &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; -|MTR_TM &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; -|DISV &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; -|CYCLE &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp;+-------------------------+</pre>
+
+<pre>
+// src CONT_S FB42
+// reversed by komatic
+// cross platforms by VA
+// https://web.archive.org/web/20220322202418/http://plc4good.org.ua/view_post.php?id=65
+// https://github.com/komatic1/SCL_regulation_control/blob/main/CONT_S.scl
+</pre>
+
+<pre>
+(*
+Добавлен: 1exan &nbsp; &nbsp;Дата: 2020-04-26
+
+В этом месте есть отличия от TCONT и там похоже реализация более правильная:
+Здесь:
+IF iImpEin=0
+THEN
+IF stImpDauer&lt;=T#0MS
+THEN
+siImpAus:=0;
+stPausDauer:=BREAK_TM;
+END_IF;
+ELSE
+siImpAus:=iImpEin;
+stImpDauer:=PULSE_TM;
+END_IF;
+В TCONT:
+IF iImpEin = 0 THEN
+IF stImpDauer &lt;= 0.0 THEN
+siImpAus := 0 ; stPausDauer := BREAK_TM ;
+END_IF ;
+ELSIF stPausDauer &lt;= 0.0 THEN
+siImpAus := iImpEin ; stImpDauer := PULSE_TM ; END_IF ;
+
+Добавлен: 1exan &nbsp; &nbsp;Дата: 2020-04-26
+
+Конкретно вот эта строка:
+ELSIF stPausDauer &lt;= 0.0 (или T#0s) THEN
+должна быть вместо простого
+ELSE
+
+Добавлен: Roman &nbsp; &nbsp;Дата: 2021-12-02
+
+Правильные строки:
+sThrOn:=ABS(AdapIn1);
+sThrOn:=ABS(AdapIn2);
+
+IF iImpEin=0
+THEN
+IF stImpDauer&lt;=T#0MS
+THEN
+siImpAus:=0;
+stPausDauer:=BREAK_TM;
+END_IF;
+ELSE IF stPausDauer&lt;=T#0MS
+THEN
+siImpAus:=iImpEin;
+stImpDauer:=PULSE_TM;
+END_IF; END_IF;
+
+*)
+</pre>
+
+<pre>
+
+&nbsp;</pre>
+]]></Attribute>
+</FBType>

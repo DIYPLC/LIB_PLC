@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType Name="FbScale" Comment="Масштабирование InMin...InMax -&gt; OutMin...OutMax.">
+	<Identification Standard="61499-1" Description="Масштабирование InMin...InMax -&gt; OutMin...OutMax.&#10;Simple FB with one algorithm">
+	</Identification>
+	<VersionInfo Organization="LIB_PLC" Version="2.1" Author="VA" Date="2026-03-13">
+	</VersionInfo>
+	<CompilerInfo>
+	</CompilerInfo>
+	<InterfaceList>
+		<EventInputs>
+			<Event Name="REQ" Type="Event" Comment="Normal Execution Request">
+				<With Var="In"/>
+				<With Var="InMax"/>
+				<With Var="InMin"/>
+				<With Var="OutMax"/>
+				<With Var="OutMin"/>
+			</Event>
+		</EventInputs>
+		<EventOutputs>
+			<Event Name="CNF" Type="Event" Comment="Execution Confirmation">
+				<With Var="Out"/>
+			</Event>
+		</EventOutputs>
+		<InputVars>
+			<VarDeclaration Name="In" Type="REAL" Comment="Вход до масштабирования." InitialValue="0.0"/>
+			<VarDeclaration Name="InMax" Type="REAL" Comment="Максимум входного диапазона." InitialValue="27648.0"/>
+			<VarDeclaration Name="InMin" Type="REAL" Comment="Минимум входного диапазона." InitialValue="0.0"/>
+			<VarDeclaration Name="OutMax" Type="REAL" Comment="Максимум выходного диапазона." InitialValue="20.0"/>
+			<VarDeclaration Name="OutMin" Type="REAL" Comment="Минимум выходного диапазона." InitialValue="4.0"/>
+		</InputVars>
+		<OutputVars>
+			<VarDeclaration Name="Out" Type="REAL" Comment="Выход после масштабирования." InitialValue="0.0"/>
+		</OutputVars>
+	</InterfaceList>
+	<SimpleFB>
+		<ECState Name="REQ">
+			<ECAction Algorithm="REQ" Output="CNF"/>
+		</ECState>
+		<Algorithm Name="REQ">
+			<ST><![CDATA[ALGORITHM REQ
+// Масштабирование сигнала.
+IF (InMax = InMin) THEN // Деление на 0 может остановить процессор.
+// При ошибке исходных данных.
+	Out := 0.0;
+ELSE
+	// Масштабирование.
+	Out := (OutMax - OutMin) * ((In - InMin) / (InMax - InMin)) + OutMin;
+END_IF;
+
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// Date start LIB_PLC: 2014
+// License: GNU GPL-2.0-or-later
+// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+// https://www.youtube.com/watch?v=n1F_MfLRlX0
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC/LIB_PLC
+// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+// https://t.me/DIY_PLC
+END_ALGORITHM
+
+]]></ST>
+		</Algorithm>
+	</SimpleFB>
+	<Attribute Name="Documentation" Type="CDATA"><![CDATA[<pre>
+// Масштабирование InMin...InMax -&gt; OutMin...OutMax.
+// &nbsp; &nbsp; &nbsp; DbScale
+// &nbsp; &nbsp;+-----------+
+// &nbsp; &nbsp;| &nbsp;FbScale &nbsp;|
+// -&gt;-|In &nbsp; &nbsp; &nbsp;Out|-&gt;-
+// &nbsp; -|InMax &nbsp; &nbsp; &nbsp;|
+// &nbsp; -|InMin &nbsp; &nbsp; &nbsp;|
+// &nbsp; -|OutMax &nbsp; &nbsp; |
+// &nbsp; -|OutMin &nbsp; &nbsp; |
+// &nbsp; &nbsp;+-----------+</pre>
+
+<pre>
+// Статическая характеристика.
+//
+// &nbsp; &nbsp; &nbsp; ^ Out
+// &nbsp; &nbsp; &nbsp; |
+// OutMax|&lt;---------------*
+// &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;* |
+// &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;* &nbsp; |
+// &nbsp; &nbsp;Out|&lt;---------* &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp;* | &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp;* &nbsp; | &nbsp; &nbsp; |
+// OutMin|&lt;---* &nbsp; &nbsp; | &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp;| &nbsp; &nbsp; | &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp;| &nbsp; &nbsp; | &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp; +---------------------&gt; In
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;InMin &nbsp;In &nbsp; InMax
+
+// Выход сигнал
+// Out = k * In + b
+//
+// Для расчета k, b надо решить систему двух линейных уравнений с двумя неизвестными.
+// {OutMax = k * InMax + b
+// {OutMin = k * InMin + b
+//
+// Усиление:
+// &nbsp; &nbsp; &nbsp;OutMax - OutMin&nbsp;
+// k = -----------------
+// &nbsp; &nbsp; &nbsp; InMax - InMin &nbsp;
+//
+// Смещение:
+// b = OutMax - k * InMax
+//
+// После подстановки в уравнение Out = k * In + b констант k, b,
+// и сокращения числа арифметических операций до минимума получаем:
+// Out := (OutMax - OutMin) * ((In - InMin)/(InMax - InMin)) + OutMin;
+
+// Данное линейное преобразование на практике легко вывести через промежуточный диаппазон 0...1:
+// InMin...InMax -&gt; 0...(InMax-InMin) -&gt; 0...1 -&gt; 0...(OutMax-OutMin) -&gt; OutMin...OutMax.
+// Пример рассчета давления с датчика &nbsp;4...20мА -&gt; 0...10Бар.
+// 4...20 - &nbsp;4 = 0...16
+// 0...16 / 16 = 0...1
+// 0...1 &nbsp;* 10 = 0...10
+// При токе 12мА
+// 12 &nbsp;- &nbsp; 4 = 8
+// 8 &nbsp; / &nbsp;16 = 0.5
+// 0.5 * &nbsp;10 = 5Бар
+// Давление 5Бар.
+</pre>
+]]></Attribute>
+</FBType>

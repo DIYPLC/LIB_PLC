@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType Name="FbRamp" Comment="Рампа разгона / торможения.">
+	<Identification Standard="61499-1" Description="Рампа разгона / торможения.&#10;Simple FB with one algorithm">
+	</Identification>
+	<VersionInfo Organization="LIB_PLC" Version="3.0" Author="VA" Date="2026-03-13">
+	</VersionInfo>
+	<CompilerInfo>
+	</CompilerInfo>
+	<InterfaceList>
+		<EventInputs>
+			<Event Name="REQ" Type="Event" Comment="Normal Execution Request">
+				<With Var="In"/>
+				<With Var="Scale"/>
+				<With Var="TAcc"/>
+				<With Var="TDec"/>
+				<With Var="Ts"/>
+			</Event>
+		</EventInputs>
+		<EventOutputs>
+			<Event Name="CNF" Type="Event" Comment="Execution Confirmation">
+				<With Var="Out"/>
+			</Event>
+		</EventOutputs>
+		<InputVars>
+			<VarDeclaration Name="In" Type="REAL" Comment="Входной сигнал." InitialValue="0.0"/>
+			<VarDeclaration Name="Scale" Type="REAL" Comment="Диапазон времени разгона и торможения." InitialValue="100.0"/>
+			<VarDeclaration Name="TAcc" Type="REAL" Comment="Время разгона от 0 до Scale [с]." InitialValue="5.0"/>
+			<VarDeclaration Name="TDec" Type="REAL" Comment="Время торможения от Scale до 0 [c]." InitialValue="5.0"/>
+			<VarDeclaration Name="Ts" Type="REAL" Comment="Шаг дискретизации по времени [с]." InitialValue="0.1"/>
+		</InputVars>
+		<OutputVars>
+			<VarDeclaration Name="Out" Type="REAL" Comment="Выходной сигнал." InitialValue="0.0"/>
+		</OutputVars>
+	</InterfaceList>
+	<SimpleFB>
+		<InternalVars>
+			<VarDeclaration Name="AccMode" Type="BOOL" Comment="Активен режим ускорения." InitialValue="FALSE"/>
+			<VarDeclaration Name="DecMode" Type="BOOL" Comment="Активен режим замедления." InitialValue="FALSE"/>
+		</InternalVars>
+		<ECState Name="REQ">
+			<ECAction Algorithm="REQ" Output="CNF"/>
+		</ECState>
+		<Algorithm Name="REQ">
+			<ST><![CDATA[ALGORITHM REQ
+// Режим байпаса интегратора рампы с безударным переходом.
+IF (Scale <= 0.0) THEN
+	Out := In;
+ELSE // Штатный режим работы.
+	// Состояние Out до отработки шага интегрирования.
+	// Оптимизировать и переместить сравнения нельзя.
+	AccMode := (In > Out); // Активен режим ускорения.
+	DecMode := (In < Out); // Активен режим замедления.
+
+		// Режим ускорения рампы.
+	IF (AccMode) THEN
+		IF (TAcc <= 0.0) THEN
+			Out := In;
+		ELSE
+			Out := Out + ((Ts * Scale) / TAcc);
+		END_IF;
+	END_IF;
+
+		// Режим замедления рампы.
+	IF (DecMode) THEN
+		IF (TDec <= 0.0) THEN
+			Out := In;
+		ELSE
+			Out := Out - ((Ts * Scale) / TDec);
+		END_IF;
+	END_IF;
+
+		// Установившийся режим рампы.
+		// Состояние Out после отработки шага интегрирования.
+	IF (((AccMode) AND (Out >= In)) OR ((DecMode) AND (Out <= In)) OR (In = Out))
+	THEN
+		Out := In;
+	END_IF;
+
+END_IF;
+
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// Date start LIB_PLC: 2014
+// License: GNU GPL-2.0-or-later
+// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+// https://www.youtube.com/watch?v=n1F_MfLRlX0
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC/LIB_PLC
+// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+// https://t.me/DIY_PLC
+END_ALGORITHM
+
+]]></ST>
+		</Algorithm>
+	</SimpleFB>
+	<Attribute Name="Documentation" Type="CDATA"><![CDATA[<pre>
+// Рампа разгона / торможения.
+//         DbRamp
+//    +--------------+
+//    |    FbRamp    |
+// -&gt;-|In         Out|-&gt;-
+//   -|Scale         |
+//   -|TAcc          |
+//   -|TDec          |
+//   -|Ts            |
+//    +--------------+</pre>
+
+<pre>
+// Пример использования №1.
+// Скорость открытия парового клапана от 0 до 100 процентов за 90 &nbsp;секунд.
+// Скорость закрытия парового клапана от 100 до 0 процентов за 150 секунд.
+// Параметры рампы для решения этой задачи:
+// DbRamp1.Scale := 100.0; //Диапазон времени разгона и торможения.
+// DbRamp1.TAcc &nbsp;:= 90.0 ; //Время разгона от 0 до Scale [с].
+// DbRamp1.TDec &nbsp;:= 150.0; //Время торможения от Scale до 0 [c].
+
+// Пример использования №2.
+// Скорость разгона частотного привода от 0 до 50 Герц за 20 секунд.
+// Скорость торможения частотного привода от 50 до 0 Герц за 15 секунд.&nbsp;
+// Параметры рампы для решения этой задачи:
+// DbRamp2.Scale := 50.0; //Диапазон времени разгона и торможения.
+// DbRamp2.TAcc &nbsp;:= 20.0; //Время разгона от 0 до Scale [с].
+// DbRamp2.TDec &nbsp;:= 15.0; //Время торможения от Scale до 0 [c].
+
+// Пример использования №3.
+// Необходимо отключть рампу и передать сигнал напрямую с входа на выход.&nbsp;
+// Параметры рампы для решения этой задачи:
+// DbRamp3.Scale := 0.0; //Диапазон времени разгона и торможения.
+
+// Временная характеристика.
+//
+// ^ In
+// |
+// 100 *************
+// | &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; *
+// | &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; *
+// | &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; *
+// 0---------------------------------&gt; t[s]
+//
+// ^ Out
+// |
+// | &nbsp; TAcc &nbsp; &nbsp; &nbsp; &nbsp; TDec
+// | &nbsp; &nbsp;10s &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;5s
+// | &nbsp;&lt;-----&gt; &nbsp; &nbsp; &nbsp; &lt;--&gt;
+// 100 &nbsp; &nbsp; &nbsp; ******* &nbsp; &nbsp; ^
+// | &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp;* &nbsp; &nbsp;| Scale 100%
+// | &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; * &nbsp; |
+// | &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;* &nbsp;v
+// 0---------------------------------&gt; t[s]
+//
+// Угол наклона рампы.
+// tg(a) = Scale / TAcc
+//
+
+// Блок схема.
+//
+// Константы &nbsp; &nbsp;Переключатель &nbsp; &nbsp;Интегратор
+// +-------+ &nbsp; &nbsp; +-----------+
+// | Scale | &nbsp; &nbsp; | In &gt; Out &nbsp;|
+// | ----- |--&gt;--|--+ &nbsp; &nbsp; &nbsp; &nbsp;|
+// | TAcc &nbsp;| &nbsp; &nbsp; | &nbsp; \ &nbsp; &nbsp; &nbsp; |
+// +-------+ &nbsp; &nbsp; | &nbsp; &nbsp;\ &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; \ &nbsp; &nbsp; |
+// +-------+ &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp;\ &nbsp; &nbsp;| &nbsp; &nbsp; +-----+
+// | &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; \ &nbsp; | &nbsp; &nbsp; | &nbsp;1 &nbsp;|
+// | &nbsp; 0 &nbsp; |--&gt;--|--+ &nbsp; &nbsp; +--|--&gt;--| --- |--&gt;-- Out
+// | &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; | In ~= Out | &nbsp; &nbsp; | &nbsp;s &nbsp;|
+// +-------+ &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; +-----+
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// +-------+ &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// | Scale | &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// | ----- |--&gt;--|--+ &nbsp; &nbsp; &nbsp; &nbsp;|
+// | TDec &nbsp;| &nbsp; &nbsp; | In &lt; Out &nbsp;|
+// +-------+ &nbsp; &nbsp; +-----------+
+</pre>
+
+<pre>
+
+&nbsp;</pre>
+
+<pre>
+&nbsp;</pre>
+]]></Attribute>
+</FBType>
