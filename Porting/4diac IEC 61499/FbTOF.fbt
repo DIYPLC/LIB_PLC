@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType Name="FbTOF" Comment="Таймер с задержкой на выключение.">
+	<Identification Standard="61499-1" Description="Таймер с задержкой на выключение.&#10;Simple FB with one algorithm">
+	</Identification>
+	<VersionInfo Organization="LIB_PLC" Version="2.2" Author="VA" Date="2026-03-14">
+	</VersionInfo>
+	<CompilerInfo>
+	</CompilerInfo>
+	<InterfaceList>
+		<EventInputs>
+			<Event Name="REQ" Type="Event" Comment="Normal Execution Request">
+				<With Var="In"/>
+				<With Var="TimeDelayOff"/>
+				<With Var="Ts_ms"/>
+			</Event>
+		</EventInputs>
+		<EventOutputs>
+			<Event Name="CNF" Type="Event" Comment="Execution Confirmation">
+				<With Var="Out"/>
+			</Event>
+		</EventOutputs>
+		<InputVars>
+			<VarDeclaration Name="In" Type="BOOL" Comment="Вход таймера." InitialValue="FALSE"/>
+			<VarDeclaration Name="TimeDelayOff" Type="UDINT" Comment="Время задержки выключения [мс]." InitialValue="5000"/>
+			<VarDeclaration Name="Ts_ms" Type="UDINT" Comment="Шаг дискретизации по времени [мс]." InitialValue="100"/>
+		</InputVars>
+		<OutputVars>
+			<VarDeclaration Name="Out" Type="BOOL" Comment="Выход таймера." InitialValue="FALSE"/>
+		</OutputVars>
+	</InterfaceList>
+	<SimpleFB>
+		<InternalVars>
+			<VarDeclaration Name="Timer1" Type="UDINT" Comment="Текущее время таймер1 [мс]." InitialValue="0"/>
+		</InternalVars>
+		<ECState Name="REQ">
+			<ECAction Algorithm="REQ" Output="CNF"/>
+		</ECState>
+		<Algorithm Name="REQ">
+			<ST><![CDATA[ALGORITHM REQ
+IF (TimeDelayOff > 0) THEN // Таймер включен.
+	IF (In) THEN // На входе 1 то на выходе тоже 1.
+		Out := TRUE;
+		Timer1 := 0;
+	ELSE // Если на входе 0.
+		IF (Out) THEN // На выходе 1.
+			IF (Timer1 >= TimeDelayOff) THEN // Задержка включения закончилась.
+				Out := FALSE;
+				Timer1 := 0;
+			ELSE // Задержка включения активна.
+				Out := TRUE;
+				Timer1 := Timer1 + Ts_ms;
+			END_IF;
+		ELSE // На выходе 0.
+			Out := FALSE;
+			Timer1 := 0;
+		END_IF;
+	END_IF;
+ELSE // Таймер выключен.
+	Out := In;
+	Timer1 := 0;
+END_IF;
+
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// Date start LIB_PLC: 2014
+// License: GNU GPL-2.0-or-later
+// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+// https://www.youtube.com/watch?v=n1F_MfLRlX0
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC/LIB_PLC
+// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+// https://t.me/DIY_PLC
+END_ALGORITHM
+
+]]></ST>
+		</Algorithm>
+	</SimpleFB>
+	<Attribute Name="Documentation" Type="CDATA"><![CDATA[<pre>
+// Таймер с задержкой на выключение.
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;DbTOF
+// &nbsp; &nbsp;+----------------+
+// &nbsp; &nbsp;| &nbsp; &nbsp; FbTOF &nbsp; &nbsp; &nbsp;|
+// -&gt;-|In &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Out|-&gt;-
+// &nbsp; -|TimeDelayOff &nbsp; &nbsp;|
+// &nbsp; -|Ts_ms &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp;+----------------+</pre>
+
+<pre>
+// Применение.
+//
+// Блок может применятся как фильтр дребезга контактов и как расширитель им-пульсов.
+
+// Временная характеристика.
+//
+// &nbsp;In
+// &nbsp;^
+// &nbsp;| &nbsp; &nbsp; TimeDelayOff &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;TimeDelayOff
+// &nbsp;| &nbsp; &nbsp; &nbsp; |&lt;---&gt;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |&lt;---&gt;|
+// 1| &nbsp; ***** &nbsp; &nbsp; | &nbsp; &nbsp; ***** *** * &nbsp; &nbsp; |
+// &nbsp;| &nbsp; * &nbsp; * &nbsp; &nbsp; | &nbsp; &nbsp; * &nbsp; * * * * &nbsp; &nbsp; |
+// 0*****---*************---***-*************----&gt; t[s]
+//
+// &nbsp;Out
+// &nbsp;^
+// &nbsp;| &nbsp; &nbsp; TimeDelayOff &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;TimeDelayOff
+// &nbsp;| &nbsp; &nbsp; &nbsp; |&lt;---&gt;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |&lt;---&gt;|
+// 1| &nbsp; *********** &nbsp; &nbsp; *****************
+// &nbsp;| &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; *
+// 0*****---------*******---------------*****----&gt; t[s]
+</pre>
+]]></Attribute>
+</FBType>
