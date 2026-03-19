@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType Name="FbLimit" Comment="Амплитудный ограничитель.">
+	<Identification Standard="61499-1" Description="Амплитудный ограничитель.&#10;Simple FB with one algorithm">
+	</Identification>
+	<VersionInfo Organization="LIB_PLC" Version="2.1" Author="VA" Date="2026-03-19">
+	</VersionInfo>
+	<CompilerInfo>
+	</CompilerInfo>
+	<InterfaceList>
+		<EventInputs>
+			<Event Name="REQ" Type="Event" Comment="Normal Execution Request">
+				<With Var="In"/>
+				<With Var="OutMax"/>
+				<With Var="OutMin"/>
+			</Event>
+		</EventInputs>
+		<EventOutputs>
+			<Event Name="CNF" Type="Event" Comment="Execution Confirmation">
+				<With Var="Out"/>
+			</Event>
+		</EventOutputs>
+		<InputVars>
+			<VarDeclaration Name="In" Type="REAL" Comment="Вход амплитудного ограничителя." InitialValue="0.0"/>
+			<VarDeclaration Name="OutMax" Type="REAL" Comment="Максимальное значение выхода." InitialValue="100.0"/>
+			<VarDeclaration Name="OutMin" Type="REAL" Comment="Минимальное значение выхода." InitialValue="0.0"/>
+		</InputVars>
+		<OutputVars>
+			<VarDeclaration Name="Out" Type="REAL" Comment="Выход амплитудного ограничителя." InitialValue="0.0"/>
+		</OutputVars>
+	</InterfaceList>
+	<SimpleFB>
+		<ECState Name="REQ">
+			<ECAction Algorithm="REQ" Output="CNF"/>
+		</ECState>
+		<Algorithm Name="REQ">
+			<ST><![CDATA[ALGORITHM REQ
+// Амплитудный ограничитель.
+IF (In >= OutMax) THEN
+	Out := OutMax; // Ограничение выхода сверху.
+ELSE
+	IF (In <= OutMin) THEN
+		Out := OutMin; // Ограничение выхода снизу.
+	ELSE
+		Out := In; // Выход без ограничений.
+	END_IF;
+END_IF;
+
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// Date start LIB_PLC: 2014
+// License: GNU GPL-2.0-or-later
+// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+// https://www.youtube.com/watch?v=n1F_MfLRlX0
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC/LIB_PLC
+// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+// https://t.me/DIY_PLC
+END_ALGORITHM
+
+]]></ST>
+		</Algorithm>
+	</SimpleFB>
+	<Attribute Name="Documentation" Type="CDATA"><![CDATA[<pre>
+// Амплитудный ограничитель.
+// &nbsp; &nbsp; &nbsp; DbLimit
+// &nbsp; &nbsp;+-----------+
+// &nbsp; &nbsp;| &nbsp;FbLimit &nbsp;|
+// -&gt;-|In &nbsp; &nbsp; &nbsp;Out|-&gt;-
+// &nbsp; -|OutMax &nbsp; &nbsp; |
+// &nbsp; -|OutMin &nbsp; &nbsp; |
+// &nbsp; &nbsp;+-----------+</pre>
+
+<pre>
+// Условное графическое обозначение.
+//
+// &nbsp; &nbsp; &nbsp; &nbsp; OutMax
+// &nbsp; &nbsp; &nbsp;+-----------+
+// &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; +-- |
+// &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp;/ &nbsp; &nbsp;|
+// In-&gt;-| &nbsp; &nbsp; / &nbsp; &nbsp; |-&gt;-Out
+// &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp;/ &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp; &nbsp;| --+ &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp;+-----------+
+// &nbsp; &nbsp; &nbsp; &nbsp; OutMin
+
+// Статическая характеристика.
+//
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;+Out
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; ********
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp;* &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; * &nbsp; &nbsp;|
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp;* &nbsp; &nbsp; | OutMax
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| * &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|* &nbsp; &nbsp; &nbsp; |
+// -In &lt;------------+------------&gt; +In
+// &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; *|
+// &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp;* |
+// &nbsp;OutMin | &nbsp; &nbsp; * &nbsp;|
+// &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp;* &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; * &nbsp; &nbsp;|
+// &nbsp; &nbsp; ******** &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;-Out
+
+// Временная характеристика.
+//
+// +In
+// | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;*
+// | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; * *
+// |----------*---* -----------------
+// | &nbsp; &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// | &nbsp; &nbsp; &nbsp; &nbsp;* &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| OutMax
+// | &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// +------*-----------*----------------------&gt; t[s]
+// | &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// | &nbsp; &nbsp;* &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| OutMin
+// | &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; |
+// |--*-------------------*----------
+// | * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; *
+// |* &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; *
+// -In
+//
+// +Out
+// |
+// |
+// |----------***** -----------------
+// | &nbsp; &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// | &nbsp; &nbsp; &nbsp; &nbsp;* &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| OutMax
+// | &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// +------*-----------*----------------------&gt; t[s]
+// | &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// | &nbsp; &nbsp;* &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| OutMin
+// | &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; |
+// |***-------------------***--------
+// |
+// |
+// -Out
+</pre>
+]]></Attribute>
+</FBType>
