@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType Name="FbValve" Comment="Пневмоцилиндр с концевиками.">
+	<Identification Standard="61499-1" Description="Пневмоцилиндр с концевиками.&#10;Simple FB with one algorithm">
+	</Identification>
+	<VersionInfo Organization="LIB_PLC" Version="2.2" Author="VA" Date="2026-03-20">
+	</VersionInfo>
+	<CompilerInfo>
+	</CompilerInfo>
+	<InterfaceList>
+		<EventInputs>
+			<Event Name="REQ" Type="Event" Comment="Normal Execution Request">
+				<With Var="CommandOpen"/>
+				<With Var="FeedbackOpen"/>
+				<With Var="FeedbackClose"/>
+				<With Var="OnFeedbackOpen"/>
+				<With Var="OnFeedbackClose"/>
+				<With Var="Reset"/>
+				<With Var="TimeOpen"/>
+				<With Var="TimeClose"/>
+				<With Var="Ts_ms"/>
+			</Event>
+		</EventInputs>
+		<EventOutputs>
+			<Event Name="CNF" Type="Event" Comment="Execution Confirmation">
+				<With Var="CoilOpen"/>
+				<With Var="StateOpen"/>
+				<With Var="StateClose"/>
+				<With Var="Error"/>
+			</Event>
+		</EventOutputs>
+		<InputVars>
+			<VarDeclaration Name="CommandOpen" Type="BOOL" Comment="Команда открыть клапан." InitialValue="FALSE"/>
+			<VarDeclaration Name="FeedbackOpen" Type="BOOL" Comment="Датчик обратной связи &quot;Клапан открылся&quot;." InitialValue="FALSE"/>
+			<VarDeclaration Name="FeedbackClose" Type="BOOL" Comment="Датчик обратной связи &quot;Клапан закрылся&quot;." InitialValue="FALSE"/>
+			<VarDeclaration Name="OnFeedbackOpen" Type="BOOL" Comment="Включить датчик обратной связи &quot;Клапан открылся&quot;." InitialValue="FALSE"/>
+			<VarDeclaration Name="OnFeedbackClose" Type="BOOL" Comment="Включить датчик обратной связи &quot;Клапан закрылся&quot;." InitialValue="FALSE"/>
+			<VarDeclaration Name="Reset" Type="BOOL" Comment="Сброс драйвера в исходное состояние." InitialValue="FALSE"/>
+			<VarDeclaration Name="TimeOpen" Type="UDINT" Comment="Время открытия клапана [мс]." InitialValue="5000"/>
+			<VarDeclaration Name="TimeClose" Type="UDINT" Comment="Время закрытия клапана [мс]." InitialValue="5000"/>
+			<VarDeclaration Name="Ts_ms" Type="UDINT" Comment="Шаг дискретизации по времени [мс]." InitialValue="100"/>
+		</InputVars>
+		<OutputVars>
+			<VarDeclaration Name="CoilOpen" Type="BOOL" Comment="Сигнал на электромагнит &quot;Открыть клапан&quot;." InitialValue="FALSE"/>
+			<VarDeclaration Name="StateOpen" Type="BOOL" Comment="Сосотение &quot;Клапан открыт&quot;." InitialValue="FALSE"/>
+			<VarDeclaration Name="StateClose" Type="BOOL" Comment="Сосотение &quot;Клапан закрыт&quot;." InitialValue="FALSE"/>
+			<VarDeclaration Name="Error" Type="BOOL" Comment="Ошибка &quot;Неисправность клапана&quot;." InitialValue="FALSE"/>
+		</OutputVars>
+	</InterfaceList>
+	<SimpleFB>
+		<InternalVars>
+			<VarDeclaration Name="Timer1" Type="UDINT" Comment="Таймер [мс]." InitialValue="0"/>
+			<VarDeclaration Name="State1" Type="UINT" Comment="Граф состояния." InitialValue="0"/>
+		</InternalVars>
+		<InternalConstVars>
+			<VarDeclaration Name="STATE_RESET" Type="UINT" Comment="Сброс алгоритма." InitialValue="0"/>
+			<VarDeclaration Name="STATE_VALVE_CLOSING" Type="UINT" Comment="Закрытие клапана." InitialValue="1"/>
+			<VarDeclaration Name="STATE_VALVE_CLOSE" Type="UINT" Comment="Клапан закрыт." InitialValue="2"/>
+			<VarDeclaration Name="STATE_VALVE_OPENING" Type="UINT" Comment="Открытие клапана." InitialValue="3"/>
+			<VarDeclaration Name="STATE_VALVE_OPEN" Type="UINT" Comment="Клапан открыт." InitialValue="4"/>
+			<VarDeclaration Name="STATE_ERROR_CLOSE" Type="UINT" Comment="Клапан не закрылся." InitialValue="5"/>
+			<VarDeclaration Name="STATE_ERROR_OPEN" Type="UINT" Comment="Клапан не открылся." InitialValue="6"/>
+		</InternalConstVars>
+		<ECState Name="REQ">
+			<ECAction Algorithm="REQ" Output="CNF"/>
+		</ECState>
+		<Algorithm Name="REQ">
+			<ST><![CDATA[ALGORITHM REQ
+CoilOpen := CommandOpen; // Это основная часть блока все остальное нужно для удобства использования.
+
+// Сброс алгоритма.
+IF (Reset) THEN
+	State1 := STATE_RESET;
+END_IF;
+
+// Граф состояний.
+CASE State1 OF
+	STATE_RESET : // Сброс алгоритма.
+		Timer1 := 0;
+		StateOpen := FALSE;
+		StateClose := FALSE;
+		Error := FALSE;
+			// Смотрим куда надо перейти на закрытие или открытие.
+		IF (CommandOpen) THEN
+			State1 := STATE_VALVE_OPENING;
+		ELSE
+			State1 := STATE_VALVE_CLOSING;
+		END_IF;
+
+	STATE_VALVE_CLOSING : // Закрытие клапана.
+		Timer1 := Timer1 + Ts_ms;
+		StateOpen := FALSE;
+		StateClose := FALSE;
+		Error := FALSE;
+			// Если доехали до датчика то переходим в состояние закрыто.
+			// Если нет обратной связи по датчику то переходим в состояние закрыто по таймеру.
+		IF (FeedbackClose OR (NOT (OnFeedbackClose) AND (Timer1 >= TimeClose))) THEN
+			State1 := STATE_VALVE_CLOSE;
+		END_IF;
+			// Если клапан заклинил и не доехал до датчика за заданное время уходим в состояние ошибки.
+		IF (OnFeedbackClose AND (Timer1 >= TimeClose)) THEN
+			State1 := STATE_ERROR_CLOSE;
+		END_IF;
+			// Если во время закрытия пришла команда на открытие переходим в режим открытие.
+		IF (CommandOpen) THEN
+			State1 := STATE_VALVE_OPENING;
+		END_IF;
+
+	STATE_VALVE_CLOSE : // Клапан закрыт.
+		Timer1 := 0;
+		StateOpen := FALSE;
+		StateClose := TRUE;
+		Error := FALSE;
+			// Если пришла команда на открытие то переходим в состояние открытие.
+		IF (CommandOpen) THEN
+			State1 := STATE_VALVE_OPENING;
+		END_IF;
+
+	STATE_VALVE_OPENING : // Открытие клапана.
+		Timer1 := Timer1 + Ts_ms;
+		StateOpen := FALSE;
+		StateClose := FALSE;
+		Error := FALSE;
+			// Если доехали до датчика то переходим в состояние открыто.
+			// Если нет обратной связи по датчику то переходим в состояние открыто по таймеру.
+		IF (FeedbackOpen OR (NOT (OnFeedbackOpen) AND (Timer1 >= TimeClose))) THEN
+			State1 := STATE_VALVE_OPEN;
+		END_IF;
+			// Если клапан заклинил и не доехал до датчика за заданное время уходим в состояние ошибки.
+		IF (OnFeedbackOpen AND (Timer1 >= TimeClose)) THEN
+			State1 := STATE_ERROR_OPEN;
+		END_IF;
+			// Если во время открытия пришла команда на закрытие переходим в режим закрытие.
+		IF NOT (CommandOpen) THEN
+			State1 := STATE_VALVE_CLOSING;
+		END_IF;
+
+	STATE_VALVE_OPEN : // Клапан открыт.
+		Timer1 := 0;
+		StateOpen := TRUE;
+		StateClose := FALSE;
+		Error := FALSE;
+			// Если пришла команда на закрытие то переходим в состояние закрытие.
+		IF NOT (CommandOpen) THEN
+			State1 := STATE_VALVE_CLOSING;
+		END_IF;
+
+	STATE_ERROR_CLOSE : // Клапан не закрылся.
+		Timer1 := 0;
+		StateOpen := FALSE;
+		StateClose := FALSE;
+		Error := TRUE;
+			// Если все таки доехали до датчика то сброс для перехода на правильное состояние.
+			// Если пришла команда на отрытие то сброс для перехода на правильное состояние.
+			// Если выключили контроль обратной связи то сброс для перехода на правильное состояние.
+		IF (FeedbackClose OR CommandOpen OR NOT (OnFeedbackClose)) THEN
+			State1 := STATE_RESET;
+		END_IF;
+
+	STATE_ERROR_OPEN : // Клапан не открылся.
+		Timer1 := 0;
+		StateOpen := FALSE;
+		StateClose := FALSE;
+		Error := TRUE;
+			// Если все таки доехали до датчика то сброс для перехода на правильное состояние.
+			// Если пришла команда на закрытие то сброс для перехода на правильное состояние.
+			// Если выключили контроль обратной связи то сброс для перехода на правильное состояние.
+		IF (FeedbackOpen OR NOT (CommandOpen) OR NOT (OnFeedbackOpen)) THEN
+			State1 := STATE_RESET;
+		END_IF;
+
+	ELSE // СТОП при неопределенном состоянии.
+		State1 := STATE_RESET;
+END_CASE;
+
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// Date start LIB_PLC: 2014
+// License: GNU GPL-2.0-or-later
+// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+// https://www.youtube.com/watch?v=n1F_MfLRlX0
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC/LIB_PLC
+// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+// https://t.me/DIY_PLC
+END_ALGORITHM
+
+]]></ST>
+		</Algorithm>
+	</SimpleFB>
+	<Attribute Name="Documentation" Type="CDATA"><![CDATA[<pre>
+// Пневмоцилиндр с концевиками.
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;DbValve
+// &nbsp; &nbsp;+-----------------------------+
+// &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; FbValve &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// -&gt;-|CommandOpen &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;CoilOpen|-&gt;-
+// &nbsp; -|FeedbackOpen &nbsp; &nbsp; &nbsp; &nbsp;StateOpen|-
+// &nbsp; -|FeedbackClose &nbsp; &nbsp; &nbsp;StateClose|-
+// &nbsp; -|OnFeedbackOpen &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Error|-
+// &nbsp; -|OnFeedbackClose &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; -|Reset &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; -|TimeOpen &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; -|TimeClose &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; -|Ts_ms &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp;+-----------------------------+</pre>
+]]></Attribute>
+</FBType>

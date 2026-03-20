@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType Name="FbSoftPWM" Comment="ШИМ генератор двухканальный.">
+	<Identification Standard="61499-1" Description="ШИМ генератор двухканальный.&#10;Simple FB with one algorithm">
+	</Identification>
+	<VersionInfo Organization="LIB_PLC" Version="2.1" Author="VA" Date="2026-03-20">
+	</VersionInfo>
+	<CompilerInfo>
+	</CompilerInfo>
+	<InterfaceList>
+		<EventInputs>
+			<Event Name="REQ" Type="Event" Comment="Normal Execution Request">
+				<With Var="DutyCucle"/>
+				<With Var="PeriodPositive"/>
+				<With Var="PeriodNegative"/>
+				<With Var="DBMAX"/>
+				<With Var="DBMIN"/>
+				<With Var="Ts"/>
+			</Event>
+		</EventInputs>
+		<EventOutputs>
+			<Event Name="CNF" Type="Event" Comment="Execution Confirmation">
+				<With Var="PWMPOS"/>
+				<With Var="PWMNEG"/>
+			</Event>
+		</EventOutputs>
+		<InputVars>
+			<VarDeclaration Name="DutyCucle" Type="REAL" Comment="Коэффициент заполнения -100...0...100 [%]." InitialValue="50.0"/>
+			<VarDeclaration Name="PeriodPositive" Type="REAL" Comment="Период ШИМ для положительного коэффициента заполнения [с]." InitialValue="10.0"/>
+			<VarDeclaration Name="PeriodNegative" Type="REAL" Comment="Период ШИМ для отрицательного коэффициента заполнения [с]." InitialValue="10.0"/>
+			<VarDeclaration Name="DBMAX" Type="REAL" Comment="dead band - Зона нечувствительности, верхняя граница [%]." InitialValue="0.001"/>
+			<VarDeclaration Name="DBMIN" Type="REAL" Comment="dead band - Зона нечувствительности, нижняя граница [%]." InitialValue="-0.001"/>
+			<VarDeclaration Name="Ts" Type="REAL" Comment="Шаг дискретизации по времени [с]." InitialValue="0.1"/>
+		</InputVars>
+		<OutputVars>
+			<VarDeclaration Name="PWMPOS" Type="BOOL" Comment="Выход ШИМ для положительных значений входа." InitialValue="FALSE"/>
+			<VarDeclaration Name="PWMNEG" Type="BOOL" Comment="Выход ШИМ для отрицательных значений входа." InitialValue="FALSE"/>
+		</OutputVars>
+	</InterfaceList>
+	<SimpleFB>
+		<InternalVars>
+			<VarDeclaration Name="TimerPositive" Type="REAL" Comment="Таймер для положительного коэффициента заполнения [с]." InitialValue="0.0"/>
+			<VarDeclaration Name="TimerNegative" Type="REAL" Comment="Таймер для отрицательного коэффициента заполнения [с]." InitialValue="0.0"/>
+			<VarDeclaration Name="Percent" Type="REAL" Comment="Входной сигнал после зоны нечувствительности и амплитудного ограничителя -100...0...100[%]." InitialValue="0.0"/>
+			<VarDeclaration Name="TimePulsePositive" Type="REAL" Comment="Время импульса для положительного коэффициента заполнения [с]." InitialValue="0.0"/>
+			<VarDeclaration Name="TimePulseNegative" Type="REAL" Comment="Время импульса для отрицательного коэффициента заполнения [с]." InitialValue="0.0"/>
+		</InternalVars>
+		<ECState Name="REQ">
+			<ECAction Algorithm="REQ" Output="CNF"/>
+		</ECState>
+		<Algorithm Name="REQ">
+			<ST><![CDATA[ALGORITHM REQ
+// Зона нечувствительности для входного сигнала.
+IF ((DBMIN < DutyCucle) AND (DutyCucle < DBMAX)) THEN
+	Percent := 0.0;
+ELSE
+	Percent := DutyCucle;
+END_IF;
+
+// Амплитудный ограничитель входного сигнала от -100% до 100%.
+IF (Percent >= 100.0) THEN
+	Percent := 100.0;
+END_IF;
+IF (Percent <= -100.0) THEN
+	Percent := -100.0;
+END_IF;
+
+// Формирование импульсов на открытие.
+IF (Percent > 0.0) THEN
+	PWMNEG := FALSE;
+	TimerNegative := 0.0;
+	TimePulsePositive := PeriodPositive * Percent * 0.01;
+	IF (TimerPositive <= TimePulsePositive) THEN
+		PWMPOS := TRUE;
+	ELSE
+		PWMPOS := FALSE;
+	END_IF;
+	TimerPositive := TimerPositive + Ts;
+	IF (TimerPositive >= PeriodPositive) THEN
+		TimerPositive := 0.0;
+	END_IF;
+END_IF;
+
+// Формирование импульсов на закрытие.
+IF (Percent < 0.0) THEN
+	PWMPOS := FALSE;
+	TimerPositive := 0.0;
+	TimePulseNegative := PeriodNegative * Percent * (-0.01);
+	IF (TimerNegative <= TimePulseNegative) THEN
+		PWMNEG := TRUE;
+	ELSE
+		PWMNEG := FALSE;
+	END_IF;
+	TimerNegative := TimerNegative + Ts;
+	IF (TimerNegative >= PeriodNegative) THEN
+		TimerNegative := 0.0;
+	END_IF;
+END_IF;
+
+// Нет импульсов.
+IF (Percent = 0.0) THEN
+	PWMPOS := FALSE;
+	PWMNEG := FALSE;
+	TimerPositive := 0.0;
+	TimerNegative := 0.0;
+END_IF;
+
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// Date start LIB_PLC: 2014
+// License: GNU GPL-2.0-or-later
+// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+// https://www.youtube.com/watch?v=n1F_MfLRlX0
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC/LIB_PLC
+// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+// https://t.me/DIY_PLC
+END_ALGORITHM
+
+]]></ST>
+		</Algorithm>
+	</SimpleFB>
+	<Attribute Name="Documentation" Type="CDATA"><![CDATA[<pre>
+// ШИМ генератор двухканальный.
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;DbSoftPWM
+// &nbsp; &nbsp; +---------------------+
+// &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp;FbSoftPWM &nbsp; &nbsp; &nbsp;|
+// &nbsp;-&gt;-|DutyCucle &nbsp; &nbsp; &nbsp;PWMPOS|-&gt;-
+// &nbsp; &nbsp;-|PeriodPositive PWMNEG|-&gt;-
+// &nbsp; &nbsp;-|PeriodNegative &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp;-|DBMAX &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp;-|DBMIN &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp;-|Ts &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp; +---------------------+
+</pre>
+
+<pre>
+&nbsp;</pre>
+]]></Attribute>
+</FBType>

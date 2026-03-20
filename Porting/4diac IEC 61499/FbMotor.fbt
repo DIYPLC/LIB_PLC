@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType Name="FbMotor" Comment="Двигатель с частотником и контактором.">
+	<Identification Standard="61499-1" Description="Двигатель с частотником и контактором.&#10;Simple FB with one algorithm">
+	</Identification>
+	<VersionInfo Organization="LIB_PLC" Version="2.1" Author="VA" Date="2026-03-20">
+	</VersionInfo>
+	<CompilerInfo>
+	</CompilerInfo>
+	<InterfaceList>
+		<EventInputs>
+			<Event Name="REQ" Type="Event" Comment="Normal Execution Request">
+				<With Var="MotorRun"/>
+				<With Var="VoltageOk"/>
+				<With Var="DriveOk"/>
+				<With Var="ContactorOk"/>
+				<With Var="TimeMonitoring"/>
+				<With Var="TimeDelayOn"/>
+				<With Var="TimeDelayOff"/>
+				<With Var="Ts_ms"/>
+				<With Var="Reset"/>
+			</Event>
+		</EventInputs>
+		<EventOutputs>
+			<Event Name="CNF" Type="Event" Comment="Execution Confirmation">
+				<With Var="MotorOn"/>
+				<With Var="ContactorOn"/>
+				<With Var="ErrorVoltage"/>
+				<With Var="ErrorDrive"/>
+				<With Var="ErrorContactor"/>
+			</Event>
+		</EventOutputs>
+		<InputVars>
+			<VarDeclaration Name="MotorRun" Type="BOOL" Comment="Команда: включить двигатель." InitialValue="FALSE"/>
+			<VarDeclaration Name="VoltageOk" Type="BOOL" Comment="Схема собрана 380VAC Ok." InitialValue="FALSE"/>
+			<VarDeclaration Name="DriveOk" Type="BOOL" Comment="Обратная связь: нет ошибок на частотном приводе." InitialValue="FALSE"/>
+			<VarDeclaration Name="ContactorOk" Type="BOOL" Comment="Обратная связь: контактор включился." InitialValue="FALSE"/>
+			<VarDeclaration Name="TimeMonitoring" Type="UDINT" Comment="Время гарантированного включения контактора [мс]." InitialValue="1000"/>
+			<VarDeclaration Name="TimeDelayOn" Type="UDINT" Comment="Время задержки включения частотника [мс]." InitialValue="1000"/>
+			<VarDeclaration Name="TimeDelayOff" Type="UDINT" Comment="Время задержки выключения контактора [мс]." InitialValue="5000"/>
+			<VarDeclaration Name="Ts_ms" Type="UDINT" Comment="Шаг дискретизации по времени [мс]." InitialValue="100"/>
+			<VarDeclaration Name="Reset" Type="BOOL" Comment="Сброс при перезагрузке." InitialValue="FALSE"/>
+		</InputVars>
+		<OutputVars>
+			<VarDeclaration Name="MotorOn" Type="BOOL" Comment="Включить двигатель." InitialValue="FALSE"/>
+			<VarDeclaration Name="ContactorOn" Type="BOOL" Comment="Включить контактор." InitialValue="FALSE"/>
+			<VarDeclaration Name="ErrorVoltage" Type="BOOL" Comment="Схема разобрана нет 380VAC." InitialValue="FALSE"/>
+			<VarDeclaration Name="ErrorDrive" Type="BOOL" Comment="Ошибка частотного привода." InitialValue="FALSE"/>
+			<VarDeclaration Name="ErrorContactor" Type="BOOL" Comment="Ошибка контактора." InitialValue="FALSE"/>
+		</OutputVars>
+	</InterfaceList>
+	<SimpleFB>
+		<InternalVars>
+			<VarDeclaration Name="State1" Type="UINT" Comment="Граф сосояния частотника и контактора." InitialValue="0"/>
+			<VarDeclaration Name="Timer1" Type="UDINT" Comment="Таймер для задержки переключения между частотником и контактором [мс]." InitialValue="0"/>
+			<VarDeclaration Name="Timer2" Type="UDINT" Comment="Таймер для формирования ошибки контактора [мс]." InitialValue="0"/>
+		</InternalVars>
+		<InternalConstVars>
+			<VarDeclaration Name="STATE_STOP" Type="UINT" Comment="Состояние &quot;Стоп&quot;." InitialValue="0"/>
+			<VarDeclaration Name="STATE_CONTACTOR_ON" Type="UINT" Comment="Состояние &quot;Включение контактора&quot;." InitialValue="1"/>
+			<VarDeclaration Name="STATE_DRIVE_ON" Type="UINT" Comment="Состояние &quot;Включение частотного привода&quot;." InitialValue="2"/>
+			<VarDeclaration Name="STATE_RUN" Type="UINT" Comment="Состояние &quot;Работа&quot;." InitialValue="3"/>
+			<VarDeclaration Name="STATE_DRIVE_OFF" Type="UINT" Comment="Состояние &quot;Выключение частотного привода&quot;." InitialValue="4"/>
+			<VarDeclaration Name="STATE_CONTACTOR_OFF" Type="UINT" Comment="Состояние &quot;Выключение контактора&quot;." InitialValue="5"/>
+		</InternalConstVars>
+		<ECState Name="REQ">
+			<ECAction Algorithm="REQ" Output="CNF"/>
+		</ECState>
+		<Algorithm Name="REQ">
+			<ST><![CDATA[ALGORITHM REQ
+// Схема разобрана нет 380VAC.
+ErrorVoltage := NOT (VoltageOk);
+
+// Ошибка частотного привода.
+ErrorDrive := NOT (DriveOk);
+
+// Формируем ошибку контактора.
+// Контактор включается не сразу.
+// За время TimeMonitoring контактор обязан включиться, иначе ошибка.
+// Так же следим чтобы контактор выключился и контакты не залипли.
+IF (ContactorOn) THEN
+	// Следим чтобы контактор вовремя включился.
+	IF (ContactorOk) THEN
+		// Контактор включился.
+		Timer2 := 0;
+		ErrorContactor := FALSE;
+	ELSE
+		IF (Timer2 <= TimeMonitoring) THEN
+			// Контактор еще не включился.
+			Timer2 := Timer2 + Ts_ms;
+			ErrorContactor := FALSE;
+		ELSE
+			// Ошибка контактор не включился за время TimeMonitoring
+			ErrorContactor := TRUE;
+		END_IF;
+	END_IF;
+ELSE
+	// Следим чтобы контактор вовремя выключился.
+	IF NOT (ContactorOk) THEN
+		// Контактор выключился.
+		Timer2 := 0;
+		ErrorContactor := FALSE;
+	ELSE
+		IF (Timer2 <= TimeMonitoring) THEN
+			// Контактор еще не выключился.
+			Timer2 := Timer2 + Ts_ms;
+			ErrorContactor := FALSE;
+		ELSE
+			// Ошибка контактор не выключился за время TimeMonitoring
+			ErrorContactor := TRUE;
+		END_IF;
+	END_IF;
+END_IF;
+
+// Сброс при перезагрузке или ошибке.
+IF (Reset OR ErrorVoltage OR ErrorDrive) THEN
+	State1 := STATE_STOP;
+END_IF;
+
+// При включении двигателя должен сначала включиться контактор затем частотный привод.
+// При выключении двигателя должен сначала выключиться частотный привод, а затем контактор.
+// Это необходимо для увеличения времени жизни контактора.
+// Граф состояний.
+CASE State1 OF
+	// Состояние "Стоп".
+	STATE_STOP :
+		MotorOn := FALSE;
+		ContactorOn := FALSE;
+		Timer1 := 0;
+			// Если получили разрешение на включение то включаем контактор.
+		IF (MotorRun) THEN
+			State1 := STATE_CONTACTOR_ON;
+		END_IF;
+
+		// Состояние "Включение контактора".
+	STATE_CONTACTOR_ON :
+		MotorOn := FALSE;
+		ContactorOn := TRUE;
+		Timer1 := Timer1 + Ts_ms;
+			// Перед включением частотника делаем паузу чтоб контактор успел включиться.
+		IF (Timer1 >= TimeDelayOn) THEN
+			State1 := STATE_DRIVE_ON;
+		END_IF;
+
+		// Состояние "Включение частотного привода".
+	STATE_DRIVE_ON :
+		MotorOn := TRUE;
+		ContactorOn := TRUE;
+		Timer1 := 0;
+		State1 := STATE_RUN;
+
+		// Состояние "Работа".
+	STATE_RUN :
+		MotorOn := TRUE;
+		ContactorOn := TRUE;
+		Timer1 := 0;
+			// Если пришла команда выключить двигатель то сначала выключаем частотник.
+		IF NOT (MotorRun) THEN
+			State1 := STATE_DRIVE_OFF;
+		END_IF;
+
+		// Состояние "Выключение частотного привода".
+	STATE_DRIVE_OFF :
+		MotorOn := FALSE;
+		ContactorOn := TRUE;
+		Timer1 := Timer1 + Ts_ms;
+			// Перед выключением контактора делаем паузу чтоб выключится без нагрузки.
+		IF (Timer1 >= TimeDelayOff) THEN
+			State1 := STATE_CONTACTOR_OFF;
+		END_IF;
+
+		// Состояние "Выключение контактора".
+	STATE_CONTACTOR_OFF :
+		MotorOn := FALSE;
+		ContactorOn := FALSE;
+		Timer1 := 0;
+			// Переходим в состояние стоп.
+		State1 := STATE_STOP;
+
+		// СТОП при неопределенном состоянии.
+	ELSE
+		State1 := STATE_STOP;
+END_CASE;
+
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// Date start LIB_PLC: 2014
+// License: GNU GPL-2.0-or-later
+// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+// https://www.youtube.com/watch?v=n1F_MfLRlX0
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC/LIB_PLC
+// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+// https://t.me/DIY_PLC
+END_ALGORITHM
+
+]]></ST>
+		</Algorithm>
+	</SimpleFB>
+	<Attribute Name="Documentation" Type="CDATA"><![CDATA[<pre>
+// Двигатель с частотником и контактором.
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; DbMotor
+// &nbsp; &nbsp;+-------------------------------+
+// &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;FbMotor &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// -&gt;-|MotorRun &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;MotorOn|-&gt;-
+// &nbsp; -|VoltageOk &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ContactorOn|-
+// &nbsp; -|DriveOk &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;ErrorVoltage|-
+// &nbsp; -|ContactorOk &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;ErrorDrive|-
+// &nbsp; -|TimeMonitoring &nbsp; ErrorContactor|-
+// &nbsp; -|TimeDelayOn &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; -|TimeDelayOff &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; -|Ts_ms &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; -|Reset &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp;+-------------------------------+</pre>
+
+<pre>
+// Схема подключения блока FbMotor.
+//
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;+-------------------+
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| 380 VAC &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;+-------------------+
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;v
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;+-------------------+
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| Вводной автомат &nbsp; |--&gt; VoltageOk
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;+-------------------+
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;v
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;+-------------------+
+// &nbsp; &nbsp; MotorOn --&gt;| Частотный привод &nbsp;|--&gt; DriveOk
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;+-------------------+
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;v
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;+-------------------+
+// ContactorOn --&gt;| Контактор &nbsp; &nbsp; &nbsp; &nbsp; |--&gt; ContactorOk
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;+-------------------+
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;v
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;+-------------------+
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| Двигатель &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;+-------------------+
+</pre>
+]]></Attribute>
+</FBType>

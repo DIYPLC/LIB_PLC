@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType Name="FbFilterNaN" Comment="Фильтр NaN и Inf для чисел REAL.">
+	<Identification Standard="61499-1" Description="Фильтр NaN и Inf для чисел REAL.&#10;Simple FB with one algorithm">
+	</Identification>
+	<VersionInfo Organization="LIB_PLC" Version="2.2" Author="VA" Date="2026-03-20">
+	</VersionInfo>
+	<CompilerInfo>
+	</CompilerInfo>
+	<InterfaceList>
+		<EventInputs>
+			<Event Name="REQ" Type="Event" Comment="Normal Execution Request">
+				<With Var="In"/>
+				<With Var="ErrValue"/>
+			</Event>
+		</EventInputs>
+		<EventOutputs>
+			<Event Name="CNF" Type="Event" Comment="Execution Confirmation">
+				<With Var="Out"/>
+				<With Var="Err"/>
+			</Event>
+		</EventOutputs>
+		<InputVars>
+			<VarDeclaration Name="In" Type="REAL" Comment="Вход." InitialValue="0.0"/>
+			<VarDeclaration Name="ErrValue" Type="REAL" Comment="Значение для Out при не корректном значении на входе In." InitialValue="0.0"/>
+		</InputVars>
+		<OutputVars>
+			<VarDeclaration Name="Out" Type="REAL" Comment="Выход." InitialValue="0.0"/>
+			<VarDeclaration Name="Err" Type="BOOL" Comment="Флаг ошибки." InitialValue="FALSE"/>
+		</OutputVars>
+	</InterfaceList>
+	<SimpleFB>
+		<InternalVars>
+			<VarDeclaration Name="Flag_nan_1" Type="BOOL" Comment="Флаг не число метод 1, по стандарту IEEE 754." InitialValue="FALSE"/>
+			<VarDeclaration Name="Flag_nan_2" Type="BOOL" Comment="Флаг не число метод 2, как в GCC." InitialValue="FALSE"/>
+			<VarDeclaration Name="Flag_nan_3" Type="BOOL" Comment="Флаг не число метод 3, математическое определение." InitialValue="FALSE"/>
+			<VarDeclaration Name="Flag_pos_inf" Type="BOOL" Comment="Флаг плюс бесконечность, математическое определение." InitialValue="FALSE"/>
+			<VarDeclaration Name="Flag_neg_inf" Type="BOOL" Comment="Флаг минус бесконечность, математическое определение." InitialValue="FALSE"/>
+		</InternalVars>
+		<ECState Name="REQ">
+			<ECAction Algorithm="REQ" Output="CNF"/>
+		</ECState>
+		<Algorithm Name="REQ">
+			<ST><![CDATA[ALGORITHM REQ
+// Если In==(NaN или Inf или -Inf) то Out=0 иначе Out=In.
+// DW#16#7F800000=DW#2#01111111_10000000_00000000_00000000
+// Стандарт IEEE 754.
+Flag_nan_1 := ((REAL_TO_DWORD(In) AND 16#7F800000) = 16#7F800000);
+Flag_nan_2 := (In <> In);
+Flag_nan_3 := ((0.0 / 0.0) = In);
+Flag_pos_inf := ((1.0 / 0.0) = In);
+Flag_neg_inf := ((-1.0 / 0.0) = In);
+
+Err := Flag_nan_1 OR Flag_nan_2 OR Flag_nan_3 OR Flag_pos_inf OR Flag_neg_inf;
+
+IF (Err) THEN
+	Out := ErrValue;
+	// По умолчанию при ошибке на выходе будит 0.
+	// Если хотим показать последнее значение без ошибки то,
+	// при вызове данного блока сделать петлю с выхода на так:
+	// DbFilterNaN1.ErrValue := DbFilterNaN1.Out
+	// DbFilterNaN1();
+ELSE
+	// Штатный режим работы без ошибок.
+	Out := In;
+END_IF;
+
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// Date start LIB_PLC: 2014
+// License: GNU GPL-2.0-or-later
+// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+// https://www.youtube.com/watch?v=n1F_MfLRlX0
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC/LIB_PLC
+// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+// https://t.me/DIY_PLC
+END_ALGORITHM
+
+]]></ST>
+		</Algorithm>
+	</SimpleFB>
+	<Attribute Name="Documentation" Type="CDATA"><![CDATA[<pre>
+// Фильтр NaN и Inf для чисел REAL.
+// &nbsp; &nbsp; &nbsp;DbFilterNaN
+// &nbsp; &nbsp;+-------------+
+// &nbsp; &nbsp;| FbFilterNaN |
+// -&gt;-|In &nbsp; &nbsp; &nbsp; &nbsp;Out|-&gt;-
+// &nbsp; -|ErrValue &nbsp;Err|-
+// &nbsp; &nbsp;+-------------+</pre>
+]]></Attribute>
+</FBType>

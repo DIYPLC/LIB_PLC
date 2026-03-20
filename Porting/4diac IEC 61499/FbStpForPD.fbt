@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType Name="FbStpForPD" Comment="Аналоговый ПД-регулятор превращаем в дискретный ПИ.">
+	<Identification Standard="61499-1" Description="Аналоговый ПД-регулятор превращаем в дискретный ПИ.&#10;Simple FB with one algorithm">
+	</Identification>
+	<VersionInfo Organization="LIB_PLC" Version="0.2" Author="VA" Date="2026-03-20">
+	</VersionInfo>
+	<CompilerInfo>
+	</CompilerInfo>
+	<InterfaceList>
+		<EventInputs>
+			<Event Name="REQ" Type="Event" Comment="Normal Execution Request">
+				<With Var="InFromPD"/>
+				<With Var="TimeOpen"/>
+				<With Var="TimeClose"/>
+				<With Var="TimeMin"/>
+				<With Var="Smax"/>
+				<With Var="Smin"/>
+				<With Var="SensorOpen"/>
+				<With Var="SensorClose"/>
+				<With Var="Ts"/>
+				<With Var="Reset"/>
+			</Event>
+		</EventInputs>
+		<EventOutputs>
+			<Event Name="CNF" Type="Event" Comment="Execution Confirmation">
+				<With Var="CmdOpen"/>
+				<With Var="CmdClose"/>
+			</Event>
+		</EventOutputs>
+		<InputVars>
+			<VarDeclaration Name="InFromPD" Type="REAL" Comment="Задание скорости с обычного ПД- регулятора -100...+100 [%/c]." InitialValue="0.0"/>
+			<VarDeclaration Name="TimeOpen" Type="REAL" Comment="Время открытия задвижки [c]." InitialValue="60.0"/>
+			<VarDeclaration Name="TimeClose" Type="REAL" Comment="Время закрытия задвижки [c]." InitialValue="50.0"/>
+			<VarDeclaration Name="TimeMin" Type="REAL" Comment="Минимальное время импульса [c]." InitialValue="0.5"/>
+			<VarDeclaration Name="Smax" Type="REAL" Comment="Ограничение внутреннего интегратора положения максимум [%]." InitialValue="10.0"/>
+			<VarDeclaration Name="Smin" Type="REAL" Comment="Ограничение внутреннего интегратора положения минимум [%]." InitialValue="-10.0"/>
+			<VarDeclaration Name="SensorOpen" Type="BOOL" Comment="Датчик на открытие задвижки 100 [%]." InitialValue="FALSE"/>
+			<VarDeclaration Name="SensorClose" Type="BOOL" Comment="Датчик на закрытие задвижки 0 [%]." InitialValue="FALSE"/>
+			<VarDeclaration Name="Ts" Type="REAL" Comment="Шаг дискретизации по времени в секундах." InitialValue="0.1"/>
+			<VarDeclaration Name="Reset" Type="BOOL" Comment="Сброс при перезагрузке." InitialValue="FALSE"/>
+		</InputVars>
+		<OutputVars>
+			<VarDeclaration Name="CmdOpen" Type="BOOL" Comment="Команда на открытие +." InitialValue="FALSE"/>
+			<VarDeclaration Name="CmdClose" Type="BOOL" Comment="Команда на закрытие -." InitialValue="FALSE"/>
+		</OutputVars>
+	</InterfaceList>
+	<SimpleFB>
+		<InternalVars>
+			<VarDeclaration Name="Pos" Type="REAL" Comment="Положение клапана интеграл скорости по времени есть путь [%]." InitialValue="0.0"/>
+			<VarDeclaration Name="Vin" Type="REAL" Comment="Скорость на входе [%/с]." InitialValue="0.0"/>
+			<VarDeclaration Name="Vopen" Type="REAL" Comment="Скорость открытия [%/с]." InitialValue="0.0"/>
+			<VarDeclaration Name="Vclose" Type="REAL" Comment="Скорость закрытия [%/с]." InitialValue="0.0"/>
+			<VarDeclaration Name="SopenMin" Type="REAL" Comment="Минимальная дистанция доступная для перемещения на открытие[%]." InitialValue="0.0"/>
+			<VarDeclaration Name="ScloseMin" Type="REAL" Comment="Минимальная дистанция доступная для перемещения на закрытие[%]." InitialValue="0.0"/>
+		</InternalVars>
+		<ECState Name="REQ">
+			<ECAction Algorithm="REQ" Output="CNF"/>
+		</ECState>
+		<Algorithm Name="REQ">
+			<ST><![CDATA[ALGORITHM REQ
+// Вычисления основаны на том, что интегрирующий исполнительный механизм работает в пределах 0...100
+// [%].
+Vin := InFromPD; // [%/с].
+Vopen := 100.0 / TimeOpen; // [%/с].
+Vclose := 100.0 / TimeClose; // [%/с].
+SopenMin := Vopen * TimeMin; // [%].
+ScloseMin := Vclose * TimeMin; // [%].
+Pos := Pos + Vin * Ts; // [%].
+
+IF(Reset) THEN
+	Pos := 0.0;
+END_IF;
+
+// Импульс открытия (положительный).
+IF(Pos >= SopenMin) THEN // RS-Триггер на открытие.
+	CmdOpen := TRUE;
+END_IF;
+
+IF((Pos <= 0.0) OR SensorOpen) THEN // RS-Триггер на открытие.
+	CmdOpen := FALSE;
+END_IF;
+
+IF(CmdOpen) THEN // Вход положительный итератор отрицательный.
+	Pos := Pos - Vopen * Ts; // [%].
+END_IF;
+
+// Импульс закрытия (отрицательный).
+IF(Pos <= (ScloseMin * (-1.0))) THEN // RS-Триггер на закрытие.
+	CmdClose := TRUE;
+END_IF;
+
+IF((Pos >= 0.0) OR SensorClose) THEN // RS-Триггер на закрытие.
+	CmdClose := FALSE;
+END_IF;
+
+IF(CmdClose) THEN // Вход отрицательный интегратор положительный.
+	Pos := Pos + Vclose * Ts; // [%].
+END_IF;
+
+// Амплитудный ограничитель интегратора.
+IF(Pos >= Smax) THEN
+	Pos := Smax;
+END_IF;
+
+IF(Pos <= Smin) THEN
+	Pos := Smin;
+END_IF;
+
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// Date start LIB_PLC: 2014
+// License: GNU GPL-2.0-or-later
+// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+// https://www.youtube.com/watch?v=n1F_MfLRlX0
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC/LIB_PLC
+// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+// https://t.me/DIY_PLC
+END_ALGORITHM
+
+]]></ST>
+		</Algorithm>
+	</SimpleFB>
+	<Attribute Name="Documentation" Type="CDATA"><![CDATA[<pre>
+// Аналоговый ПД-регулятор превращаем в дискретный ПИ.
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; DbStpForPD
+// &nbsp; &nbsp;+----------------------+
+// &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp;FbStpForPD &nbsp; &nbsp; &nbsp;|
+// -&gt;-|InFromPD &nbsp; &nbsp; &nbsp; CmdOpen|-&gt;-
+// &nbsp; -|TimeOpen &nbsp; &nbsp; &nbsp;CmdClose|-&gt;-
+// &nbsp; -|TimeClose &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; -|TimeMin &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; -|Smax &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; -|Smin &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; -|SensorOpen &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; -|SensorClose &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; -|Ts &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; -|Reset &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp;+----------------------+</pre>
+
+<pre>
+// Описание.
+// Данный блок это приставка к обычному аналоговому ПИД- регулятору которая превращает его в регулятор с двумя дискретными выходами.
+// Применять данный блок можно на котлах с интегральными исполнительными механизмами.
+// Например, если у вас есть мотор редуктор, который управляется двумя пускателями и выходной вал имеет датчик положения и концевики положений 0% и 100%,
+// то данный блок в паре с ПИД- регулятором позволит управлять положением этого механизма.
+// Вместо датчика положения можно завести датчик температуры или давления и получить соответственно систему стабилизации температуры или давления.
+//
+// Основная идея данного блока состоит в том, что интегральный исполнительный механизм вместе с регулятором должен иметь передаточную функцию ПИ-регулятора.
+// Из чего следует что интегральный исполнительный механизм должен управляться ПД- регулятором и тогда они вместе дадут передаточную функцию ПИ-регулятора.
+// Но выход с ПД- регулятора аналоговый а исполнительный механизм дискретный.
+// Так как аналоговый выход с ПД- регулятора это по сути задание скорости на интегральный исполнительный механизм, а
+// дискретные сигналы это тоже суть задание положительной и отрицательной постоянной скорости,
+// то остается вычислить площадь аналоговой кривой который дает ПД- регулятор, и выдать эту площадь в виде эквивалентных по площади дискретных импульсах управления.
+// Другими словами можно сказать, что данный блок считает площадь сигнала произвольной формы на входе
+// и выдает эквивалентную площадь дискретных сигналов на выходе с учетом его полярности.
+// Так же необходимо учесть, что есть минимальное значение импульса, который может отработать исполнительный механизм.
+// Еще учесть, что в общем случае, что время открытия и закрытия исполнительного механизма может быть разное.
+//
+// Изначальной данный блок планировался как самостоятельный ПИ- регулятор с двумя дискретными выходами для интегральных исполнительных механизмов.
+// Но во время реализации стало понятно что более оптимально сделать приставке к обычному ПИД- регулятору который должен работать как ПД- регулятор.
+// Между ПИД- регулятором и данным блоком на время отладки можно поставить дополнительный амплитудный ограничитель и зону не чувствительности.
+//
+// Данный блок проектировался ручкой в тетрадке в терминах языка CFC.
+// При трансляции на структурированный текст сумматор и триггеры были реализованны не явно.
+
+// Блок схема.
+//
+// &nbsp; &nbsp; &nbsp; &nbsp;Сумматор
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;+---+ &nbsp; &nbsp;Интегратор
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; | &nbsp; +----------+
+// &nbsp;Vopen-&gt;-|- &nbsp;| &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; | &nbsp; | &nbsp;Z * Ts &nbsp;|
+// &nbsp; &nbsp;Vin-&gt;-|+ &nbsp;|-&gt;-| -------- |-&gt;-S
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; | &nbsp; | &nbsp;Z - 1 &nbsp; |
+// Vclose-&gt;-|+ &nbsp;| &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; | &nbsp; +----------+
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;+---+
+//
+// Амплитудный ограничитель
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Smax
+// &nbsp; &nbsp; &nbsp; +-----------+
+// &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; +-- |
+// &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp;/ &nbsp; &nbsp;|
+// Pos-&gt;-| &nbsp; &nbsp; / &nbsp; &nbsp; |-&gt;-Pos
+// &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp;/ &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp; &nbsp; | --+ &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp; +-----------+
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Smin
+//
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Триггер на открытие
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;+-------------+
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| FbTriggerRS |
+// &nbsp; &nbsp; &nbsp; +--------------+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// Pos-&gt;-| Pos &gt;= Smin &nbsp;|---------&gt;-|Set &nbsp; &nbsp; &nbsp; Out|-&gt;-CmdOpen
+// &nbsp; &nbsp; &nbsp; +--------------+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp; +--------------+ &nbsp; +---+ &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// Pos-&gt;-| &nbsp; Pos &lt;= 0 &nbsp; |-&gt;-| 1 |-&gt;-|Rst &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp; &nbsp; +--------------+ &nbsp; | &nbsp; | &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; | &nbsp; +-------------+
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; SensorOpen-&gt;-| &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;+---+
+//
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; +--------------+ &nbsp; +---+
+// CmdOpen-&gt;-| BOOL_TO_REAL |-&gt;-| * |-&gt;-Vopen
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; +--------------+ &nbsp; | &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 100.0 / TimeOpen-&gt;-| &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;+---+
+//
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Триггер на закрытие
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;+-------------+
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| FbTriggerRS |
+// &nbsp; &nbsp; &nbsp; +--------------+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// Pos-&gt;-| Pos &lt;= -Smin |---------&gt;-|Set &nbsp; &nbsp; &nbsp; Out|-&gt;-CmdClose
+// &nbsp; &nbsp; &nbsp; +--------------+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp; +--------------+ &nbsp; +---+ &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// Pos-&gt;-| &nbsp; Pos &gt;= 0 &nbsp; |-&gt;-| 1 |-&gt;-|Rst &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp; &nbsp; +--------------+ &nbsp; | &nbsp; | &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; | &nbsp; +-------------+
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;SensorClose-&gt;-| &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;+---+
+//
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;+--------------+ &nbsp; +---+
+// CmdClose-&gt;-| BOOL_TO_REAL |-&gt;-| * |-&gt;-Vclose
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;+--------------+ &nbsp; | &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 100.0 / TimeClose-&gt;-| &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; +---+
+
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;-Pos-&gt;
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;V
+// &lt;----------|-----------|-----------|-----------&gt;
+// &nbsp; &nbsp; &nbsp; &nbsp; -Smin &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; &nbsp; &nbsp; +Smin
+// &nbsp; &nbsp; &nbsp; &nbsp;CmdClose &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; CmdOpen
+</pre>
+]]></Attribute>
+</FBType>

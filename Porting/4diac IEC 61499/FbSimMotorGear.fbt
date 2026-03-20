@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType Name="FbSimMotorGear" Comment="Виртуальный МЭО для отладки шагового регулятора.">
+	<Identification Standard="61499-1" Description="Виртуальный МЭО для отладки шагового регулятора.&#10;Simple FB with one algorithm">
+	</Identification>
+	<VersionInfo Organization="LIB_PLC" Version="0.2" Author="VA" Date="2026-03-20">
+	</VersionInfo>
+	<CompilerInfo>
+	</CompilerInfo>
+	<InterfaceList>
+		<EventInputs>
+			<Event Name="REQ" Type="Event" Comment="Normal Execution Request">
+				<With Var="CmdOpen"/>
+				<With Var="CmdClose"/>
+				<With Var="TimeOpen"/>
+				<With Var="TimeClose"/>
+				<With Var="Ts"/>
+				<With Var="Reset"/>
+			</Event>
+		</EventInputs>
+		<EventOutputs>
+			<Event Name="CNF" Type="Event" Comment="Execution Confirmation">
+				<With Var="Position"/>
+				<With Var="SensorOpen"/>
+				<With Var="SensorClose"/>
+			</Event>
+		</EventOutputs>
+		<InputVars>
+			<VarDeclaration Name="CmdOpen" Type="BOOL" InitialValue="FALSE"/>
+			<VarDeclaration Name="CmdClose" Type="BOOL" InitialValue="FALSE"/>
+			<VarDeclaration Name="TimeOpen" Type="REAL" InitialValue="60.0"/>
+			<VarDeclaration Name="TimeClose" Type="REAL" InitialValue="50.0"/>
+			<VarDeclaration Name="Ts" Type="REAL" InitialValue="0.1"/>
+			<VarDeclaration Name="Reset" Type="BOOL" InitialValue="FALSE"/>
+		</InputVars>
+		<OutputVars>
+			<VarDeclaration Name="Position" Type="REAL" InitialValue="0.0"/>
+			<VarDeclaration Name="SensorOpen" Type="BOOL" InitialValue="FALSE"/>
+			<VarDeclaration Name="SensorClose" Type="BOOL" InitialValue="FALSE"/>
+		</OutputVars>
+	</InterfaceList>
+	<SimpleFB>
+		<InternalVars>
+			<VarDeclaration Name="SpeedPos" Type="REAL" Comment="Скорость открытия." InitialValue="0.0"/>
+			<VarDeclaration Name="SpeedNeg" Type="REAL" Comment="Скорость закрытия." InitialValue="0.0"/>
+		</InternalVars>
+		<ECState Name="REQ">
+			<ECAction Algorithm="REQ" Output="CNF"/>
+		</ECState>
+		<Algorithm Name="REQ">
+			<ST><![CDATA[ALGORITHM REQ
+IF(Reset) THEN
+	Position := 0.0;
+END_IF;
+
+SpeedPos := 100.0 / TimeOpen; // [%/s]
+SpeedNeg := 100.0 / TimeClose; // [%/s]
+
+IF(CmdOpen) THEN
+	Position := Position + SpeedPos * Ts; // [%]
+END_IF;
+
+IF(CmdClose) THEN
+	Position := Position - SpeedNeg * Ts; // [%]
+END_IF;
+
+IF(Position >= 100.0) THEN
+	Position := 100.0;
+	SensorOpen := TRUE;
+ELSE
+	SensorOpen := FALSE;
+END_IF;
+
+IF(Position <= 0.0) THEN
+	Position := 0.0;
+	SensorClose := TRUE;
+ELSE
+	SensorClose := FALSE;
+END_IF;
+
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// Date start LIB_PLC: 2014
+// License: GNU GPL-2.0-or-later
+// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+// https://www.youtube.com/watch?v=n1F_MfLRlX0
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC/LIB_PLC
+// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+// https://t.me/DIY_PLC
+END_ALGORITHM
+
+]]></ST>
+		</Algorithm>
+	</SimpleFB>
+	<Attribute Name="Documentation" Type="CDATA"><![CDATA[<pre>
+// Виртуальный МЭО для отладки шагового регулятора.
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; DbSimMotorGear
+// &nbsp; &nbsp;+--------------------------+
+// &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp;FbSimMotorGear &nbsp; &nbsp; &nbsp;|
+// -&gt;-|CmdOpen &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Position|-&gt;-
+// -&gt;-|CmdClose &nbsp; &nbsp; &nbsp; &nbsp;SensorOpen|-
+// &nbsp; -|TimeOpen &nbsp; &nbsp; &nbsp; SensorClose|-
+// &nbsp; -|TimeClose &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; -|Ts &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; -|Reset &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp;+--------------------------+</pre>
+]]></Attribute>
+</FBType>
