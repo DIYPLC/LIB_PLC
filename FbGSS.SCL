@@ -54,8 +54,8 @@ BEGIN
 //    -|Ts              Prnd|->-
 //     +--------------------+
 
-Sine   := Amplitude*SIN(2*PI*(1.0/Period)*CurrentTime+Phase) + Offset;
-Cosine := Amplitude*COS(2*PI*(1.0/Period)*CurrentTime+Phase) + Offset;
+Sine   := Amplitude*SIN(2.0*PI*(1.0/Period)*CurrentTime+Phase) + Offset;
+Cosine := Amplitude*COS(2.0*PI*(1.0/Period)*CurrentTime+Phase) + Offset;
 
 IF (CurrentTime < PulseTime) THEN // Прямоугольные импульсы.
 RectangleR := Amplitude + Offset;
