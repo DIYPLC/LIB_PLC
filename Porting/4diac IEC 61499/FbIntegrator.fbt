@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType Name="FbIntegrator" Comment="Интегратор W(s)=1/s.">
+	<Identification Standard="61499-1" Description="Интегратор W(s)=1/s.&#10;Simple FB with one algorithm">
+	</Identification>
+	<VersionInfo Organization="LIB_PLC" Version="2.2" Author="VA" Date="2026-03-20">
+	</VersionInfo>
+	<CompilerInfo>
+	</CompilerInfo>
+	<InterfaceList>
+		<EventInputs>
+			<Event Name="REQ" Type="Event" Comment="Normal Execution Request">
+				<With Var="In"/>
+				<With Var="OutMax"/>
+				<With Var="OutMin"/>
+				<With Var="InitValue"/>
+				<With Var="Trapezoid"/>
+				<With Var="Ts"/>
+				<With Var="Reset"/>
+			</Event>
+		</EventInputs>
+		<EventOutputs>
+			<Event Name="CNF" Type="Event" Comment="Execution Confirmation">
+				<With Var="Out"/>
+			</Event>
+		</EventOutputs>
+		<InputVars>
+			<VarDeclaration Name="In" Type="REAL" Comment="Входной сигнал интегратора." InitialValue="0.0"/>
+			<VarDeclaration Name="OutMax" Type="REAL" Comment="Максимальное значение выхода." InitialValue="1000000.0"/>
+			<VarDeclaration Name="OutMin" Type="REAL" Comment="Минимальное значение выхода." InitialValue="-1000000.0"/>
+			<VarDeclaration Name="InitValue" Type="REAL" Comment="Начальные условия интегрирования для Reset" InitialValue="0.0"/>
+			<VarDeclaration Name="Trapezoid" Type="BOOL" Comment="Интегрирование методом: 1-трапеций 0-прямоугольников." InitialValue="FALSE"/>
+			<VarDeclaration Name="Ts" Type="REAL" Comment="Шаг дискретизации по времени [с]." InitialValue="0.1"/>
+			<VarDeclaration Name="Reset" Type="BOOL" Comment="Сброс при перезагрузке." InitialValue="FALSE"/>
+		</InputVars>
+		<OutputVars>
+			<VarDeclaration Name="Out" Type="REAL" Comment="Выходной сигнал интегратора." InitialValue="0.0"/>
+		</OutputVars>
+	</InterfaceList>
+	<SimpleFB>
+		<InternalVars>
+			<VarDeclaration Name="InPrevious" Type="REAL" Comment="Предидущее значение входа только для трапециидального интегратора.Предидущее значение входа только для трапециидального интегратора." InitialValue="0.0"/>
+		</InternalVars>
+		<ECState Name="REQ">
+			<ECAction Algorithm="REQ" Output="CNF"/>
+		</ECState>
+		<Algorithm Name="REQ">
+			<ST><![CDATA[ALGORITHM REQ
+IF (Trapezoid) THEN
+	// При шаге дискретизации Ts>=1s есть смысл включить более точный алгоритм.
+	// Или если мы точно понимаем, что делаем и зачем.
+	// Все же не траекторию ракеты в космомосе считаем.
+	Out := Out + (In + InPrevious) * 0.5 * Ts; // Трапецеидальный интегратор.
+ELSE
+	// По умолчанию простой алгоритм.
+	// Используем прямоугольный интегратор т.к. его обычно достаточно.
+	Out := Out + In * Ts; // Прямоугольный интегратор
+END_IF;
+
+InPrevious := In;
+
+IF (Reset) THEN // Начальные условия интегрирования применяются при сбросе.
+	Out := InitValue;
+END_IF;
+
+IF (Out >= OutMax) THEN // Ограничение верх.
+	Out := OutMax;
+END_IF;
+
+IF (Out <= OutMin) THEN // Ограничение низ.
+	Out := OutMin;
+END_IF;
+
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// Date start LIB_PLC: 2014
+// License: GNU GPL-2.0-or-later
+// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+// https://www.youtube.com/watch?v=n1F_MfLRlX0
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC/LIB_PLC
+// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+// https://t.me/DIY_PLC
+END_ALGORITHM
+
+]]></ST>
+		</Algorithm>
+	</SimpleFB>
+	<Attribute Name="Documentation" Type="CDATA"><![CDATA[<pre>
+// Интегратор W(s)=1/s.
+// &nbsp; &nbsp; &nbsp;DbIntegrator
+// &nbsp; &nbsp;+--------------+
+// &nbsp; &nbsp;| FbIntegrator |
+// -&gt;-|In &nbsp; &nbsp; &nbsp; &nbsp; Out|-&gt;-
+// &nbsp; -|OutMax &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; -|OutMin &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; -|InitValue &nbsp; &nbsp; |
+// &nbsp; -|Trapezoid &nbsp; &nbsp; |
+// &nbsp; -|Ts &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; -|Reset &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp;+--------------+
+
+// Условное графическое обозначение (точное).
+//
+// &nbsp; &nbsp;+----------+
+// &nbsp; &nbsp;| &nbsp;Ts * z &nbsp;|
+// -&gt;-| -------- |-&gt;-
+// &nbsp; &nbsp;| &nbsp; z - 1 &nbsp;|
+// &nbsp; &nbsp;+----------+
+
+// Условное графическое обозначение (приближенное).
+//
+// &nbsp; &nbsp; &nbsp; &nbsp;+-----+
+// &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp;1 &nbsp;|
+// X(s)-&gt;-| --- |-&gt;-Y(s)
+// &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp;s &nbsp;|
+// &nbsp; &nbsp; &nbsp; &nbsp;+-----+
+//
+// W(s) = Y(s) / X(s).
+
+// Временная характеристика.
+//
+// ^ Out
+// |
+// 3 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; *
+// | &nbsp; &nbsp; &nbsp; &nbsp; * &nbsp;
+// 2 &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp;
+// | &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp;
+// 1 &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp;
+// | * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+// 0---1---2---3---&gt; t[s]
+//
+// ^ In
+// |
+// 1************
+// | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+// 0---1---2---3---&gt; t[s]
+
+// Подаем на вход константу на выходе получаем линейную функцию.
+// Подаем на вход линейную функцию на выходе получаем параболу.
+// Подаем на вход функцию sin(t) на выходе получаем cos(t).
+// Подаем на вход функцию e(t) &nbsp; на выходе получаем e(t).
+
+// Передаточная функция интегратора в изображении по Лапласу:
+// &nbsp; &nbsp; &nbsp; &nbsp; 1
+// W(s) = ---
+// &nbsp; &nbsp; &nbsp; &nbsp; s
+// W(s) = Y(s) / X(s)
+// X(s) = L( X(t) )
+// Y(s) = L( Y(t) )
+// Например подали на вход константу 2:
+// X(t) = 2
+// Изображение константы 2:
+// L( X(t) ) = L( 2 ) = 2/s
+// На выходе получили линейную функцию 2t:
+// Y(t) = 2t
+// Изображение линейной функции 2t:
+// L( Y(t) ) = L( 2t ) = 2/(s*s)
+// Тогда по определению передаточной функции получаем для интегратора:
+// W(s) = Y(s) / X(s) = 2/(s*s) &nbsp;/ &nbsp;2/s = 1/s
+// W(s) = 1/s
+// Преобразование Лапласа грубо говоря это преобразование Фурье в котором:
+// Исходную функцию умножили на затухающую экспоненту чтобы результирующая площадь (интеграл) была конечной.
+// Предел интегрирования не от -inf до +inf а 0 до +inf с той же целью чтобы площадь (интеграл) была конечной и проще было считать интеграл.
+// Если вы не знаете что такое интеграл смотрите и вам откроется:)
+// История математики ВВС: The Story of Maths (4 серии)
+// Механическая Вселенная The Mechanical Universe&hellip; And Beyond (52 серии)
+
+// Вывод разностного уравнения из дифференциального уравнения:
+// &nbsp; &nbsp; &nbsp; &nbsp; 1
+// W(p) = ---
+// &nbsp; &nbsp; &nbsp; &nbsp; p
+// W(p) = Y(t) / X(t)
+// p = d/dt
+// Y(t) / X(t) = 1 / p
+// Y(t) * p = X(t)
+// Y(t) * d/dt = X(t)
+// d(Y(t)) / dt = X(t)
+// (Y(t) - Y(t-dt)) / dt = X(t)
+// Y(t) - Y(t-dt) = X(t) * dt
+// Y(t) &nbsp;= Y(t-dt) + X(t) * dt
+// Y = Y + X * Ts
+
+// Прямоугольный интегратор (Integrator Backward Euler).
+// Алгебраический порядок точности численного метода = 0 (ODE0)
+// Вывод разностного уравнения из дискретной передаточной функции:
+// &nbsp; &nbsp; &nbsp; &nbsp; Ts * z
+// W(z) = --------
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;z - 1
+// W(z) = (Ts * z) / (z - 1)
+// Y(z) / X(z) = (Ts * z) / (z - 1)
+// Y(z) * (z - 1) = Ts * X(z) * z
+// Y(z) * z - Y(z) = Ts * X(z) * z
+// Y(z) * z &nbsp;= Y(z) + Ts * X(z) * z
+// Y(z) &nbsp;= Y(z) * (z^-1) + Ts * X(z)
+// Y[n] &nbsp;= Y[n-1] &nbsp;+ Ts * X[n]
+// Y = Y + X * Ts
+// Практика применения в АСУТП показывает
+// что достаточно нулевой алгебраической точности интегратора
+// и шага дискретизации по времени Ts = 0.1s.
+
+// Трапецеидальный интегратор (Integrator Trapezoidal).
+// Алгебраический порядок точности численного метода = 1 (ODE1)
+// Вывод разностного уравнения из дискретной передаточной функции:
+// &nbsp; &nbsp; &nbsp; &nbsp; Ts * (z + 1)
+// W(z) = --------------
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;2 * (z - 1)
+// W(z) = Ts * (z + 1) / 2 * (z - 1)
+// Y(z) / X(z) = Ts * (z + 1) / 2 * (z - 1)
+// Y(z) * 2 * (z - 1) = X(z) * Ts * (z + 1)
+// Y(z) * z * 2 - Y(z) * 2 = X(z) * z * Ts + X(z) * Ts
+// Y(z) * 2 - Y(z) * (z^-1) * 2 = X(z) * Ts + X(z) * (z^-1) * Ts
+// Y(z) * 2 = Y(z) * (z^-1) * 2 + X(z) * Ts + X(z) * (z^-1) * Ts
+// Y(z) = Y(z) * (z^-1) + (X(z) * Ts + X(z) * (z^-1) * Ts) / 2
+// Y(z) = Y(z) * (z^-1) + (X(z) + X(z) * (z^-1)) * 0.5 * Ts
+// Y[n] = Y[n-1] + (X[n] + X[n-1]) * 0.5 * Ts
+// Y = Y + (X + Xprevious) * 0.5 * Ts
+// Xprevious = X</pre>
+]]></Attribute>
+</FBType>

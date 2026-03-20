@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType Name="Fb3PosControl" Comment="Регулятор трехпозиционный.">
+	<Identification Standard="61499-1" Description="Регулятор трехпозиционный.&#10;Simple FB with one algorithm">
+	</Identification>
+	<VersionInfo Organization="LIB_PLC" Version="2.2" Author="VA" Date="2026-03-20">
+	</VersionInfo>
+	<CompilerInfo>
+	</CompilerInfo>
+	<InterfaceList>
+		<EventInputs>
+			<Event Name="REQ" Type="Event" Comment="Normal Execution Request">
+				<With Var="PV"/>
+				<With Var="SP"/>
+				<With Var="DBand"/>
+				<With Var="HystPos"/>
+				<With Var="HystNeg"/>
+			</Event>
+		</EventInputs>
+		<EventOutputs>
+			<Event Name="CNF" Type="Event" Comment="Execution Confirmation">
+				<With Var="OpPos"/>
+				<With Var="OpNeg"/>
+			</Event>
+		</EventOutputs>
+		<InputVars>
+			<VarDeclaration Name="PV" Type="REAL" Comment="Измеренное значение регулируемого параметра." InitialValue="0.0"/>
+			<VarDeclaration Name="SP" Type="REAL" Comment="Заданное значение регулируемого параметра." InitialValue="0.0"/>
+			<VarDeclaration Name="DBand" Type="REAL" Comment="Зона нечувствительности &gt; 0." InitialValue="2.0"/>
+			<VarDeclaration Name="HystPos" Type="REAL" Comment="Гистерезис &gt; 0." InitialValue="1.0"/>
+			<VarDeclaration Name="HystNeg" Type="REAL" Comment="Гистерезис &gt; 0." InitialValue="1.0"/>
+		</InputVars>
+		<OutputVars>
+			<VarDeclaration Name="OpPos" Type="BOOL" Comment="Выход управляющего сигнала положительный." InitialValue="FALSE"/>
+			<VarDeclaration Name="OpNeg" Type="BOOL" Comment="Выход управляющего сигнала отрицательный." InitialValue="FALSE"/>
+		</OutputVars>
+	</InterfaceList>
+	<SimpleFB>
+		<InternalVars>
+			<VarDeclaration Name="ER" Type="REAL" Comment="Ошибка регулирования." InitialValue="0.0"/>
+		</InternalVars>
+		<ECState Name="REQ">
+			<ECAction Algorithm="REQ" Output="CNF"/>
+		</ECState>
+		<Algorithm Name="REQ">
+			<ST><![CDATA[ALGORITHM REQ
+// Ошибка регулирования.
+ER := SP - PV;
+
+// ВКЛ нагрев или движение вперед.
+IF (ER >= (DBand + HystPos)) THEN
+	OpPos := TRUE;
+END_IF;
+
+// ВЫКЛ нагрев или движение вперед.
+IF (ER <= (DBand - HystPos)) THEN
+	OpPos := FALSE;
+END_IF;
+
+// ВКЛ охлаждение или движение назад.
+IF (ER <= (0.0 - DBand - HystNeg)) THEN
+	OpNeg := TRUE;
+END_IF;
+
+// ВЫКЛ охлаждение или движение назад.
+IF (ER >= (0.0 - DBand + HystNeg)) THEN
+	OpNeg := FALSE;
+END_IF;
+
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// Date start LIB_PLC: 2014
+// License: GNU GPL-2.0-or-later
+// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+// https://www.youtube.com/watch?v=n1F_MfLRlX0
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC/LIB_PLC
+// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+// https://t.me/DIY_PLC
+END_ALGORITHM
+
+]]></ST>
+		</Algorithm>
+	</SimpleFB>
+	<Attribute Name="Documentation" Type="CDATA"><![CDATA[<pre>
+// Регулятор трехпозиционный.
+// &nbsp; &nbsp; &nbsp; Db3PosControl
+// &nbsp; &nbsp; +---------------+
+// &nbsp; &nbsp; | Fb3PosControl |
+// &nbsp;-&gt;-|PV &nbsp; &nbsp; &nbsp; &nbsp;OpPos|-&gt;-
+// &nbsp; &nbsp;-|SP &nbsp; &nbsp; &nbsp; &nbsp;OpNeg|-&gt;-
+// &nbsp; &nbsp;-|DBand &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp;-|HystPos &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp;-|HystNeg &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp; +---------------+
+
+// Применение.
+//
+// Трехпозиционный регулятор используется как простейший регулятор температуры или положения.
+
+// Статическая характеристика.
+//
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; OpPos
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ^
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp;DBand
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |&lt;--------&gt;|
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; HystPos|HystPos
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; |&lt;----&gt;|&lt;----&gt;|
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; | &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;1|---***&lt;***1***&lt;******
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; * &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp;*
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; v &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp;^
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; * &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp;*
+// -ER &lt;-----***&lt;*******&lt;******0******&gt;*******&gt;***-----&gt; +ER
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp;* &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; v &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp;^ &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp;* &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp;******&gt;***1***&gt;***---|-1
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp;| &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |&lt;----&gt;|&lt;----&gt;| &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; HystHeg|HystHeg &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|&lt;--------&gt;|
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; DBand &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; v
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; OpNeg
+
+// Схема включения.
+//
+// &nbsp; &nbsp; &nbsp; &nbsp;+---------------+ &nbsp; &nbsp; +-------------+ &nbsp; &nbsp; +-------------+
+// SP--&gt;--|SP &nbsp; &nbsp; &nbsp; &nbsp;OpPos|--&gt;--| Нагреватель |--&gt;--| Датчик &nbsp; &nbsp; &nbsp;|--+--&gt;PV
+// &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; +-------------+ &nbsp; &nbsp; | температуры | &nbsp;|
+// &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp;|
+// &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; +-------------+ &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp;|
+// &nbsp; &nbsp; +--|PV &nbsp; &nbsp; &nbsp; &nbsp;OpNeg|--&gt;--| Охладитель &nbsp;|--&gt;--| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp;|
+// &nbsp; &nbsp; | &nbsp;+---------------+ &nbsp; &nbsp; +-------------+ &nbsp; &nbsp; +-------------+ &nbsp;|
+// &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp; +-------------------------------------------------------------+
+//
+// &nbsp; &nbsp; &nbsp; &nbsp;+---------------+ &nbsp; &nbsp; +--------------+ &nbsp; &nbsp; +-------------+
+// SP--&gt;--|SP &nbsp; &nbsp; &nbsp; &nbsp;OpPos|--&gt;--| Мотор вперед |--&gt;--| Датчик &nbsp; &nbsp; &nbsp;|--+--&gt;PV
+// &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; +--------------+ &nbsp; &nbsp; | положения &nbsp; | &nbsp;|
+// &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp;|
+// &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; +--------------+ &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp;|
+// &nbsp; &nbsp; +--|PV &nbsp; &nbsp; &nbsp; &nbsp;OpNeg|--&gt;--| Мотор назад &nbsp;|--&gt;--| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp;|
+// &nbsp; &nbsp; | &nbsp;+---------------+ &nbsp; &nbsp; +--------------+ &nbsp; &nbsp; +-------------+ &nbsp;|
+// &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp; +--------------------------------------------------------------+</pre>
+]]></Attribute>
+</FBType>

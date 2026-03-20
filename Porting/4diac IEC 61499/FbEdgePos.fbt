@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType Name="FbEdgePos" Comment="Детектор нарастающего фронта.">
+	<Identification Standard="61499-1" Description="Детектор нарастающего фронта.&#10;Simple FB with one algorithm">
+	</Identification>
+	<VersionInfo Organization="LIB_PLC" Version="2.1" Author="VA" Date="2026-03-20">
+	</VersionInfo>
+	<CompilerInfo>
+	</CompilerInfo>
+	<InterfaceList>
+		<EventInputs>
+			<Event Name="REQ" Type="Event" Comment="Normal Execution Request">
+				<With Var="In"/>
+			</Event>
+		</EventInputs>
+		<EventOutputs>
+			<Event Name="CNF" Type="Event" Comment="Execution Confirmation">
+				<With Var="Out"/>
+			</Event>
+		</EventOutputs>
+		<InputVars>
+			<VarDeclaration Name="In" Type="BOOL" Comment="Вход" InitialValue="FALSE"/>
+		</InputVars>
+		<OutputVars>
+			<VarDeclaration Name="Out" Type="BOOL" Comment="Выход" InitialValue="FALSE"/>
+		</OutputVars>
+	</InterfaceList>
+	<SimpleFB>
+		<InternalVars>
+			<VarDeclaration Name="In_previos" Type="BOOL" Comment="Предыдущее состояние входа." InitialValue="FALSE"/>
+		</InternalVars>
+		<ECState Name="REQ">
+			<ECAction Algorithm="REQ" Output="CNF"/>
+		</ECState>
+		<Algorithm Name="REQ">
+			<ST><![CDATA[ALGORITHM REQ
+// Детектор нарастающего фронта.
+Out := In AND NOT (In_previos);
+// Запомнить предыдущее состояние входа.
+In_previos := In;
+
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// Date start LIB_PLC: 2014
+// License: GNU GPL-2.0-or-later
+// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+// https://www.youtube.com/watch?v=n1F_MfLRlX0
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC/LIB_PLC
+// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+// https://t.me/DIY_PLC
+END_ALGORITHM
+
+]]></ST>
+		</Algorithm>
+	</SimpleFB>
+	<Attribute Name="Documentation" Type="CDATA"><![CDATA[<pre>
+// Детектор нарастающего фронта.
+// &nbsp; &nbsp; &nbsp; DbEdgePos
+// &nbsp; &nbsp; +-----------+
+// &nbsp; &nbsp; | FbEdgePos |
+// &nbsp;-&gt;-|In &nbsp; &nbsp; &nbsp;Out|-&gt;-
+// &nbsp; &nbsp; +-----------+</pre>
+]]></Attribute>
+</FBType>

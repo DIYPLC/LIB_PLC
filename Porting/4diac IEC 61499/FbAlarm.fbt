@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType Name="FbAlarm" Comment="Блок предупреждений.">
+	<Identification Standard="61499-1" Description="Блок предупреждений.&#10;Simple FB with one algorithm">
+	</Identification>
+	<VersionInfo Organization="LIB_PLC" Version="2.2" Author="VA" Date="2026-03-20">
+	</VersionInfo>
+	<CompilerInfo>
+	</CompilerInfo>
+	<InterfaceList>
+		<EventInputs>
+			<Event Name="REQ" Type="Event" Comment="Normal Execution Request">
+				<With Var="In"/>
+				<With Var="LevelHi"/>
+				<With Var="LevelLo"/>
+				<With Var="TimeDelay"/>
+				<With Var="Ts_ms"/>
+			</Event>
+		</EventInputs>
+		<EventOutputs>
+			<Event Name="CNF" Type="Event" Comment="Execution Confirmation">
+				<With Var="AlarmHi"/>
+				<With Var="AlarmLo"/>
+			</Event>
+		</EventOutputs>
+		<InputVars>
+			<VarDeclaration Name="In" Type="REAL" Comment="Входной сигнал." InitialValue="0.0"/>
+			<VarDeclaration Name="LevelHi" Type="REAL" Comment="Верхняя граница предупреждения." InitialValue="0.0"/>
+			<VarDeclaration Name="LevelLo" Type="REAL" Comment="Нижняя граница предупреждения." InitialValue="0.0"/>
+			<VarDeclaration Name="TimeDelay" Type="UDINT" Comment="Время задержки включения [мс]." InitialValue="0"/>
+			<VarDeclaration Name="Ts_ms" Type="UDINT" Comment="Шаг дискретизации по времени [мс]." InitialValue="0"/>
+		</InputVars>
+		<OutputVars>
+			<VarDeclaration Name="AlarmHi" Type="BOOL" Comment="Достигнут верхний предел." InitialValue="FALSE"/>
+			<VarDeclaration Name="AlarmLo" Type="BOOL" Comment="Достигнут нижний предел." InitialValue="FALSE"/>
+		</OutputVars>
+	</InterfaceList>
+	<SimpleFB>
+		<InternalVars>
+			<VarDeclaration Name="_AlarmHi" Type="BOOL" Comment="Достигнут верхний предел." InitialValue="FALSE"/>
+			<VarDeclaration Name="_AlarmLo" Type="BOOL" Comment="Достигнут нижний предел." InitialValue="FALSE"/>
+			<VarDeclaration Name="Timer1" Type="UDINT" Comment="Текущее время таймер1 [мс]." InitialValue="0"/>
+			<VarDeclaration Name="Timer2" Type="UDINT" Comment="Текущее время таймер1 [мс]." InitialValue="0"/>
+		</InternalVars>
+		<ECState Name="REQ">
+			<ECAction Algorithm="REQ" Output="CNF"/>
+		</ECState>
+		<Algorithm Name="REQ">
+			<ST><![CDATA[ALGORITHM REQ
+// Верхний предел.
+_AlarmHi := (In >= LevelHi);
+
+// Таймер задержки включения для верхнего предела.
+IF (TimeDelay > 0) THEN // Таймер включен.
+	IF (_AlarmHi) THEN // На входе 1.
+		IF (AlarmHi) THEN // На выходе 1.
+			AlarmHi := TRUE;
+		ELSE // На выходе 0.
+			IF (Timer1 >= TimeDelay) THEN // Задержка включения закончилась.
+				AlarmHi := TRUE;
+			ELSE // Задержка включения активна.
+				AlarmHi := FALSE;
+				Timer1 := Timer1 + Ts_ms;
+			END_IF;
+		END_IF;
+	ELSE // Если на входе 0 то на выходе тоже 0.
+		AlarmHi := FALSE;
+		Timer1 := 0;
+	END_IF;
+ELSE // Таймер выключен.
+	AlarmHi := _AlarmHi;
+	Timer1 := 0;
+END_IF;
+
+// Нижний предел.
+_AlarmLo := (In <= LevelLo);
+
+// Таймер задержки включения для нижнего предела.
+IF (TimeDelay > 0) THEN // Таймер включен.
+	IF (_AlarmLo) THEN // На входе 1.
+		IF (AlarmLo) THEN // На выходе 1.
+			AlarmLo := TRUE;
+		ELSE // На выходе 0.
+			IF (Timer2 >= TimeDelay) THEN // Задержка включения закончилась.
+				AlarmLo := TRUE;
+			ELSE // Задержка включения активна.
+				AlarmLo := FALSE;
+				Timer2 := Timer2 + Ts_ms;
+			END_IF;
+		END_IF;
+	ELSE // Если на входе 0 то на выходе тоже 0.
+		AlarmLo := FALSE;
+		Timer2 := 0;
+	END_IF;
+ELSE // Таймер выключен.
+	AlarmLo := _AlarmLo;
+	Timer2 := 0;
+END_IF;
+
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// Date start LIB_PLC: 2014
+// License: GNU GPL-2.0-or-later
+// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+// https://www.youtube.com/watch?v=n1F_MfLRlX0
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC/LIB_PLC
+// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+// https://t.me/DIY_PLC
+END_ALGORITHM
+
+]]></ST>
+		</Algorithm>
+	</SimpleFB>
+	<Attribute Name="Documentation" Type="CDATA"><![CDATA[<pre>
+// Блок предупреждений.
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;DbAlarm
+// &nbsp; &nbsp;+-----------------+
+// &nbsp; &nbsp;| &nbsp; &nbsp; FbAlarm &nbsp; &nbsp; |
+// -&gt;-|In &nbsp; &nbsp; &nbsp; &nbsp;AlarmHi|-&gt;-
+// &nbsp; -|LevelHi &nbsp; AlarmLo|-&gt;-
+// &nbsp; -|LevelLo &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; -|TimeDelay &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; -|Ts_ms &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp;+-----------------+</pre>
+]]></Attribute>
+</FBType>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType Name="FbCounter" Comment="Счетчик импульсов.">
+	<Identification Standard="61499-1" Description="Счетчик импульсов.&#10;Simple FB with one algorithm">
+	</Identification>
+	<VersionInfo Organization="LIB_PLC" Version="2.2" Author="VA" Date="2026-03-20">
+	</VersionInfo>
+	<CompilerInfo>
+	</CompilerInfo>
+	<InterfaceList>
+		<EventInputs>
+			<Event Name="REQ" Type="Event" Comment="Normal Execution Request">
+				<With Var="INC"/>
+				<With Var="DEC"/>
+				<With Var="RESET"/>
+				<With Var="SETVALUE"/>
+				<With Var="VALUE"/>
+			</Event>
+		</EventInputs>
+		<EventOutputs>
+			<Event Name="CNF" Type="Event" Comment="Execution Confirmation">
+				<With Var="CNT"/>
+				<With Var="OVERFLOW"/>
+			</Event>
+		</EventOutputs>
+		<InputVars>
+			<VarDeclaration Name="INC" Type="BOOL" Comment="Вход импульсов +1." InitialValue="FALSE"/>
+			<VarDeclaration Name="DEC" Type="BOOL" Comment="Вход импульсов -1." InitialValue="FALSE"/>
+			<VarDeclaration Name="RESET" Type="BOOL" Comment="Сбросить счетчик на 0." InitialValue="FALSE"/>
+			<VarDeclaration Name="SETVALUE" Type="BOOL" Comment="Установить на выходе значение VALUE." InitialValue="FALSE"/>
+			<VarDeclaration Name="VALUE" Type="DINT" Comment="Предустановленное значение счета." InitialValue="0"/>
+		</InputVars>
+		<OutputVars>
+			<VarDeclaration Name="CNT" Type="DINT" Comment="Выход счетчика." InitialValue="0"/>
+			<VarDeclaration Name="OVERFLOW" Type="BOOL" Comment="Флаг переполнения счетчика." InitialValue="FALSE"/>
+		</OutputVars>
+	</InterfaceList>
+	<SimpleFB>
+		<InternalVars>
+			<VarDeclaration Name="INCPrevios" Type="BOOL" Comment="Предыдущее состояние входа +1." InitialValue="FALSE"/>
+			<VarDeclaration Name="DECPrevios" Type="BOOL" Comment="Предыдущее состояние входа -1." InitialValue="FALSE"/>
+		</InternalVars>
+		<InternalConstVars>
+			<VarDeclaration Name="LIMIT_MAX" Type="DINT" Comment="Максимальное значение счетчика." InitialValue="2147483647"/>
+			<VarDeclaration Name="LIMIT_MIN" Type="DINT" Comment="Минимальное значение счетчика." InitialValue="-2147483648"/>
+		</InternalConstVars>
+		<ECState Name="REQ">
+			<ECAction Algorithm="REQ" Output="CNF"/>
+		</ECState>
+		<Algorithm Name="REQ">
+			<ST><![CDATA[ALGORITHM REQ
+// Прямой счет по нарастающему фронту импульсов +1.
+IF (INC AND NOT (INCPrevios)) THEN
+	IF (CNT >= LIMIT_MAX) THEN // Ограничение сверху.
+		CNT := LIMIT_MAX;
+		OVERFLOW := TRUE;
+	ELSE // Прямой счет.
+		CNT := CNT + 1;
+		OVERFLOW := FALSE;
+	END_IF;
+END_IF;
+
+// Обратный счет по нарастающему фронту импульсов -1.
+IF (DEC AND NOT (DECPrevios)) THEN
+	IF (CNT <= LIMIT_MIN) THEN // Ограничение снизу.
+		CNT := LIMIT_MIN;
+		OVERFLOW := TRUE;
+	ELSE // Обратный счет.
+		CNT := CNT - 1;
+		OVERFLOW := FALSE;
+	END_IF;
+END_IF;
+
+// Установить значение счетчика.
+IF (SETVALUE) THEN
+	CNT := VALUE;
+END_IF;
+
+// Сбросить счетчик.
+IF (RESET) THEN
+	CNT := 0;
+END_IF;
+
+// Запомнить предыдущее состояние входа.
+INCPrevios := INC;
+DECPrevios := DEC;
+
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// Date start LIB_PLC: 2014
+// License: GNU GPL-2.0-or-later
+// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+// https://www.youtube.com/watch?v=n1F_MfLRlX0
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC/LIB_PLC
+// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+// https://t.me/DIY_PLC
+END_ALGORITHM
+
+]]></ST>
+		</Algorithm>
+	</SimpleFB>
+	<Attribute Name="Documentation" Type="CDATA"><![CDATA[<pre>
+// Счетчик импульсов.
+// &nbsp; &nbsp; &nbsp; &nbsp; DbCounter
+// &nbsp; &nbsp;+-----------------+
+// &nbsp; &nbsp;| &nbsp; &nbsp;FbCounter &nbsp; &nbsp;|
+// -&gt;-|INC &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; CNT|-&gt;-
+// &nbsp; -|DEC &nbsp; &nbsp; &nbsp;OVERFLOW|-
+// &nbsp; -|RESET &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; -|SETVALUE &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; -|VALUE &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp;+-----------------+</pre>
+]]></Attribute>
+</FBType>

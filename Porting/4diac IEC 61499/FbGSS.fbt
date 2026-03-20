@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType Name="FbGSS" Comment="Генератор сигналов и псевдослучайных чисел.">
+	<Identification Standard="61499-1" Description="Генератор сигналов и псевдослучайных чисел.&#10;Simple FB with one algorithm">
+	</Identification>
+	<VersionInfo Organization="LIB_PLC" Version="2.1" Author="VA" Date="2026-03-20">
+	</VersionInfo>
+	<CompilerInfo>
+	</CompilerInfo>
+	<InterfaceList>
+		<EventInputs>
+			<Event Name="REQ" Type="Event" Comment="Normal Execution Request">
+				<With Var="Amplitude"/>
+				<With Var="Period"/>
+				<With Var="Phase"/>
+				<With Var="Offset"/>
+				<With Var="PulseTime"/>
+				<With Var="Ts"/>
+			</Event>
+		</EventInputs>
+		<EventOutputs>
+			<Event Name="CNF" Type="Event" Comment="Execution Confirmation">
+				<With Var="Sine"/>
+				<With Var="Cosine"/>
+				<With Var="RectangleR"/>
+				<With Var="RectangleB"/>
+				<With Var="Triangle"/>
+				<With Var="Prnd"/>
+			</Event>
+		</EventOutputs>
+		<InputVars>
+			<VarDeclaration Name="Amplitude" Type="REAL" Comment="Амплитуда выходного сигнала." InitialValue="1.0"/>
+			<VarDeclaration Name="Period" Type="REAL" Comment="Период выходного сигнала [с]." InitialValue="10.0"/>
+			<VarDeclaration Name="Phase" Type="REAL" Comment="Фаза выходного сигнала [рад]." InitialValue="0.0"/>
+			<VarDeclaration Name="Offset" Type="REAL" Comment="Постоянная составляющая выходного сигнала." InitialValue="0.0"/>
+			<VarDeclaration Name="PulseTime" Type="REAL" Comment="Время импульса [с]." InitialValue="5.0"/>
+			<VarDeclaration Name="Ts" Type="REAL" Comment="Шаг дискретизации по времени [с]." InitialValue="0.1"/>
+		</InputVars>
+		<OutputVars>
+			<VarDeclaration Name="Sine" Type="REAL" Comment="Синусоидальный сигнал." InitialValue="0.0"/>
+			<VarDeclaration Name="Cosine" Type="REAL" Comment="Косинусоидальный сигнал." InitialValue="0.0"/>
+			<VarDeclaration Name="RectangleR" Type="REAL" Comment="Прямоугольный сигнал вещественный." InitialValue="0.0"/>
+			<VarDeclaration Name="RectangleB" Type="BOOL" Comment="Прямоугольный сигнал булевый." InitialValue="FALSE"/>
+			<VarDeclaration Name="Triangle" Type="REAL" Comment="Треугольный, линейно нарастающий и убывающий сигнал." InitialValue="0.0"/>
+			<VarDeclaration Name="Prnd" Type="REAL" Comment="Псевдослучайные числа в диапазоне 0...1." InitialValue="0.0"/>
+		</OutputVars>
+	</InterfaceList>
+	<SimpleFB>
+		<InternalVars>
+			<VarDeclaration Name="CurrentTime" Type="REAL" InitialValue="0.0"/>
+			<VarDeclaration Name="IntegratorTriangle" Type="REAL" InitialValue="0.0"/>
+			<VarDeclaration Name="SummatorRnd" Type="DINT" InitialValue="1"/>
+			<VarDeclaration Name="Tmp" Type="DWORD" InitialValue="16#00000000"/>
+		</InternalVars>
+		<InternalConstVars>
+			<VarDeclaration Name="PI" Type="REAL" Comment="Число Пи." InitialValue="3.14159265358979323846"/>
+		</InternalConstVars>
+		<ECState Name="REQ">
+			<ECAction Algorithm="REQ" Output="CNF"/>
+		</ECState>
+		<Algorithm Name="REQ">
+			<ST><![CDATA[ALGORITHM REQ
+Sine := Amplitude * SIN(2.0 * PI * (1.0 / Period) * CurrentTime + Phase) + Offset;
+Cosine := Amplitude * COS(2.0 * PI * (1.0 / Period) * CurrentTime + Phase) + Offset;
+
+IF (CurrentTime < PulseTime) THEN // Прямоугольные импульсы.
+	RectangleR := Amplitude + Offset;
+	RectangleB := TRUE;
+ELSE
+	RectangleR := Offset;
+	RectangleB := FALSE;
+END_IF;
+
+IF (CurrentTime <= (Period * 0.5)) THEN // Треугольные импульсы.
+	IntegratorTriangle := IntegratorTriangle + Ts;
+ELSE
+	IntegratorTriangle := IntegratorTriangle - Ts;
+END_IF;
+IF (Period <> 0.0) THEN
+	Triangle := (((IntegratorTriangle * 2.0) / Period) * Amplitude) + Offset;
+END_IF;
+
+// Псевдослучайные числа линейный конгруэнтный метод.
+SummatorRnd := SummatorRnd * 1103515245 + 12345;
+// Принудительно отбрасывающей младшие 16 и один старший разряд.
+Tmp := DINT_TO_DWORD(SummatorRnd) AND 2#01111111111111110000000000000000;
+// Арифметический сдвиг вправо на 16бит.
+Tmp := SHR(Tmp, 16);
+// Масштабирование 0...32767 -> 0...1
+Prnd := (DINT_TO_REAL(DWORD_TO_DINT(Tmp)) / 32767.0) * Amplitude + Offset;
+
+CurrentTime := CurrentTime + Ts; // Формирование периода.
+IF (CurrentTime >= Period) THEN
+	CurrentTime := 0.0;
+	IntegratorTriangle := 0.0;
+END_IF;
+
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// Date start LIB_PLC: 2014
+// License: GNU GPL-2.0-or-later
+// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+// https://www.youtube.com/watch?v=n1F_MfLRlX0
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC/LIB_PLC
+// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+// https://t.me/DIY_PLC
+END_ALGORITHM
+
+]]></ST>
+		</Algorithm>
+	</SimpleFB>
+	<Attribute Name="Documentation" Type="CDATA"><![CDATA[<pre>
+// Генератор сигналов и псевдослучайных чисел.
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; DbGSS
+// &nbsp; &nbsp; +--------------------+
+// &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; FbGSS &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp;-|Amplitude &nbsp; &nbsp; &nbsp; Sine|-&gt;-
+// &nbsp; &nbsp;-|Period &nbsp; &nbsp; &nbsp; &nbsp;Cosine|-&gt;-
+// &nbsp; &nbsp;-|Phase &nbsp; &nbsp; RectangleR|-&gt;-
+// &nbsp; &nbsp;-|Offset &nbsp; &nbsp;RectangleB|-&gt;-
+// &nbsp; &nbsp;-|PulseTime &nbsp; Triangle|-&gt;-
+// &nbsp; &nbsp;-|Ts &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Prnd|-&gt;-
+// &nbsp; &nbsp; +--------------------+</pre>
+]]></Attribute>
+</FBType>

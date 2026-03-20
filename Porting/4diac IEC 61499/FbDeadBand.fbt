@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType Name="FbDeadBand" Comment="Зона нечувствительности.">
+	<Identification Standard="61499-1" Description="Зона нечувствительности.&#10;Simple FB with one algorithm">
+	</Identification>
+	<VersionInfo Organization="LIB_PLC" Version="2.2" Author="VA" Date="2026-03-20">
+	</VersionInfo>
+	<CompilerInfo>
+	</CompilerInfo>
+	<InterfaceList>
+		<EventInputs>
+			<Event Name="REQ" Type="Event" Comment="Normal Execution Request">
+				<With Var="In"/>
+				<With Var="ERMAX"/>
+				<With Var="ERMIN"/>
+			</Event>
+		</EventInputs>
+		<EventOutputs>
+			<Event Name="CNF" Type="Event" Comment="Execution Confirmation">
+				<With Var="Out"/>
+			</Event>
+		</EventOutputs>
+		<InputVars>
+			<VarDeclaration Name="In" Type="REAL" Comment="Вход зоны нечувствительности." InitialValue="0.0"/>
+			<VarDeclaration Name="ERMAX" Type="REAL" Comment="Зона нечувствительности верхняя граница." InitialValue="0.001"/>
+			<VarDeclaration Name="ERMIN" Type="REAL" Comment="Зона нечувствительности нижняя граница." InitialValue="-0.001"/>
+		</InputVars>
+		<OutputVars>
+			<VarDeclaration Name="Out" Type="REAL" Comment="Выход зоны нечувствительности." InitialValue="0.0"/>
+		</OutputVars>
+	</InterfaceList>
+	<SimpleFB>
+		<ECState Name="REQ">
+			<ECAction Algorithm="REQ" Output="CNF"/>
+		</ECState>
+		<Algorithm Name="REQ">
+			<ST><![CDATA[ALGORITHM REQ
+// Зона нечувствительности.
+IF ((ERMIN < In) AND (In < ERMAX)) THEN
+	Out := 0.0;
+ELSE
+	Out := In;
+END_IF;
+
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// Date start LIB_PLC: 2014
+// License: GNU GPL-2.0-or-later
+// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+// https://www.youtube.com/watch?v=n1F_MfLRlX0
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC/LIB_PLC
+// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+// https://t.me/DIY_PLC
+END_ALGORITHM
+
+]]></ST>
+		</Algorithm>
+	</SimpleFB>
+	<Attribute Name="Documentation" Type="CDATA"><![CDATA[<pre>
+// Зона нечувствительности.
+// &nbsp; &nbsp; &nbsp;DbDeadBand
+// &nbsp; &nbsp;+------------+
+// &nbsp; &nbsp;| FbDeadBand |
+// -&gt;-|In &nbsp; &nbsp; &nbsp; Out|-&gt;-
+// &nbsp; -|ERMAX &nbsp; &nbsp; &nbsp; |
+// &nbsp; -|ERMIN &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp;+------------+
+
+// Условное графическое обозначение.
+//
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;ERMAX
+// &nbsp; &nbsp; &nbsp;+-----------+
+// &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; / &nbsp; |
+// &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp;/ &nbsp; &nbsp;|
+// &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp;|
+// In-&gt;-| &nbsp; +--+ &nbsp; &nbsp;|-&gt;-Out
+// &nbsp; &nbsp; &nbsp;| &nbsp; | &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp;| &nbsp;/ &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp; &nbsp;| / &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp;+-----------+
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;ERMIN
+
+// Статическая характеристика.
+//
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;+Out
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp;*
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; *
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp;*
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; *
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; *
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; *
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ERMIN| &nbsp; &nbsp; *
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|&lt;---&gt;| &nbsp; &nbsp; *
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; | &nbsp; &nbsp; *
+// -In &lt;------*************--&gt; +In
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;* &nbsp; &nbsp; | &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;* &nbsp; &nbsp; |&lt;---&gt;|
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;* &nbsp; &nbsp; |ERMAX
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;* &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;* &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;* &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;* &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;-Out
+
+// Временная характеристика.
+//
+// +In
+// | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;*
+// | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; * *
+// |----------*---* -----------------
+// | &nbsp; &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// | &nbsp; &nbsp; &nbsp; &nbsp;* &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| ERMAX
+// | &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// +------*-----------*----------------------&gt; t[s]
+// | &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// | &nbsp; &nbsp;* &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| ERMIN
+// | &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; |
+// |--*-------------------*----------
+// | * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; *
+// |* &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; *
+// -In
+//
+// +Out
+// | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;*
+// | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; * *
+// |----------*---* -----------------
+// | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;* &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;* &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| ERMAX
+// | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;* &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// +--*********---*********------------------&gt; t[s]
+// | &nbsp;* &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp;|
+// | &nbsp;* &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp;| ERMIN
+// | &nbsp;* &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp;|
+// |--*-------------------*----------
+// | * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; *
+// |* &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; *
+// -Out</pre>
+]]></Attribute>
+</FBType>

@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType Name="Fb2PosControl" Comment="Регулятор двухпозиционный.">
+	<Identification Standard="61499-1" Description="Регулятор двухпозиционный.&#10;Simple FB with one algorithm">
+	</Identification>
+	<VersionInfo Organization="LIB_PLC" Version="2.1" Author="VA" Date="2026-03-20">
+	</VersionInfo>
+	<CompilerInfo>
+	</CompilerInfo>
+	<InterfaceList>
+		<EventInputs>
+			<Event Name="REQ" Type="Event" Comment="Normal Execution Request">
+				<With Var="PV"/>
+				<With Var="SP"/>
+				<With Var="HYST"/>
+			</Event>
+		</EventInputs>
+		<EventOutputs>
+			<Event Name="CNF" Type="Event" Comment="Execution Confirmation">
+				<With Var="OP"/>
+			</Event>
+		</EventOutputs>
+		<InputVars>
+			<VarDeclaration Name="PV" Type="REAL" Comment="Измеренное значение регулируемого параметра." InitialValue="0.0"/>
+			<VarDeclaration Name="SP" Type="REAL" Comment="Заданное значение регулируемого параметра." InitialValue="0.0"/>
+			<VarDeclaration Name="HYST" Type="REAL" Comment="Гистерезис &gt; 0." InitialValue="0.0"/>
+		</InputVars>
+		<OutputVars>
+			<VarDeclaration Name="OP" Type="BOOL" Comment="Выход управляющего сигнала." InitialValue="FALSE"/>
+		</OutputVars>
+	</InterfaceList>
+	<SimpleFB>
+		<InternalVars>
+			<VarDeclaration Name="ER" Type="REAL" Comment="Ошибка регулирования." InitialValue="0.0"/>
+		</InternalVars>
+		<ECState Name="REQ">
+			<ECAction Algorithm="REQ" Output="CNF"/>
+		</ECState>
+		<Algorithm Name="REQ">
+			<ST><![CDATA[ALGORITHM REQ
+// Ошибка регулирования.
+ER := SP - PV;
+
+// Регулятор двухпозиционный.
+IF (ER >= HYST) THEN
+	OP := TRUE;
+END_IF;
+
+IF (ER <= HYST * (-1.0)) THEN
+	OP := FALSE;
+END_IF;
+
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// Date start LIB_PLC: 2014
+// License: GNU GPL-2.0-or-later
+// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+// https://www.youtube.com/watch?v=n1F_MfLRlX0
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC/LIB_PLC
+// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+// https://t.me/DIY_PLC
+END_ALGORITHM
+
+]]></ST>
+		</Algorithm>
+	</SimpleFB>
+	<Attribute Name="Documentation" Type="CDATA"><![CDATA[<pre>
+// Регулятор двухпозиционный.
+// &nbsp; &nbsp; &nbsp; Db2PosControl
+// &nbsp; &nbsp; +---------------+
+// &nbsp; &nbsp; | Fb2PosControl |
+// &nbsp;-&gt;-|PV &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; OP|-&gt;-
+// &nbsp; &nbsp;-|SP &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp;-|HYST &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp; +---------------+
+
+// Применение.
+//
+// Двухпозиционный регулятор используется как простейший регулятор температуры, давления, уровня.
+
+// Условное графическое обозначение.
+//
+// &nbsp; &nbsp; &nbsp;+---------------+
+// &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp;+--&lt;--+-- &nbsp;|
+// &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp;| &nbsp; &nbsp; | &nbsp; &nbsp;|
+// ER-&gt;-| &nbsp; &nbsp;v &nbsp; &nbsp; ^ &nbsp; &nbsp;|-&gt;-OP
+// &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp;| &nbsp; &nbsp; | &nbsp; &nbsp;|
+// &nbsp; &nbsp; &nbsp;| &nbsp;--+--&gt;--+ &nbsp; &nbsp;|
+// &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp;+---------------+
+
+// Статическая характеристика.
+//
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; OP
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;^
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ***&lt;***1***&lt;******
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp;*
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; v &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp;^
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp;*
+// -ER &lt;--******&gt;***0***&gt;***--&gt; +ER
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |&lt;----&gt;|&lt;----&gt;|
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; HYST &nbsp; HYST
+
+// Временная характеристика.
+//
+// ^ PV,SP
+// | &nbsp; &nbsp; &nbsp; &nbsp; PV
+// |----------*---------------*------
+// | &nbsp; &nbsp; &nbsp; &nbsp; * * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; * * &nbsp; |
+// | &nbsp; &nbsp; &nbsp; &nbsp;* &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; * &nbsp; * &nbsp;| &nbsp;SP + HYST
+// | &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; |
+// |======*=======*=======*========== SP
+// | &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; |
+// | &nbsp; &nbsp;* &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; * &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp;SP - HYST
+// | &nbsp; * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; * * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// |--*---------------*--------------
+// | *&nbsp;
+// |*
+// +-----------------------------------------&gt; t[s]
+//
+// ^ OP
+// |
+// 1*********** &nbsp; &nbsp; &nbsp; *********
+// | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;* &nbsp; &nbsp; &nbsp; * &nbsp; &nbsp; &nbsp; *
+// 0----------*********-------***------------&gt; t[s]
+
+// Схема включения.
+//
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;+---------------+
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; Объект управления
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp;+--&lt;--+-- &nbsp;| &nbsp; &nbsp; +-----------+
+// &nbsp; &nbsp; &nbsp; &nbsp;+---+ ER &nbsp;| &nbsp; &nbsp;| &nbsp; &nbsp; | &nbsp; &nbsp;| OP &nbsp;| &nbsp; &nbsp; K &nbsp; &nbsp; |
+// SP--&gt;--| + |--&gt;--| &nbsp; &nbsp;v &nbsp; &nbsp; ^ &nbsp; &nbsp;|--&gt;--| --------- |--&gt;--+--&gt;PV
+// PV &nbsp;+--| - | &nbsp; &nbsp; | &nbsp; &nbsp;| &nbsp; &nbsp; | &nbsp; &nbsp;| &nbsp; &nbsp; | T * s + 1 | &nbsp; &nbsp; |
+// &nbsp; &nbsp; | &nbsp;+---+ &nbsp; &nbsp; | &nbsp;--+--&gt;--+ &nbsp; &nbsp;| &nbsp; &nbsp; +-----------+ &nbsp; &nbsp; |
+// &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;+---------------+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp; +----------------------------------------------------+</pre>
+
+<pre>
+&nbsp;</pre>
+]]></Attribute>
+</FBType>

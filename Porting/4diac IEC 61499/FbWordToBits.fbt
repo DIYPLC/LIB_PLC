@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType Name="FbWordToBits" Comment="Преобразование слова в 16 бит.">
+	<Identification Standard="61499-1" Description="Преобразование слова в 16 бит.&#10;Simple FB with one algorithm">
+	</Identification>
+	<VersionInfo Organization="LIB_PLC" Version="2.1" Author="VA" Date="2026-03-20">
+	</VersionInfo>
+	<CompilerInfo>
+	</CompilerInfo>
+	<InterfaceList>
+		<EventInputs>
+			<Event Name="REQ" Type="Event" Comment="Normal Execution Request">
+				<With Var="In"/>
+			</Event>
+		</EventInputs>
+		<EventOutputs>
+			<Event Name="CNF" Type="Event" Comment="Execution Confirmation">
+				<With Var="Out0"/>
+				<With Var="Out1"/>
+				<With Var="Out2"/>
+				<With Var="Out3"/>
+				<With Var="Out4"/>
+				<With Var="Out5"/>
+				<With Var="Out6"/>
+				<With Var="Out7"/>
+				<With Var="Out8"/>
+				<With Var="Out9"/>
+				<With Var="Out10"/>
+				<With Var="Out11"/>
+				<With Var="Out12"/>
+				<With Var="Out13"/>
+				<With Var="Out14"/>
+				<With Var="Out15"/>
+			</Event>
+		</EventOutputs>
+		<InputVars>
+			<VarDeclaration Name="In" Type="WORD" Comment="Входной сигнал." InitialValue="16#0000"/>
+		</InputVars>
+		<OutputVars>
+			<VarDeclaration Name="Out0" Type="BOOL" Comment="Выходной сигнал бит0." InitialValue="FALSE"/>
+			<VarDeclaration Name="Out1" Type="BOOL" Comment="Выходной сигнал бит1." InitialValue="FALSE"/>
+			<VarDeclaration Name="Out2" Type="BOOL" Comment="Выходной сигнал бит2." InitialValue="FALSE"/>
+			<VarDeclaration Name="Out3" Type="BOOL" Comment="Выходной сигнал бит3." InitialValue="FALSE"/>
+			<VarDeclaration Name="Out4" Type="BOOL" Comment="Выходной сигнал бит4." InitialValue="FALSE"/>
+			<VarDeclaration Name="Out5" Type="BOOL" Comment="Выходной сигнал бит5." InitialValue="FALSE"/>
+			<VarDeclaration Name="Out6" Type="BOOL" Comment="Выходной сигнал бит6." InitialValue="FALSE"/>
+			<VarDeclaration Name="Out7" Type="BOOL" Comment="Выходной сигнал бит7." InitialValue="FALSE"/>
+			<VarDeclaration Name="Out8" Type="BOOL" Comment="Выходной сигнал бит8." InitialValue="FALSE"/>
+			<VarDeclaration Name="Out9" Type="BOOL" Comment="Выходной сигнал бит9." InitialValue="FALSE"/>
+			<VarDeclaration Name="Out10" Type="BOOL" Comment="Выходной сигнал бит10." InitialValue="FALSE"/>
+			<VarDeclaration Name="Out11" Type="BOOL" Comment="Выходной сигнал бит11." InitialValue="FALSE"/>
+			<VarDeclaration Name="Out12" Type="BOOL" Comment="Выходной сигнал бит12." InitialValue="FALSE"/>
+			<VarDeclaration Name="Out13" Type="BOOL" Comment="Выходной сигнал бит13." InitialValue="FALSE"/>
+			<VarDeclaration Name="Out14" Type="BOOL" Comment="Выходной сигнал бит14." InitialValue="FALSE"/>
+			<VarDeclaration Name="Out15" Type="BOOL" Comment="Выходной сигнал бит15." InitialValue="FALSE"/>
+		</OutputVars>
+	</InterfaceList>
+	<SimpleFB>
+		<ECState Name="REQ">
+			<ECAction Algorithm="REQ" Output="CNF"/>
+		</ECState>
+		<Algorithm Name="REQ">
+			<ST><![CDATA[ALGORITHM REQ
+// Логическое условие без оператора if.
+Out0 := ((In AND 2#0000000000000001) <> 0);
+Out1 := ((In AND 2#0000000000000010) <> 0);
+Out2 := ((In AND 2#0000000000000100) <> 0);
+Out3 := ((In AND 2#0000000000001000) <> 0);
+Out4 := ((In AND 2#0000000000010000) <> 0);
+Out5 := ((In AND 2#0000000000100000) <> 0);
+Out6 := ((In AND 2#0000000001000000) <> 0);
+Out7 := ((In AND 2#0000000010000000) <> 0);
+Out8 := ((In AND 2#0000000100000000) <> 0);
+Out9 := ((In AND 2#0000001000000000) <> 0);
+Out10 := ((In AND 2#0000010000000000) <> 0);
+Out11 := ((In AND 2#0000100000000000) <> 0);
+Out12 := ((In AND 2#0001000000000000) <> 0);
+Out13 := ((In AND 2#0010000000000000) <> 0);
+Out14 := ((In AND 2#0100000000000000) <> 0);
+Out15 := ((In AND 2#1000000000000000) <> 0);
+
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// Date start LIB_PLC: 2014
+// License: GNU GPL-2.0-or-later
+// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+// https://www.youtube.com/watch?v=n1F_MfLRlX0
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC/LIB_PLC
+// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+// https://t.me/DIY_PLC
+END_ALGORITHM
+
+]]></ST>
+		</Algorithm>
+	</SimpleFB>
+	<Attribute Name="Documentation" Type="CDATA"><![CDATA[<pre>
+// Преобразование слова в 16 бит.
+// &nbsp; &nbsp; &nbsp;DbWordToBits
+// &nbsp; &nbsp;+--------------+
+// &nbsp; &nbsp;| FbWordToBits |
+// -&gt;-|In &nbsp; &nbsp; &nbsp; &nbsp;Out0|-&gt;-
+// &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Out1|-&gt;-
+// &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Out2|-&gt;-
+// &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Out3|-&gt;-
+// &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Out4|-&gt;-
+// &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Out5|-&gt;-
+// &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Out6|-&gt;-
+// &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Out7|-&gt;-
+// &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Out8|-&gt;-
+// &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Out9|-&gt;-
+// &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; Out10|-&gt;-
+// &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; Out11|-&gt;-
+// &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; Out12|-&gt;-
+// &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; Out13|-&gt;-
+// &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; Out14|-&gt;-
+// &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; Out15|-&gt;-
+// &nbsp; &nbsp;+--------------+</pre>
+]]></Attribute>
+</FBType>

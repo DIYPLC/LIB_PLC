@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType Name="FbDeriveF" Comment="Производная с фильтром.">
+	<Identification Standard="61499-1" Description="Производная с фильтром.&#10;Simple FB with one algorithm">
+	</Identification>
+	<VersionInfo Organization="LIB_PLC" Version="2.2" Author="VA" Date="2026-03-20">
+	</VersionInfo>
+	<CompilerInfo>
+	</CompilerInfo>
+	<InterfaceList>
+		<EventInputs>
+			<Event Name="REQ" Type="Event" Comment="Normal Execution Request">
+				<With Var="In"/>
+				<With Var="Kdf"/>
+				<With Var="Ts"/>
+			</Event>
+		</EventInputs>
+		<EventOutputs>
+			<Event Name="CNF" Type="Event" Comment="Execution Confirmation">
+				<With Var="Out"/>
+			</Event>
+		</EventOutputs>
+		<InputVars>
+			<VarDeclaration Name="In" Type="REAL" Comment="Входной сигнал." InitialValue="0.0"/>
+			<VarDeclaration Name="Kdf" Type="REAL" Comment="Коэффициент фильтрации дифференциальный Kdf=1/Tdf." InitialValue="1.0"/>
+			<VarDeclaration Name="Ts" Type="REAL" Comment="Шаг дискретизации по времени [с]." InitialValue="0.1"/>
+		</InputVars>
+		<OutputVars>
+			<VarDeclaration Name="Out" Type="REAL" Comment="Выходной сигнал." InitialValue="0.0"/>
+		</OutputVars>
+	</InterfaceList>
+	<SimpleFB>
+		<InternalVars>
+			<VarDeclaration Name="Dintegral" Type="REAL" Comment="Интегратор." InitialValue="0.0"/>
+		</InternalVars>
+		<ECState Name="REQ">
+			<ECAction Algorithm="REQ" Output="CNF"/>
+		</ECState>
+		<Algorithm Name="REQ">
+			<ST><![CDATA[ALGORITHM REQ
+// W(s)=s/(1+Tdf*s) при Tdf=1/Kdf и Ts->0.
+IF (Kdf <= 0.0) THEN
+	Dintegral := 0.0;
+	Out := 0.0;
+ELSE
+	Out := (In - Dintegral) * Kdf;
+	Dintegral := Dintegral + (Ts * Out);
+END_IF;
+
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// Date start LIB_PLC: 2014
+// License: GNU GPL-2.0-or-later
+// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+// https://www.youtube.com/watch?v=n1F_MfLRlX0
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC/LIB_PLC
+// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+// https://t.me/DIY_PLC
+END_ALGORITHM
+
+]]></ST>
+		</Algorithm>
+	</SimpleFB>
+	<Attribute Name="Documentation" Type="CDATA"><![CDATA[<pre>
+// Производная с фильтром.
+// &nbsp; &nbsp; &nbsp;DbDeriveF
+// &nbsp; &nbsp;+-----------+
+// &nbsp; &nbsp;| FbDeriveF |
+// -&gt;-|In &nbsp; &nbsp; &nbsp;Out|-&gt;-
+// &nbsp; -|Kdf &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; -|Ts &nbsp; &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp;+-----------+
+
+// Внутренняя схема фильтра.
+//
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Вычитание &nbsp; Умножение
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;+---+ &nbsp; &nbsp; +------+
+// In -----&gt;--| + | &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; |--&gt;--| *Kdf |--&gt;----+--&gt;-- Out
+// &nbsp; &nbsp; &nbsp;+--&gt;--| - | &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; +---+ &nbsp; &nbsp; +------+ &nbsp; &nbsp; &nbsp; |
+// &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
+// &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Интегрирование &nbsp;|
+// &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;+----------+ &nbsp; &nbsp;|
+// &nbsp; &nbsp; &nbsp;| &nbsp; Dintegral &nbsp;| &nbsp;Ts * z &nbsp;| &nbsp; &nbsp;|
+// &nbsp; &nbsp; &nbsp;+--------------| -------- |----+
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; z - 1 &nbsp;|
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; +----------+
+
+// Условное графическое обозначение (приближенное).
+//
+// &nbsp; &nbsp;+-----------------+
+// &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp;s &nbsp; &nbsp; &nbsp; &nbsp;|
+// -&gt;-| --------------- |-&gt;-
+// &nbsp; &nbsp;| (1/Kdf) * s + 1 |
+// &nbsp; &nbsp;+-----------------+
+
+// Электрическая схема фильтра.
+//
+// + &nbsp; &nbsp;|| C &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;+
+// o----||----o---------o
+// &nbsp; &nbsp; &nbsp;|| &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+// &nbsp;U In &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; U Out
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; +-+ &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | | R &nbsp; &nbsp; &nbsp;&nbsp;
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | | &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; +-+ &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
+// &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+// - &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;| &nbsp; &nbsp; &nbsp; &nbsp; -
+// o----------o---------o
+// Tf = 1/Kdf = R * C ([с] = [Ом] * [Ф])
+
+// Временная характеристика.
+//
+// ^ Out
+// |
+// 1* &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Y(t) = 0 - exp(-(t/Tf))
+// | * &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+// | &nbsp;* &nbsp; &nbsp; &nbsp; &nbsp;
+// | &nbsp; &nbsp;* &nbsp; &nbsp; &nbsp;&nbsp;
+// | &nbsp; &nbsp; &nbsp;* &nbsp; &nbsp;&nbsp;
+// 0---------***---&gt; t[s]
+//
+// ^ In
+// |
+// 1************ X(t) = 1
+// | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+// | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+// | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+// | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+// 0---------------&gt; t[s]</pre>
+]]></Attribute>
+</FBType>
