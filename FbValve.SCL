@@ -6,7 +6,7 @@ TITLE = 'Пневмоцилиндр с концевиками.'
 
 AUTHOR  : VA
 FAMILY  : LIB_PLC
-VERSION : '2.2'
+VERSION : '2.3'
 
 VAR_INPUT // Входные переменные, сохраняемые.
 CommandOpen     :BOOL := FALSE; // Команда открыть клапан.
@@ -117,11 +117,11 @@ StateClose := FALSE;
 Error      := FALSE;
 // Если доехали до датчика то переходим в состояние открыто.
 // Если нет обратной связи по датчику то переходим в состояние открыто по таймеру.
-IF (FeedbackOpen OR (NOT(OnFeedbackOpen) AND (Timer1>=TimeClose)) ) THEN
+IF (FeedbackOpen OR (NOT(OnFeedbackOpen) AND (Timer1>=TimeOpen)) ) THEN
 State1 := STATE_VALVE_OPEN;
 END_IF;
 // Если клапан заклинил и не доехал до датчика за заданное время уходим в состояние ошибки.
-IF (OnFeedbackOpen AND (Timer1>=TimeClose) ) THEN
+IF (OnFeedbackOpen AND (Timer1>=TimeOpen) ) THEN
 State1 := STATE_ERROR_OPEN;
 END_IF;
 // Если во время открытия пришла команда на закрытие переходим в режим закрытие.

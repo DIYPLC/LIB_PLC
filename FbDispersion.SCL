@@ -6,7 +6,7 @@ TITLE = 'Дисперсия PV.'
 
 AUTHOR  : VA
 FAMILY  : LIB_PLC
-VERSION : '1.1'
+VERSION : '1.2'
 
 VAR_INPUT // Входные переменные, сохраняемые.
 In:REAL := 0.0; // Вход измерения.
@@ -24,7 +24,7 @@ END_CONST
 
 VAR // Внутренние переменные, сохраняемые.
 Buffer1: ARRAY [0..NUMBER] OF REAL; // Буфер.
-COUNTER1:INT := 0; // Счетчик.
+Counter1:INT := 0; // Счетчик.
 Summator:REAL := 0.0; // Сумматор.
 END_VAR
 
@@ -40,22 +40,22 @@ BEGIN
 //     +--------------+
 
 // Обновление массива.
-FOR COUNTER1 := NUMBER TO 1 BY -1 DO
-Buffer1[COUNTER1] := Buffer1[COUNTER1 - 1];
+FOR Counter1 := NUMBER TO 1 BY -1 DO
+Buffer1[Counter1] := Buffer1[Counter1 - 1];
 END_FOR;
 Buffer1[0] := In;
 
 // Расчет математического ожидания (среднего арифметического).
 Summator := 0.0;
-FOR COUNTER1 := 0 TO NUMBER BY 1 DO
-Summator := Summator + Buffer1[COUNTER1];
+FOR Counter1 := 0 TO NUMBER BY 1 DO
+Summator := Summator + Buffer1[Counter1];
 END_FOR;
 Mean := Summator /(INT_TO_REAL(NUMBER + 1));
 
 // Рассчет дисперсии.
 Summator := 0.0;
-FOR COUNTER1 := 0 TO NUMBER BY 1 DO
-Summator := Summator + ((Buffer1[COUNTER1] - Mean) * (Buffer1[COUNTER1] - Mean));
+FOR Counter1 := 0 TO NUMBER BY 1 DO
+Summator := Summator + ((Buffer1[Counter1] - Mean) * (Buffer1[Counter1] - Mean));
 END_FOR;
 Variance := Summator / (INT_TO_REAL(NUMBER + 1));
 

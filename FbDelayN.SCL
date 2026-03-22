@@ -6,7 +6,7 @@ TITLE = 'Ѕлок задержки сигнала на 100 тактов.'
 
 AUTHOR  : VA
 FAMILY  : LIB_PLC
-VERSION : '2.2'
+VERSION : '2.3'
 
 VAR_INPUT // ¬ходные переменные, сохран€емые.
 In :REAL := 0.0; // ¬ход.
@@ -36,8 +36,8 @@ BEGIN
 
 // W(Z)=Z^(-N), N=NUMBER+2
 Out := Buffer1[NUMBER];
-FOR COUNTER1 := NUMBER TO 1 BY -1 DO
-Buffer1[COUNTER1] := Buffer1[Counter1 - 1];
+FOR Counter1 := NUMBER TO 1 BY -1 DO
+Buffer1[Counter1] := Buffer1[Counter1 - 1];
 END_FOR;
 Buffer1[0] := In;
 
