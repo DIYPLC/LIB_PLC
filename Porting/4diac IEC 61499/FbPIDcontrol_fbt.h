@@ -48,8 +48,6 @@ class FORTE_FbPIDcontrol final : public CSimpleFB {
     CIEC_REAL var_Ipart;
     CIEC_REAL var_Dpart;
     CIEC_REAL var_Dintegral;
-    CIEC_REAL var_Auto;
-    CIEC_REAL var_Sw;
 
     CIEC_ANY *getVarInternal(size_t) override;
 

@@ -2,7 +2,7 @@
 <FBType Name="FbValve" Comment="Пневмоцилиндр с концевиками.">
 	<Identification Standard="61499-1" Description="Пневмоцилиндр с концевиками.&#10;Simple FB with one algorithm">
 	</Identification>
-	<VersionInfo Organization="LIB_PLC" Version="2.2" Author="VA" Date="2026-03-20">
+	<VersionInfo Organization="LIB_PLC" Version="2.3" Author="VA" Date="2026-03-20">
 	</VersionInfo>
 	<CompilerInfo>
 	</CompilerInfo>
@@ -15,9 +15,9 @@
 				<With Var="OnFeedbackOpen"/>
 				<With Var="OnFeedbackClose"/>
 				<With Var="Reset"/>
-				<With Var="TimeOpen"/>
 				<With Var="TimeClose"/>
 				<With Var="Ts_ms"/>
+				<With Var="TimeOpen"/>
 			</Event>
 		</EventInputs>
 		<EventOutputs>
@@ -122,11 +122,11 @@ CASE State1 OF
 		Error := FALSE;
 			// Если доехали до датчика то переходим в состояние открыто.
 			// Если нет обратной связи по датчику то переходим в состояние открыто по таймеру.
-		IF (FeedbackOpen OR (NOT (OnFeedbackOpen) AND (Timer1 >= TimeClose))) THEN
+		IF (FeedbackOpen OR (NOT (OnFeedbackOpen) AND (Timer1 >= TimeOpen))) THEN
 			State1 := STATE_VALVE_OPEN;
 		END_IF;
 			// Если клапан заклинил и не доехал до датчика за заданное время уходим в состояние ошибки.
-		IF (OnFeedbackOpen AND (Timer1 >= TimeClose)) THEN
+		IF (OnFeedbackOpen AND (Timer1 >= TimeOpen)) THEN
 			State1 := STATE_ERROR_OPEN;
 		END_IF;
 			// Если во время открытия пришла команда на закрытие переходим в режим закрытие.

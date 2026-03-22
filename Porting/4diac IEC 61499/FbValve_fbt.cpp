@@ -6,7 +6,7 @@
  *** Name: FbValve
  *** Description: Пневмоцилиндр с концевиками.
  *** Version:
- ***     2.2: 2026-03-20/VA - LIB_PLC -
+ ***     2.3: 2026-03-20/VA - LIB_PLC -
  *************************************************************************/
 
 #include "FbValve_fbt.h"
@@ -29,7 +29,7 @@ const CStringDictionary::TStringId FORTE_FbValve::scmDataInputNames[] = {g_nStri
 const CStringDictionary::TStringId FORTE_FbValve::scmDataInputTypeIds[] = {g_nStringIdBOOL, g_nStringIdBOOL, g_nStringIdBOOL, g_nStringIdBOOL, g_nStringIdBOOL, g_nStringIdBOOL, g_nStringIdUDINT, g_nStringIdUDINT, g_nStringIdUDINT};
 const CStringDictionary::TStringId FORTE_FbValve::scmDataOutputNames[] = {g_nStringIdCoilOpen, g_nStringIdStateOpen, g_nStringIdStateClose, g_nStringIdError};
 const CStringDictionary::TStringId FORTE_FbValve::scmDataOutputTypeIds[] = {g_nStringIdBOOL, g_nStringIdBOOL, g_nStringIdBOOL, g_nStringIdBOOL};
-const TDataIOID FORTE_FbValve::scmEIWith[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, scmWithListDelimiter};
+const TDataIOID FORTE_FbValve::scmEIWith[] = {0, 1, 2, 3, 4, 5, 7, 8, 6, scmWithListDelimiter};
 const TForteInt16 FORTE_FbValve::scmEIWithIndexes[] = {0};
 const CStringDictionary::TStringId FORTE_FbValve::scmEventInputNames[] = {g_nStringIdREQ};
 const TDataIOID FORTE_FbValve::scmEOWith[] = {0, 1, 2, 3, scmWithListDelimiter};
@@ -136,9 +136,9 @@ void FORTE_FbValve::readInputData(const TEventID paEIID) {
       readData(3, var_OnFeedbackOpen, conn_OnFeedbackOpen);
       readData(4, var_OnFeedbackClose, conn_OnFeedbackClose);
       readData(5, var_Reset, conn_Reset);
-      readData(6, var_TimeOpen, conn_TimeOpen);
       readData(7, var_TimeClose, conn_TimeClose);
       readData(8, var_Ts_ms, conn_Ts_ms);
+      readData(6, var_TimeOpen, conn_TimeOpen);
       break;
     }
     default:
@@ -302,12 +302,12 @@ void FORTE_FbValve::alg_REQ(void) {
     #line 56 "FbValve.fbt"
     var_Error = false_BOOL;
     #line 59 "FbValve.fbt"
-    if (func_OR<CIEC_BOOL>(var_FeedbackOpen, func_AND<CIEC_BOOL>(func_NOT<CIEC_BOOL>(var_OnFeedbackOpen), func_GE(var_Timer1, var_TimeClose)))) {
+    if (func_OR<CIEC_BOOL>(var_FeedbackOpen, func_AND<CIEC_BOOL>(func_NOT<CIEC_BOOL>(var_OnFeedbackOpen), func_GE(var_Timer1, var_TimeOpen)))) {
       #line 60 "FbValve.fbt"
       var_State1 = var_const_STATE_VALVE_OPEN;
     }
     #line 63 "FbValve.fbt"
-    if (func_AND<CIEC_BOOL>(var_OnFeedbackOpen, func_GE(var_Timer1, var_TimeClose))) {
+    if (func_AND<CIEC_BOOL>(var_OnFeedbackOpen, func_GE(var_Timer1, var_TimeOpen))) {
       #line 64 "FbValve.fbt"
       var_State1 = var_const_STATE_ERROR_OPEN;
     }

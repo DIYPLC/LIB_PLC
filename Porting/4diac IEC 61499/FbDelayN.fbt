@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType Name="FbDelayN" Comment="Блок задержки сигнала на 100 тактов.">
+	<Identification Standard="61499-1" Description="Блок задержки сигнала на 100 тактов.&#10;Simple FB with one algorithm">
+	</Identification>
+	<VersionInfo Organization="LIB_PLC" Version="2.3" Author="VA" Date="2026-03-22">
+	</VersionInfo>
+	<CompilerInfo>
+	</CompilerInfo>
+	<InterfaceList>
+		<EventInputs>
+			<Event Name="REQ" Type="Event" Comment="Normal Execution Request">
+				<With Var="In"/>
+			</Event>
+		</EventInputs>
+		<EventOutputs>
+			<Event Name="CNF" Type="Event" Comment="Execution Confirmation">
+				<With Var="Out"/>
+			</Event>
+		</EventOutputs>
+		<InputVars>
+			<VarDeclaration Name="In" Type="REAL" Comment="Вход." InitialValue="0.0"/>
+		</InputVars>
+		<OutputVars>
+			<VarDeclaration Name="Out" Type="REAL" Comment="Выход." InitialValue="0.0"/>
+		</OutputVars>
+	</InterfaceList>
+	<SimpleFB>
+		<InternalVars>
+			<VarDeclaration Name="Buffer1" Type="REAL" Comment="Буфер задержки сигнала." ArraySize="0..NUMBER"/>
+		</InternalVars>
+		<InternalConstVars>
+			<VarDeclaration Name="NUMBER" Type="INT" Comment="Размер массива Тактов 100 - 2 = 98." InitialValue="98"/>
+		</InternalConstVars>
+		<ECState Name="REQ">
+			<ECAction Algorithm="REQ" Output="CNF"/>
+		</ECState>
+		<Algorithm Name="REQ">
+			<ST><![CDATA[ALGORITHM REQ
+
+VAR_TEMP
+	Counter1 : INT := 0; // Счетчик.
+END_VAR
+
+// W(Z)=Z^(-N), N=NUMBER+2
+Out := Buffer1[NUMBER];
+FOR Counter1 := NUMBER TO 1 BY -1 DO
+	Buffer1[Counter1] := Buffer1[Counter1 - 1];
+END_FOR;
+Buffer1[0] := In;
+
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// Date start LIB_PLC: 2014
+// License: GNU GPL-2.0-or-later
+// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+// https://www.youtube.com/watch?v=n1F_MfLRlX0
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC/LIB_PLC
+// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+// https://t.me/DIY_PLC
+END_ALGORITHM
+
+]]></ST>
+		</Algorithm>
+	</SimpleFB>
+	<Attribute Name="Documentation" Type="CDATA"><![CDATA[<pre>
+// Блок задержки сигнала на 100 тактов.
+// &nbsp; &nbsp; &nbsp;DbDelayN
+// &nbsp; &nbsp;+----------+
+// &nbsp; &nbsp;| FbDelayN |
+// -&gt;-|In &nbsp; &nbsp; Out|-&gt;-
+// &nbsp; &nbsp;+----------+</pre>
+]]></Attribute>
+</FBType>

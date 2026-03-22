@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType Name="FbDispersion" Comment="Дисперсия PV.">
+	<Identification Standard="61499-1" Description="Дисперсия PV.&#10;Simple FB with one algorithm">
+	</Identification>
+	<VersionInfo Organization="LIB_PLC" Version="1.1" Author="VA" Date="2026-03-22">
+	</VersionInfo>
+	<CompilerInfo>
+	</CompilerInfo>
+	<InterfaceList>
+		<EventInputs>
+			<Event Name="REQ" Type="Event" Comment="Normal Execution Request">
+				<With Var="In"/>
+			</Event>
+		</EventInputs>
+		<EventOutputs>
+			<Event Name="CNF" Type="Event" Comment="Execution Confirmation">
+				<With Var="Variance"/>
+				<With Var="Deviation"/>
+				<With Var="Mean"/>
+			</Event>
+		</EventOutputs>
+		<InputVars>
+			<VarDeclaration Name="In" Type="REAL" Comment="Вход измерения." InitialValue="0.0"/>
+		</InputVars>
+		<OutputVars>
+			<VarDeclaration Name="Variance" Type="REAL" Comment="Дисперсия." InitialValue="0.0"/>
+			<VarDeclaration Name="Deviation" Type="REAL" Comment="Среднеквадратическое отклонение." InitialValue="0.0"/>
+			<VarDeclaration Name="Mean" Type="REAL" Comment="Математическое ожидание (Среднее арифметическое)." InitialValue="0.0"/>
+		</OutputVars>
+	</InterfaceList>
+	<SimpleFB>
+		<InternalVars>
+			<VarDeclaration Name="Buffer1" Type="REAL" Comment="Буфер." ArraySize="0..NUMBER"/>
+			<VarDeclaration Name="Summator" Type="REAL" Comment="Сумматор." InitialValue="0.0"/>
+		</InternalVars>
+		<InternalConstVars>
+			<VarDeclaration Name="NUMBER" Type="INT" Comment="Размер массива 100." InitialValue="99"/>
+		</InternalConstVars>
+		<ECState Name="REQ">
+			<ECAction Algorithm="REQ" Output="CNF"/>
+		</ECState>
+		<Algorithm Name="REQ">
+			<ST><![CDATA[ALGORITHM REQ
+
+VAR_TEMP
+	Counter1 : INT := 0; // Счетчик.
+END_VAR
+
+// Обновление массива.
+FOR Counter1 := NUMBER TO 1 BY -1 DO
+	Buffer1[Counter1] := Buffer1[Counter1 - 1];
+END_FOR;
+Buffer1[0] := In;
+
+// Расчет математического ожидания (среднего арифметического).
+Summator := 0.0;
+FOR Counter1 := 0 TO NUMBER BY 1 DO
+	Summator := Summator + Buffer1[Counter1];
+END_FOR;
+Mean := Summator / (INT_TO_REAL(NUMBER + 1));
+
+// Рассчет дисперсии.
+Summator := 0.0;
+FOR Counter1 := 0 TO NUMBER BY 1 DO
+	Summator := Summator + ((Buffer1[Counter1] - Mean) * (Buffer1[Counter1] - Mean));
+END_FOR;
+Variance := Summator / (INT_TO_REAL(NUMBER + 1));
+
+// Рассчет среднеквадратического отклонения.
+Deviation := SQRT(Variance);
+
+// @COPYLEFT ALL WRONGS RESERVED :)
+// Author: VA
+// Contacts: DIY.PLC.314@gmail.com
+// Date start LIB_PLC: 2014
+// License: GNU GPL-2.0-or-later
+// https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+// https://www.youtube.com/watch?v=n1F_MfLRlX0
+// https://www.youtube.com/@DIY_PLC
+// https://github.com/DIYPLC/LIB_PLC
+// https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+// https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+// https://t.me/DIY_PLC
+END_ALGORITHM
+
+]]></ST>
+		</Algorithm>
+	</SimpleFB>
+	<Attribute Name="Documentation" Type="CDATA"><![CDATA[<pre>
+// Дисперсия PV.
+// &nbsp; &nbsp; &nbsp; DbDispersion
+// &nbsp; &nbsp; +--------------+
+// &nbsp; &nbsp; | FbDispersion |
+// &nbsp;-&gt;-|In &nbsp; &nbsp;Variance|-&gt;-
+// &nbsp; &nbsp; | &nbsp; &nbsp; Deviation|-&gt;-
+// &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Mean|-&gt;-
+// &nbsp; &nbsp; +--------------+</pre>
+]]></Attribute>
+</FBType>

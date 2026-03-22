@@ -43,9 +43,9 @@ const SFBInterfaceSpec FORTE_FbPIDcontrol::scmFBInterfaceSpec = {
   0, nullptr
 };
 
-const CStringDictionary::TStringId FORTE_FbPIDcontrol::scmInternalsNames[] = {g_nStringIdER, g_nStringIdPpart, g_nStringIdIpart, g_nStringIdDpart, g_nStringIdDintegral, g_nStringIdAuto, g_nStringIdSw};
-const CStringDictionary::TStringId FORTE_FbPIDcontrol::scmInternalsTypeIds[] = {g_nStringIdREAL, g_nStringIdREAL, g_nStringIdREAL, g_nStringIdREAL, g_nStringIdREAL, g_nStringIdREAL, g_nStringIdREAL};
-const SInternalVarsInformation FORTE_FbPIDcontrol::scmInternalVars = {7, scmInternalsNames, scmInternalsTypeIds};
+const CStringDictionary::TStringId FORTE_FbPIDcontrol::scmInternalsNames[] = {g_nStringIdER, g_nStringIdPpart, g_nStringIdIpart, g_nStringIdDpart, g_nStringIdDintegral};
+const CStringDictionary::TStringId FORTE_FbPIDcontrol::scmInternalsTypeIds[] = {g_nStringIdREAL, g_nStringIdREAL, g_nStringIdREAL, g_nStringIdREAL, g_nStringIdREAL};
+const SInternalVarsInformation FORTE_FbPIDcontrol::scmInternalVars = {5, scmInternalsNames, scmInternalsTypeIds};
 
 FORTE_FbPIDcontrol::FORTE_FbPIDcontrol(const CStringDictionary::TStringId paInstanceNameId, forte::core::CFBContainer &paContainer) :
     CSimpleFB(paContainer, scmFBInterfaceSpec, paInstanceNameId, &scmInternalVars),
@@ -54,8 +54,6 @@ FORTE_FbPIDcontrol::FORTE_FbPIDcontrol(const CStringDictionary::TStringId paInst
     var_Ipart(0.0_REAL),
     var_Dpart(0.0_REAL),
     var_Dintegral(0.0_REAL),
-    var_Auto(0.0_REAL),
-    var_Sw(0.0_REAL),
     var_PV(0.0_REAL),
     var_SP(0.0_REAL),
     var_Kp(0.01_REAL),
@@ -94,8 +92,6 @@ void FORTE_FbPIDcontrol::setInitialValues() {
   var_Ipart = 0.0_REAL;
   var_Dpart = 0.0_REAL;
   var_Dintegral = 0.0_REAL;
-  var_Auto = 0.0_REAL;
-  var_Sw = 0.0_REAL;
   var_PV = 0.0_REAL;
   var_SP = 0.0_REAL;
   var_Kp = 0.01_REAL;
@@ -226,77 +222,77 @@ CIEC_ANY *FORTE_FbPIDcontrol::getVarInternal(const size_t paIndex) {
     case 2: return &var_Ipart;
     case 3: return &var_Dpart;
     case 4: return &var_Dintegral;
-    case 5: return &var_Auto;
-    case 6: return &var_Sw;
   }
   return nullptr;
 }
 
 void FORTE_FbPIDcontrol::alg_REQ(void) {
+  CIEC_REAL st_lv_Auto = 0_REAL;
+  CIEC_REAL st_lv_Sw = 0_REAL;
 
-  #line 4 "FbPIDcontrol.fbt"
+  #line 9 "FbPIDcontrol.fbt"
   var_ER = func_SUB<CIEC_REAL>(var_SP, var_PV);
-  #line 7 "FbPIDcontrol.fbt"
+  #line 12 "FbPIDcontrol.fbt"
   if (func_AND<CIEC_BOOL>(func_LT(var_ERMIN, var_ER), func_LT(var_ER, var_ERMAX))) {
-    #line 8 "FbPIDcontrol.fbt"
+    #line 13 "FbPIDcontrol.fbt"
     var_ER = 0.0_REAL;
   }
-  #line 12 "FbPIDcontrol.fbt"
+  #line 17 "FbPIDcontrol.fbt"
   var_Ppart = func_MUL<CIEC_REAL>(var_Kp, var_ER);
-  #line 15 "FbPIDcontrol.fbt"
+  #line 20 "FbPIDcontrol.fbt"
   if (func_EQ(var_Ki, 0.0_REAL)) {
-    #line 16 "FbPIDcontrol.fbt"
+    #line 21 "FbPIDcontrol.fbt"
     var_Ipart = 0.0_REAL;
   }
   else {
-    #line 18 "FbPIDcontrol.fbt"
+    #line 23 "FbPIDcontrol.fbt"
     var_Ipart = func_ADD<CIEC_REAL>(var_Ipart, func_MUL<CIEC_REAL>(func_MUL<CIEC_REAL>(var_Ki, var_ER), var_Ts));
   }
-  #line 22 "FbPIDcontrol.fbt"
+  #line 27 "FbPIDcontrol.fbt"
   if (func_EQ(var_Kd, 0.0_REAL)) {
-    #line 23 "FbPIDcontrol.fbt"
+    #line 28 "FbPIDcontrol.fbt"
     var_Dpart = 0.0_REAL;
-    #line 24 "FbPIDcontrol.fbt"
+    #line 29 "FbPIDcontrol.fbt"
     var_Dintegral = 0.0_REAL;
   }
   else {
-    #line 26 "FbPIDcontrol.fbt"
+    #line 31 "FbPIDcontrol.fbt"
     var_Dpart = func_MUL<CIEC_REAL>(func_SUB<CIEC_REAL>(func_MUL<CIEC_REAL>(var_ER, var_Kd), var_Dintegral), var_Kdf);
-    #line 27 "FbPIDcontrol.fbt"
+    #line 32 "FbPIDcontrol.fbt"
     var_Dintegral = func_ADD<CIEC_REAL>(var_Dintegral, func_MUL<CIEC_REAL>(var_Dpart, var_Ts));
   }
-  #line 31 "FbPIDcontrol.fbt"
-  var_Auto = func_ADD<CIEC_REAL>(func_ADD<CIEC_REAL>(var_Ppart, var_Ipart), var_Dpart);
-  #line 34 "FbPIDcontrol.fbt"
+  #line 36 "FbPIDcontrol.fbt"
+  st_lv_Auto = func_ADD<CIEC_REAL>(func_ADD<CIEC_REAL>(var_Ppart, var_Ipart), var_Dpart);
+  #line 39 "FbPIDcontrol.fbt"
   if (var_OnMan) {
-    #line 35 "FbPIDcontrol.fbt"
-    var_Sw = var_Manual;
+    #line 40 "FbPIDcontrol.fbt"
+    st_lv_Sw = var_Manual;
   }
   else {
-    #line 37 "FbPIDcontrol.fbt"
-    var_Sw = var_Auto;
-  }
-  #line 41 "FbPIDcontrol.fbt"
-  if (func_GE(var_Sw, var_MVMAX)) {
     #line 42 "FbPIDcontrol.fbt"
+    st_lv_Sw = st_lv_Auto;
+  }
+  #line 46 "FbPIDcontrol.fbt"
+  if (func_GE(st_lv_Sw, var_MVMAX)) {
+    #line 47 "FbPIDcontrol.fbt"
     var_MV = var_MVMAX;
-    #line 44 "FbPIDcontrol.fbt"
-    var_Ipart = func_SUB<CIEC_REAL>(var_MV, func_ADD<CIEC_REAL>(var_Ppart, var_Dpart));
-  }
-  #line 48 "FbPIDcontrol.fbt"
-  if (func_LE(var_Sw, var_MVMIN)) {
     #line 49 "FbPIDcontrol.fbt"
-    var_MV = var_MVMIN;
-    #line 51 "FbPIDcontrol.fbt"
     var_Ipart = func_SUB<CIEC_REAL>(var_MV, func_ADD<CIEC_REAL>(var_Ppart, var_Dpart));
   }
-  #line 55 "FbPIDcontrol.fbt"
-  if (func_AND<CIEC_BOOL>(func_LT(var_MVMIN, var_Sw), func_LT(var_Sw, var_MVMAX))) {
+  #line 53 "FbPIDcontrol.fbt"
+  if (func_LE(st_lv_Sw, var_MVMIN)) {
+    #line 54 "FbPIDcontrol.fbt"
+    var_MV = var_MVMIN;
     #line 56 "FbPIDcontrol.fbt"
-    var_MV = var_Sw;
-    #line 57 "FbPIDcontrol.fbt"
+    var_Ipart = func_SUB<CIEC_REAL>(var_MV, func_ADD<CIEC_REAL>(var_Ppart, var_Dpart));
+  }
+  #line 60 "FbPIDcontrol.fbt"
+  if (func_AND<CIEC_BOOL>(func_LT(var_MVMIN, st_lv_Sw), func_LT(st_lv_Sw, var_MVMAX))) {
+    #line 61 "FbPIDcontrol.fbt"
+    var_MV = st_lv_Sw;
+    #line 62 "FbPIDcontrol.fbt"
     if (var_OnMan) {
-      #line 59 "FbPIDcontrol.fbt"
+      #line 64 "FbPIDcontrol.fbt"
       var_Ipart = func_SUB<CIEC_REAL>(var_MV, func_ADD<CIEC_REAL>(var_Ppart, var_Dpart));
     }
   }

@@ -54,14 +54,17 @@
 			<VarDeclaration Name="Ipart" Type="REAL" Comment="Интегратор интегральной составляющей регулятора." InitialValue="0.0"/>
 			<VarDeclaration Name="Dpart" Type="REAL" Comment="Дифференциальная составляющая регулятора." InitialValue="0.0"/>
 			<VarDeclaration Name="Dintegral" Type="REAL" Comment="Интегратор дифференциальной составляющей регулятора." InitialValue="0.0"/>
-			<VarDeclaration Name="Auto" Type="REAL" Comment="Выход ПИД- алгоритма и вход переключателя режимов работы." InitialValue="0.0"/>
-			<VarDeclaration Name="Sw" Type="REAL" Comment="Выход с переключателя режимов работы." InitialValue="0.0"/>
 		</InternalVars>
 		<ECState Name="REQ">
 			<ECAction Algorithm="REQ" Output="CNF"/>
 		</ECState>
 		<Algorithm Name="REQ">
 			<ST><![CDATA[ALGORITHM REQ
+
+VAR_TEMP // Временные переменные, не сохраняемые.
+	Auto : REAL; // Выход ПИД- алгоритма и вход переключателя режимов работы.
+	Sw : REAL; // Выход с переключателя режимов работы.
+END_VAR
 
 // Ошибка регулирования.
 ER := SP - PV;
