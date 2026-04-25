@@ -10,7 +10,7 @@ VERSION : '1.0'
 
 VAR_INPUT // Входные переменные, сохраняемые.
 X:S5TIME := T#0s; // Вход S5TIME 16 бит BCD.
-// Представим это слово как 2 байта...
+// Представим это слово как 2 байта.
 LocalStructTime AT X: STRUCT
 ArrayByte:ARRAY[0..1] OF BYTE;
 END_STRUCT;

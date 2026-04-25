@@ -38,7 +38,7 @@ OB82_ADU_FLT        :BOOL         ; // ADU fault
 OB82_FUSE_FLT       :BOOL         ; // Fuse fault
 OB82_HW_INTR_FLT    :BOOL         ; // Hardware interupt input in fault
 OB82_RESERVED_3     :BOOL         ; // Reserved for system  
-OB82_DATE_TIME      :DATE_AND_TIME; // Date and time OB82 started   
+OB82_DATE_TIME      :DATE_AND_TIME; // Date and time OB82 started
 END_VAR
 
 BEGIN
