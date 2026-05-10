@@ -15,8 +15,8 @@ COM_RST  :BOOL := FALSE; // Полная перезагрузка.
 LMNR_HS  :BOOL := FALSE; // Датчик обранной связи клапан открыт.
 LMNR_LS  :BOOL := FALSE; // Датчик обранной связи клапан закрыт.
 LMNS_ON  :BOOL := FALSE; // Включить ружной режим управления.
-LMNUP    :BOOL := FALSE; // Команда открыть в ручном режиме. 
-LMNDN    :BOOL := FALSE; // Команда закрыть в ручном режиме. 
+LMNUP    :BOOL := FALSE; // Команда открыть в ручном режиме.
+LMNDN    :BOOL := FALSE; // Команда закрыть в ручном режиме.
 GAIN     :REAL := 2.0  ; // Пропорциональное усиление ошибки регулирования.
 TI       :REAL := 20.0 ; // Время интегрирования [с].
 DEADB_W  :REAL := 0.5  ; // Зона нечувствительности к ошибке регулирования [%].
@@ -45,16 +45,16 @@ stPausDauer :REAL := 0.0  ; //
 END_VAR
 
 VAR_TEMP
-Hvar     :REAL ; // Вспомогательная переменная
-ErKp     :REAL ; // Вспомогательная переменная
+Hvar     :REAL ; // Вспомогательная переменная.
+ErKp     :REAL ; // Вспомогательная переменная.
 rTi      :REAL ; // Время интегрирования в real !!! не удалять !!!
-AdapIn1  :REAL ; // Eingang 1 der Adaption der Ansprechschwelle
-AdapIn2  :REAL ; // Eingang 2 der Adaption der Ansprechschwelle
-iImpEin  :INT  ; // Eingang des Impulsformers
-rThrOff  :REAL ; // Abschaltschwelle
-dInteg   :REAL ; // Eingang des Integrierers in der Rьckfьhrung
-dThrStIn :REAL ; // Three - step element input
-LmnrSim  :REAL ; // Simulierte Stellungsrьckmeldung
+AdapIn1  :REAL ; // Eingang 1 der Adaption der Ansprechschwelle.
+AdapIn2  :REAL ; // Eingang 2 der Adaption der Ansprechschwelle.
+iImpEin  :INT  ; // Eingang des Impulsformers.
+rThrOff  :REAL ; // Abschaltschwelle.
+dInteg   :REAL ; // Eingang des Integrierers in der Rьckfьhrung.
+dThrStIn :REAL ; // Three - step element input.
+LmnrSim  :REAL ; // Simulierte Stellungsrьckmeldung.
 END_VAR
 
 BEGIN
@@ -103,27 +103,27 @@ ELSE
     ELSE  ER := 0.0; END_IF;
     ErKp := ER * GAIN;
     rTi := TI;
-    IF rTi < CYCLE * 0.5 THEN rTi := CYCLE * 0.5; END_IF; 
+    IF rTi < CYCLE * 0.5 THEN rTi := CYCLE * 0.5; END_IF;
     Hvar := rTi - ABS(0.01 * ErKp * MTR_TM);
     IF Hvar < (rTi * 0.1)THEN rTi := rTi * 0.1; ELSE rTi := Hvar; END_IF;
-    IF LMNS_ON 
-    THEN 
+    IF LMNS_ON
+    THEN
         sFbPVal := 0.0;
-    ELSE  
-        IF siImpAus <> 0 
-        THEN  
+    ELSE
+        IF siImpAus <> 0
+        THEN
             dInteg := DINT_TO_REAL(INT_TO_DINT(siImpAus)) * CYCLE / MTR_TM;
-        ELSE 
+        ELSE
             IF (ErKp > 0.0 AND LMNR_HS) OR (ErKp < 0.0 AND LMNR_LS) OR (TI = 0.0)
-            THEN 
+            THEN
                 dInteg := 0.0;
-            ELSE    
+            ELSE
                 dInteg  := (-ErKp) * CYCLE / rTi;
             END_IF;
         END_IF;
         sFbPVal := sFbPVal + dInteg;
         IF TI = 0.0
-        THEN  
+        THEN
             IF    sFbPVal > 100.0 THEN sFbPVal := 100.0;
             ELSIF sFbPVal < 0.0   THEN sFbPVal := 0.0;
             END_IF;
@@ -236,10 +236,10 @@ ELSE
         QLMNUP := 0;
         QLMNDN := 0;
     ELSIF siImpAus = 100
-    THEN 
+    THEN
         QLMNUP := 1;
         QLMNDN := 0;
-    ELSE 
+    ELSE
         QLMNUP := 0;
         QLMNDN := 1;
     END_IF;

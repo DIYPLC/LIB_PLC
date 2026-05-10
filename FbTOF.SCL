@@ -36,7 +36,7 @@ BEGIN
 IF (TimeDelayOff > 0) THEN // Таймер включен.
   IF (In) THEN // На входе 1 то на выходе тоже 1.
   Out := TRUE;
-  Timer1 := 0;   
+  Timer1 := 0;
   ELSE // Если на входе 0.
     IF (Out) THEN // На выходе 1.
       IF (Timer1 >= TimeDelayOff) THEN // Задержка включения закончилась.
