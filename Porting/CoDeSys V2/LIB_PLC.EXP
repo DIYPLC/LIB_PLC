@@ -1,7 +1,7 @@
 
 
 (* @NESTEDCOMMENTS := 'Yes' *)
-(* @PATH := '' *)
+(* @PATH := '\/LIB_PLC' *)
 (* @OBJECTFLAGS := '0, 8' *)
 (* @SYMFILEFLAGS := '2048' *)
 FUNCTION_BLOCK Fb2oo3 (* Резервирование датчиков методом голосования. *)
@@ -278,7 +278,7 @@ END_FUNCTION_BLOCK
 
 
 (* @NESTEDCOMMENTS := 'Yes' *)
-(* @PATH := '' *)
+(* @PATH := '\/LIB_PLC' *)
 (* @OBJECTFLAGS := '0, 8' *)
 (* @SYMFILEFLAGS := '2048' *)
 FUNCTION_BLOCK Fb2PosControl (* Регулятор двухпозиционный. *)
@@ -404,7 +404,7 @@ END_FUNCTION_BLOCK
 
 
 (* @NESTEDCOMMENTS := 'Yes' *)
-(* @PATH := '' *)
+(* @PATH := '\/LIB_PLC' *)
 (* @OBJECTFLAGS := '0, 8' *)
 (* @SYMFILEFLAGS := '2048' *)
 FUNCTION_BLOCK Fb3PosControl (* Регулятор трехпозиционный. *)
@@ -537,7 +537,7 @@ END_FUNCTION_BLOCK
 
 
 (* @NESTEDCOMMENTS := 'Yes' *)
-(* @PATH := '' *)
+(* @PATH := '\/LIB_PLC' *)
 (* @OBJECTFLAGS := '0, 8' *)
 (* @SYMFILEFLAGS := '2048' *)
 FUNCTION_BLOCK FbAlarm (* Блок предупреждений. *)
@@ -643,7 +643,7 @@ END_FUNCTION_BLOCK
 
 
 (* @NESTEDCOMMENTS := 'Yes' *)
-(* @PATH := '' *)
+(* @PATH := '\/LIB_PLC' *)
 (* @OBJECTFLAGS := '0, 8' *)
 (* @SYMFILEFLAGS := '2048' *)
 FUNCTION_BLOCK FbBitsToWord (* Преобразование 16 бит в слово. *)
@@ -731,7 +731,7 @@ END_FUNCTION_BLOCK
 
 
 (* @NESTEDCOMMENTS := 'Yes' *)
-(* @PATH := '' *)
+(* @PATH := '\/LIB_PLC' *)
 (* @OBJECTFLAGS := '0, 8' *)
 (* @SYMFILEFLAGS := '2048' *)
 FUNCTION_BLOCK FbBlink (* Мигающий светодиод. *)
@@ -857,7 +857,7 @@ END_FUNCTION_BLOCK
 
 
 (* @NESTEDCOMMENTS := 'Yes' *)
-(* @PATH := '' *)
+(* @PATH := '\/LIB_PLC' *)
 (* @OBJECTFLAGS := '0, 8' *)
 (* @SYMFILEFLAGS := '2048' *)
 FUNCTION_BLOCK FbCounter (* Счетчик импульсов. *)
@@ -954,10 +954,2052 @@ END_FUNCTION_BLOCK
 
 
 (* @NESTEDCOMMENTS := 'Yes' *)
-(* @PATH := '' *)
+(* @PATH := '\/LIB_PLC' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK FbDeadBand (* Зона нечувствительности. *)
+
+VAR_INPUT
+In    :REAL :=  0.0  ; (* Вход зоны нечувствительности. *)
+ERMAX :REAL :=  0.001; (* Зона нечувствительности верхняя граница. *)
+ERMIN :REAL := -0.001; (* Зона нечувствительности нижняя граница. *)
+END_VAR
+
+VAR_OUTPUT
+Out :REAL := 0.0; (* Выход зоны нечувствительности. *)
+END_VAR
+
+(* @END_DECLARATION := '0' *)
+(*
+ Зона нечувствительности.
+      DbDeadBand
+    +------------+
+    | FbDeadBand |
+ ->-|In       Out|->-
+   -|ERMAX       |
+   -|ERMIN       |
+    +------------+
+*)
+
+(* Зона нечувствительности. *)
+IF ((ERMIN < In) AND (In < ERMAX)) THEN
+Out := 0.0;
+ELSE
+Out := In;
+END_IF;
+
+(*
+ Условное графическое обозначение.
+
+          ERMAX
+      +-----------+
+      |           |
+      |       /   |
+      |      /    |
+      |      |    |
+ In->-|   +--+    |->-Out
+      |   |       |
+      |  /        |
+      | /         |
+      |           |
+      +-----------+
+          ERMIN
+
+ Статическая характеристика.
+
+                +Out
+                  |        *
+                  |       *
+                  |      *
+                  |     *
+                  |     *
+                  |     *
+             ERMIN|     *
+            |<--->|     *
+            |     |     *
+ -In <------*************--> +In
+            *     |     |
+            *     |<--->|
+            *     |ERMAX
+            *     |
+            *     |
+            *     |
+           *      |
+          *       |
+         *        |
+                -Out
+
+ Временная характеристика.
+
+ +In
+ |            *
+ |           * *
+ |----------*---* -----------------
+ |         *     *               |
+ |        *       *              | ERMAX
+ |       *         *             |
+ +------*-----------*----------------------> t[s]
+ |     *             *           |
+ |    *               *          | ERMIN
+ |   *                 *         |
+ |--*-------------------*----------
+ | *                     *
+ |*                       *
+ -In
+
+ +Out
+ |            *
+ |           * *
+ |----------*---* -----------------
+ |          *   *                |
+ |          *   *                | ERMAX
+ |          *   *                |
+ +--*********---*********------------------> t[s]
+ |  *                   *        |
+ |  *                   *        | ERMIN
+ |  *                   *        |
+ |--*-------------------*----------
+ | *                     *
+ |*                       *
+ -Out
+
+@COPYLEFT ALL WRONGS RESERVED :)
+Author: VA
+Contacts: DIY.PLC.314@gmail.com
+Date start LIB_PLC: 2014
+License: GNU GPL-2.0-or-later
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+https://www.youtube.com/watch?v=n1F_MfLRlX0
+https://www.youtube.com/@DIY_PLC
+https://github.com/DIYPLC/LIB_PLC
+https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+https://t.me/DIY_PLC
+*)
+END_FUNCTION_BLOCK
+
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/LIB_PLC' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK FbDelayN (* Блок задержки сигнала на 100 тактов. *)
+
+VAR_INPUT
+	In :REAL := 0.0; (* Вход. *)
+END_VAR
+
+VAR_OUTPUT
+	Out :REAL := 0.0; (* Выход. *)
+END_VAR
+
+VAR
+	Buffer1: ARRAY [0..NUMBER] OF REAL; (* Буфер задержки сигнала. *)
+	Counter1 :INT := 0; (* Счетчик. *)
+END_VAR
+
+VAR CONSTANT
+	NUMBER :INT := 98; (* Размер массива Тактов 100 - 2 = 98. *)
+END_VAR
+
+(* @END_DECLARATION := '0' *)
+(*
+ Блок задержки сигнала на 100 тактов.
+      DbDelayN
+    +----------+
+    | FbDelayN |
+ ->-|In     Out|->-
+    +----------+
+*)
+
+(* W(Z)=Z^(-N), N=NUMBER+2 *)
+Out := Buffer1[NUMBER];
+FOR Counter1 := NUMBER TO 1 BY -1 DO
+Buffer1[Counter1] := Buffer1[Counter1 - 1];
+END_FOR;
+Buffer1[0] := In;
+
+(*
+@COPYLEFT ALL WRONGS RESERVED :)
+Author: VA
+Contacts: DIY.PLC.314@gmail.com
+Date start LIB_PLC: 2014
+License: GNU GPL-2.0-or-later
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+https://www.youtube.com/watch?v=n1F_MfLRlX0
+https://www.youtube.com/@DIY_PLC
+https://github.com/DIYPLC/LIB_PLC
+https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+https://t.me/DIY_PLC
+*)
+
+END_FUNCTION_BLOCK
+
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/LIB_PLC' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK FbDeriveF (* Производная с фильтром. *)
+
+VAR_INPUT
+	In  :REAL := 0.0; (* Входной сигнал. *)
+	Kdf :REAL := 1.0; (* Коэффициент фильтрации дифференциальный Kdf=1/Tdf. *)
+	Ts  :REAL := 0.1; (* Шаг дискретизации по времени [с]. *)
+END_VAR
+
+VAR_OUTPUT
+	Out :REAL := 0.0; (* Выходной сигнал. *)
+END_VAR
+
+VAR
+	Dintegral :REAL := 0.0; (* Интегратор. *)
+END_VAR
+(* @END_DECLARATION := '0' *)
+(*
+ Производная с фильтром.
+      DbDeriveF
+    +-----------+
+    | FbDeriveF |
+ ->-|In      Out|->-
+   -|Kdf        |
+   -|Ts         |
+    +-----------+
+*)
+
+(* W(s)=s/(1+Tdf*s) при Tdf=1/Kdf и Ts->0. *)
+IF (Kdf <= 0.0) THEN
+Dintegral := 0.0;
+Out := 0.0;
+ELSE
+Out := (In - Dintegral) * Kdf;
+Dintegral := Dintegral + (Ts * Out);
+END_IF;
+
+(*
+ Внутренняя схема фильтра.
+
+          Вычитание   Умножение
+            +---+     +------+
+ In ----->--| + |     |      |
+            |   |-->--| *Kdf |-->----+-->-- Out
+      +-->--| - |     |      |       |
+      |     +---+     +------+       |
+      |                              |
+      |              Интегрирование  |
+      |              +----------+    |
+      |   Dintegral  |  Ts * z  |    |
+      +--------------| -------- |----+
+                     |   z - 1  |
+                     +----------+
+
+ Условное графическое обозначение (приближенное).
+
+    +-----------------+
+    |        s        |
+ ->-| --------------- |->-
+    | (1/Kdf) * s + 1 |
+    +-----------------+
+
+ Электрическая схема фильтра.
+
+ +    || C            +
+ o----||----o---------o
+      ||    |          
+  U In      |     U Out
+           +-+         
+           | | R       
+           | |         
+           +-+         
+            |          
+ -          |         -
+ o----------o---------o
+ Tf = 1/Kdf = R * C ([с] = [Ом] * [Ф])
+
+ Временная характеристика.
+
+ ^ Out
+ |
+ 1*            Y(t) = 0 - exp(-(t/Tf))
+ | *          
+ |  *        
+ |    *       
+ |      *     
+ 0---------***---> t[s]
+
+ ^ In
+ |
+ 1************ X(t) = 1
+ |            
+ |            
+ |            
+ |            
+ 0---------------> t[s]
+
+@COPYLEFT ALL WRONGS RESERVED :)
+Author: VA
+Contacts: DIY.PLC.314@gmail.com
+Date start LIB_PLC: 2014
+License: GNU GPL-2.0-or-later
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+https://www.youtube.com/watch?v=n1F_MfLRlX0
+https://www.youtube.com/@DIY_PLC
+https://github.com/DIYPLC/LIB_PLC
+https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+https://t.me/DIY_PLC
+*)
+
+END_FUNCTION_BLOCK
+
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/LIB_PLC' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK FbDispersion (* Дисперсия PV. *)
+
+VAR_INPUT
+	In:REAL := 0.0; (* Вход измерения. *)
+END_VAR
+
+VAR_OUTPUT
+	Variance  :REAL := 0.0; (* Дисперсия. *)
+	Deviation :REAL := 0.0; (* Среднеквадратическое отклонение. *)
+	Mean      :REAL := 0.0; (* Математическое ожидание (Среднее арифметическое). *)
+END_VAR
+
+VAR
+	Buffer1: ARRAY [0..NUMBER] OF REAL; (* Буфер. *)
+	Counter1:INT := 0; (* Счетчик. *)
+	Summator:REAL := 0.0; (* Сумматор. *)
+END_VAR
+
+VAR CONSTANT
+	NUMBER :INT := 99; (* Размер массива 100. *)
+END_VAR
+
+(* @END_DECLARATION := '0' *)
+(*
+ Дисперсия PV.
+       DbDispersion
+     +--------------+
+     | FbDispersion |
+  ->-|In    Variance|->-
+     |     Deviation|->-
+     |          Mean|->-
+     +--------------+
+*)
+
+(* Обновление массива. *)
+FOR Counter1 := NUMBER TO 1 BY -1 DO
+Buffer1[Counter1] := Buffer1[Counter1 - 1];
+END_FOR;
+Buffer1[0] := In;
+
+(* Расчет математического ожидания (среднего арифметического). *)
+Summator := 0.0;
+FOR Counter1 := 0 TO NUMBER BY 1 DO
+Summator := Summator + Buffer1[Counter1];
+END_FOR;
+Mean := Summator /(INT_TO_REAL(NUMBER + 1));
+
+(* Рассчет дисперсии. *)
+Summator := 0.0;
+FOR Counter1 := 0 TO NUMBER BY 1 DO
+Summator := Summator + ((Buffer1[Counter1] - Mean) * (Buffer1[Counter1] - Mean));
+END_FOR;
+Variance := Summator / (INT_TO_REAL(NUMBER + 1));
+
+(* Рассчет среднеквадратического отклонения. *)
+Deviation := SQRT(Variance);
+
+(*
+@COPYLEFT ALL WRONGS RESERVED :)
+Author: VA
+Contacts: DIY.PLC.314@gmail.com
+Date start LIB_PLC: 2014
+License: GNU GPL-2.0-or-later
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+https://www.youtube.com/watch?v=n1F_MfLRlX0
+https://www.youtube.com/@DIY_PLC
+https://github.com/DIYPLC/LIB_PLC
+https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+https://t.me/DIY_PLC
+*)
+END_FUNCTION_BLOCK
+
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/LIB_PLC' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK FbDriverAi420 (* Драйвер аналогово входа 4...20мА. *)
+
+VAR_INPUT
+	ADC      :WORD := 0    ; (* АЦП Сигнал от датчика 0...27648. *)
+	OutMax   :REAL := 100.0; (* Диаппазон датчика максимум. *)
+	OutMin   :REAL := 0.0  ; (* Диаппазон датчика минимум. *)
+	ErrValue :REAL := 0.0  ; (* Значение для Out при ошибке датчика. *)
+	SimValue :REAL := 0.0  ; (* Значение для Out при симуляции. *)
+	SimOn    :BOOL := FALSE; (* Включить симуляцию. *)
+END_VAR
+
+VAR_OUTPUT
+	Out   :REAL := 0.0  ; (* Выход в единицах датчика. *)
+	I_mA  :REAL := 0.0  ; (* Ток на аналоговом входе 4...20мА. *)
+	Error :BOOL := FALSE; (* Ошибка аналогово входа или датчика. *)
+END_VAR
+(* @END_DECLARATION := '0' *)
+(*
+ Драйвер аналогово входа 4...20мА.
+            DbDriverAi420
+    +---------------------------+
+    |       FbDriverAi420       |
+ ->-|ADC                     Out|->-
+   -|OutMax                 I_mA|-
+   -|OutMin                Error|-
+   -|ErrValue                   |
+   -|SimValue                   |
+   -|SimOn                      |
+    +---------------------------+
+*)
+
+(* Ошибка аналогово входа или датчика. *)
+Error := (ADC = 16#7FFF) OR (ADC = 16#8000); (* 32767,-32768  *)
+
+(* Ток на аналоговом входе 4...20мА. *)
+IF (Error) THEN
+I_mA := 0.0;
+ELSE
+(* Масштабирование 0...27648 [АЦП] -> 4...20[мА] *)
+I_mA := ((INT_TO_REAL(WORD_TO_INT(ADC)) * 16.0 ) / 27648.0) + 4.0;
+END_IF;
+
+IF (SimOn) THEN (* Включена симуляция. *)
+Out := SimValue; (* Значение для Out при симуляции. *)
+ELSE
+    IF (Error) THEN (* Ошибка аналогово входа или датчика. *)
+    Out := ErrValue; (* Значение для Out при ошибке датчика. *)
+    ELSE
+    (* Масштабирование 4...20[мА] -> OutMin...OutMax *)
+    Out := (OutMax - OutMin) * ((I_mA - 4.0) / 16.0) + OutMin;
+    END_IF;
+END_IF;
+
+(* Амплитудный ограничитель диапазона датчика OutMin...OutMax *)
+IF (Out >= OutMax) THEN (* Ограничение выхода сверху. *)
+Out := OutMax; 
+ELSE
+    IF (Out <= OutMin) THEN (* Ограничение выхода снизу. *)
+    Out := OutMin;
+    ELSE
+    (* Выход без ограничений. *)
+    Out := Out;
+    END_IF;
+END_IF;
+
+(*
+Описание работы драйвера аналогово входа 4...20мА.
+1.Сначала сигнал с АЦП 0...27648 преобразуется в токовый сигна 4...20мА.
+2.Если не включена симуляция и нет ошибок сигнал 4...20мА преобразуется в сигнал датчика OutMin...OutMax.
+3.Сигнал датчика ограничивается в пределах его диаппазона измерения OutMin...OutMax.
+
+@COPYLEFT ALL WRONGS RESERVED :)
+Author: VA
+Contacts: DIY.PLC.314@gmail.com
+Date start LIB_PLC: 2014
+License: GNU GPL-2.0-or-later
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+https://www.youtube.com/watch?v=n1F_MfLRlX0
+https://www.youtube.com/@DIY_PLC
+https://github.com/DIYPLC/LIB_PLC
+https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+https://t.me/DIY_PLC
+*)
+END_FUNCTION_BLOCK
+
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/LIB_PLC' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK FbDriverAo420 (* Драйвер аналогово выхода 4...20мА. *)
+
+VAR_INPUT
+	In       :REAL := 0.0  ; (* Вход сигнала на исполнительный механизм. *)
+	InMax    :REAL := 100.0; (* Исполнительный механизм максимум. *)
+	InMin    :REAL := 0.0  ; (* Исполнительный механизм минимум. *)
+	SimValue :REAL := 0.0  ; (* Значение для исполнительного механизма при симуляции. *)
+	SimOn    :BOOL := FALSE; (* Включить симуляцию. *)
+END_VAR
+
+VAR_OUTPUT
+	DAC  :WORD := 0  ; (* ЦАП Сигнал на исполнительный механизм 0...27648. *)
+	I_mA :REAL := 0.0; (* Ток на аналоговом выходе 4...20мА. *)
+END_VAR
+
+VAR
+	InLim   :REAL := 0.0; (* Сигнал исполнительного механизма после ограничения. *)
+	Switch1 :REAL := 0.0; (* Переключатель. *)
+END_VAR
+(* @END_DECLARATION := '0' *)
+(*
+ Драйвер аналогово выхода 4...20мА.
+          DbDriverAo420
+    +-----------------------+
+    |     FbDriverAo420     |
+ ->-|In                  DAC|->-
+   -|InMax              I_mA|-
+   -|InMin                  |
+   -|SimValue               |
+   -|SimOn                  |
+    +-----------------------+
+*)
+
+(* Амплитудный ограничитель диапазона исполнительного механизма InMin...InMax *)
+IF (In >= InMax) THEN (* Ограничение выхода сверху. *)
+InLim := InMax; 
+ELSE
+    IF (In <= InMin) THEN (* Ограничение выхода снизу. *)
+    InLim := InMin;
+    ELSE
+    (* Выход без ограничений. *)
+    InLim := In;
+    END_IF;
+END_IF;
+
+IF (SimOn) THEN (* Включена симуляция. *)
+Switch1 := SimValue;
+ELSE
+Switch1 := InLim;
+END_IF;
+
+(* ЦАП Сигнал на исполнительный механизм 0...27648. *)
+(* Масштабирование InMin...InMax -> 0...27648 *)
+DAC := INT_TO_WORD( REAL_TO_INT( ((Switch1 - InMin) / (InMax - InMin)) * 27648.0) );
+
+(* Ток на аналоговом выходе 4...20мА. *)
+IF (InMax = InMin) THEN (* Защита от деления на 0. *)
+I_mA := 0.0;
+ELSE
+(* Масштабирование InMin...InMax -> 4...20[мА] *)
+I_mA := (((InLim - InMin) / (InMax - InMin)) * 16.0) + 4.0;
+END_IF;
+
+(*
+Описание работы драйвера аналогово входа 4...20мА.
+1.Сигнал исполнительного механизма ограничивается в пределах его диаппазона измерения InMin...InMax.
+2.Если не включена симуляция сигнал c входа In преобразуется в сигнал ЦАП.
+3.Если включена симуляция сигнал c входа SimValue преобразуется в сигнал ЦАП.
+4.Рассчитывается значение тока 4...20мА для индикации.
+
+@COPYLEFT ALL WRONGS RESERVED :)
+Author: VA
+Contacts: DIY.PLC.314@gmail.com
+Date start LIB_PLC: 2014
+License: GNU GPL-2.0-or-later
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+https://www.youtube.com/watch?v=n1F_MfLRlX0
+https://www.youtube.com/@DIY_PLC
+https://github.com/DIYPLC/LIB_PLC
+https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+https://t.me/DIY_PLC
+*)
+END_FUNCTION_BLOCK
+
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/LIB_PLC' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK FbDriverDi
+
+VAR_INPUT
+	In       :BOOL := FALSE; (* Дискретный вход ПЛК. *)
+	SimValue :BOOL := FALSE; (* Значение для Out при симуляции. *)
+	SimOn    :BOOL := FALSE; (* Включить симуляцию. *)
+END_VAR
+
+VAR_OUTPUT
+	Out :BOOL := FALSE; (* Выход дискретного сигнала. *)
+END_VAR
+(* @END_DECLARATION := '0' *)
+(*
+ Драйвер дискретного входа.
+          DbDriverDi
+    +--------------------+
+    |     FbDriverDi     |
+ ->-|In               Out|->-
+   -|SimValue            |
+   -|SimOn               |
+    +--------------------+
+*)
+
+IF (SimOn) THEN
+(* Симуляция включена. *)
+(* Режим используется для отладки и при нештатной работе. *)
+Out := SimValue;
+ELSE
+(* Симуляция выключена. *)
+(* Штатный режим работы. *)
+Out := In;
+END_IF;
+
+(*
+@COPYLEFT ALL WRONGS RESERVED :)
+Author: VA
+Contacts: DIY.PLC.314@gmail.com
+Date start LIB_PLC: 2014
+License: GNU GPL-2.0-or-later
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+https://www.youtube.com/watch?v=n1F_MfLRlX0
+https://www.youtube.com/@DIY_PLC
+https://github.com/DIYPLC/LIB_PLC
+https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+https://t.me/DIY_PLC
+*)
+END_FUNCTION_BLOCK
+
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/LIB_PLC' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK FbDriverDo
+
+VAR_INPUT
+	In       :BOOL := FALSE; (* Вход дискретного сигнала. *)
+	SimValue :BOOL := FALSE; (* Значение для Out при симуляции. *)
+	SimOn    :BOOL := FALSE; (* Включить симуляцию. *)
+END_VAR
+
+VAR_OUTPUT
+	Out :BOOL := FALSE; (* Дискретный выход ПЛК. *)
+END_VAR
+(* @END_DECLARATION := '0' *)
+(*
+ Драйвер дискретного выхода.
+          DbDriverDo
+    +--------------------+
+    |     FbDriverDo     |
+ ->-|In               Out|->-
+   -|SimValue            |
+   -|SimOn               |
+    +--------------------+
+*)
+
+IF (SimOn) THEN
+(* Симуляция включена. *)
+(* Режим используется для отладки и при нештатной работе. *)
+Out := SimValue;
+ELSE
+(* Симуляция выключена. *)
+(* Штатный режим работы. *)
+Out := In;
+END_IF;
+
+(*
+@COPYLEFT ALL WRONGS RESERVED :)
+Author: VA
+Contacts: DIY.PLC.314@gmail.com
+Date start LIB_PLC: 2014
+License: GNU GPL-2.0-or-later
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+https://www.youtube.com/watch?v=n1F_MfLRlX0
+https://www.youtube.com/@DIY_PLC
+https://github.com/DIYPLC/LIB_PLC
+https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+https://t.me/DIY_PLC
+*)
+END_FUNCTION_BLOCK
+
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/LIB_PLC' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK FbEdgeNeg (* Детектор ниспадающего фронта (среза). *)
+
+VAR_INPUT
+	In :BOOL := FALSE; (* Вход. *)
+END_VAR
+
+VAR_OUTPUT
+	Out :BOOL := FALSE; (* Выход. *)
+END_VAR
+
+VAR (* Внутренние переменные, сохраняемые. *)
+	In_previos :BOOL := FALSE; (* Предыдущее состояние входа. *)
+END_VAR
+(* @END_DECLARATION := '0' *)
+(*
+ Детектор ниспадающего фронта (среза).
+       DbEdgeNeg
+     +-----------+
+     | FbEdgeNeg |
+  ->-|In      Out|->-
+     +-----------+
+*)
+
+(* Детектор ниспадающего фронта (среза). *)
+Out := In_previos AND NOT(In);
+(* Запомнить предыдущее состояние входа. *)
+In_previos := In;
+
+(*
+@COPYLEFT ALL WRONGS RESERVED :)
+Author: VA
+Contacts: DIY.PLC.314@gmail.com
+Date start LIB_PLC: 2014
+License: GNU GPL-2.0-or-later
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+https://www.youtube.com/watch?v=n1F_MfLRlX0
+https://www.youtube.com/@DIY_PLC
+https://github.com/DIYPLC/LIB_PLC
+https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+https://t.me/DIY_PLC
+*)
+END_FUNCTION_BLOCK
+
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/LIB_PLC' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK FbEdgePos (* Детектор нарастающего фронта. *)
+
+VAR_INPUT
+	In :BOOL := FALSE; (* Вход. *)
+END_VAR
+
+VAR_OUTPUT
+	Out :BOOL := FALSE; (* Выход. *)
+END_VAR
+
+VAR
+	In_previos :BOOL := FALSE; (* Предыдущее состояние входа. *)
+END_VAR
+(* @END_DECLARATION := '0' *)
+(*
+ Детектор нарастающего фронта.
+       DbEdgePos
+     +-----------+
+     | FbEdgePos |
+  ->-|In      Out|->-
+     +-----------+
+*)
+
+(* Детектор нарастающего фронта. *)
+Out := In AND NOT(In_previos);
+(* Запомнить предыдущее состояние входа. *)
+In_previos := In;
+
+(*
+@COPYLEFT ALL WRONGS RESERVED :)
+Author: VA
+Contacts: DIY.PLC.314@gmail.com
+Date start LIB_PLC: 2014
+License: GNU GPL-2.0-or-later
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+https://www.youtube.com/watch?v=n1F_MfLRlX0
+https://www.youtube.com/@DIY_PLC
+https://github.com/DIYPLC/LIB_PLC
+https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+https://t.me/DIY_PLC
+*)
+END_FUNCTION_BLOCK
+
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/LIB_PLC' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK FbFilterA (* Фильтр апериодический. *)
+
+VAR_INPUT
+	In :REAL := 0.0; (* Входной сигнал до фильтрации. *)
+	Tf :REAL := 1.0; (* Постоянная времени фильтра [с]. *)
+	Ts :REAL := 0.1; (* Шаг дискретизации по времени [с]. *)
+END_VAR
+
+VAR_OUTPUT
+	Out :REAL := 0.0; (* Выходной сигнал после фильтрации. *)
+END_VAR
+
+VAR_TEMP
+	Tmp :REAL; (* Временная переменная вход интегратора. *)
+END_VAR
+(* @END_DECLARATION := '0' *)
+(*
+ Фильтр апериодический.
+      DbFilterA
+    +-----------+
+    | FbFilterA |
+ ->-|In      Out|->-
+   -|Tf         |
+   -|Ts         |
+    +-----------+
+*)
+
+(* W(s) = 1 / (1 + Tf * s) при Ts->0. *)
+IF (Tf <= 0.0) THEN
+Out := In;
+ELSE
+Tmp := (In - Out) / Tf;
+Out := Out + Tmp * Ts;
+END_IF;
+
+(*
+ Внутренняя схема фильтра.
+
+          Вычитание   Деление      Интегрирование
+            +---+     +------+     +----------+
+ In ----->--| + |     |   1  | Tmp |  Ts * z  |
+            |   |-->--| ---- |-->--| -------- |--+-->-- Out
+      +-->--| - |     |  Tf  |     |   z - 1  |  |
+      |     +---+     +------+     +----------+  |
+      |                                          |
+      +------------------------------------------+
+
+ Условное графическое обозначение (приближенное).
+
+    +--------------+
+    |      1       |
+ ->-| ------------ |->-
+    |  Tf * s + 1  |
+    +--------------+
+
+ Электрическая схема фильтра.
+
+         R                  
+ +    +-----+              +
+ o----|     |----o---------o
+      +-----+    |          
+                 | C        
+               -----        
+ U In          -----   U Out
+                 |          
+ -               |         -
+ o---------------o---------o
+ Tf = R * C ([с] = [Ом] * [Ф])
+
+ Временная характеристика.
+
+ ^ Out
+ |
+ 1         *** Y(t) = 1 - exp(-(t/Tf))
+ |      *     
+ |    *       
+ |  *         
+ | *          
+ 0---------------> t[s]
+
+ ^ In
+ |
+ 1************ X(t) = 1
+ |            
+ |            
+ |            
+ |            
+ 0---------------> t[s]
+
+@COPYLEFT ALL WRONGS RESERVED :)
+Author: VA
+Contacts: DIY.PLC.314@gmail.com
+Date start LIB_PLC: 2014
+License: GNU GPL-2.0-or-later
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+https://www.youtube.com/watch?v=n1F_MfLRlX0
+https://www.youtube.com/@DIY_PLC
+https://github.com/DIYPLC/LIB_PLC
+https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+https://t.me/DIY_PLC
+*)
+END_FUNCTION_BLOCK
+
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/LIB_PLC' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK FbFilterM (* Фильтр медианный. *)
+
+VAR_INPUT
+	In    :REAL := 0.0  ; (* Входной сигнал до фильтрации. *)
+	Size  :INT  := 16   ; (* Размер массива для сортировки (Количество выборок). *)
+	Ts_in :DINT := 1000 ; (* Время между выборками и сортировками для входа In [мс]. *)
+	Ts_ms :DINT := 100  ; (* Шаг дискретизации по времени [мс]. *)
+	Reset :BOOL := FALSE; (* Сброс при перезагрузке. *)
+END_VAR
+
+VAR_OUTPUT
+	Out :REAL := 0.0; (* Выходной сигнал (середина отсортированного массива). *)
+END_VAR
+
+VAR CONSTANT
+	NUMBER :INT := 64; (* Размер массива. *)
+END_VAR
+
+VAR
+	TimerTs     :DINT := 0; (* Таймер для ресемплинга [мс]. *)
+	Size_prev   :INT  := 0; (* Предыдущее значение соответствующего входного параметра. *)
+	Old_i       :INT  := 0; (* Адрес самого старого элемента в массиве. *)
+	InputArray  :ARRAY [0..NUMBER] OF REAL; (* Массив входных значений для сортировки. *)
+	TimeArray   :ARRAY [0..NUMBER] OF INT ; (* Массив времени жизни элемента 0-самый молодой 1-старше 2- еще старше. *)
+END_VAR
+
+VAR_TEMP
+	FlagRunCode :BOOL; (* Флаг выполнить программу с шагом дискретизации Ts_in. *)
+	Adr_max     :INT ; (* Максимальное значение адреса массива. *)
+	i           :INT ; (* Счетчик цикла. *)
+	j           :INT ; (* Счетчик цикла. *)
+	TempValue   :REAL; (* Временная переменная для сортировки значений. *)
+	TempTime    :INT ; (* Временная переменная для сортировки времени жизни элемента. *)
+END_VAR
+(* @END_DECLARATION := '0' *)
+(*
+ Фильтр медианный.
+       DbFilterM
+    +-------------+
+    |  FbFilterM  |
+ ->-|In        Out|->-
+   -|Size         |
+   -|Ts_in        |
+   -|Ts_ms        |
+   -|Reset        |
+    +-------------+
+
+ Фильтр медианный.
+ Хорошо фильтрует случайные импульсные выбросы.
+ Разрабатывался для фильтрации сигналов с расходомеров воды.
+ Как не в себя жрет память и процессор.
+ В 2025 году фильтр проверен на практике все отлично работает на электромагитных расходомерах жидкости.
+ На самом электромагнитном расходомере необходимо выключить или уменьшить значение встроенной постоянной времени фильтра.
+ 
+ Суть алгоритма.
+ Берем массив измеренных значений InputArray собранный с входа In и обновляем его каждые Ts_in миллисекунд.
+ Самое старое значение массива выкидываем и записываем на его место новое значение с входа In.
+ Чтобы понимать какое значение новое, а какое старое делаем дополнительный массив возраста значений InputArray.
+ После записи нового значения сортируем массив InputArray пузырьком по возрастанию, чем больше индекс массива, тем больше там лежит значение.
+ Выход фильта Out есть середина этого массива, собственно поэтому он медианный.
+ 
+ Планируется вызывать этот фильтр в основном цикле OB1 main().
+ 
+ Для настройки фильтра есть два параметра первый размер массива.
+ Второй параметр изменение (увеличение) шага дискретизации фильтра относительно времени скана контроллера.
+ То есть выборки фильтра должны происходить реже чем вызывается сам фильтр (Ts_in > Ts_ms).
+*)
+
+(* *****************************************************************************)
+(* Так как массив считается с 0 то максимальный адрес на 1 меньше размера. *)
+Adr_max := Size - 1;
+(* Защита от выхода массива за границы. *)
+IF (Size >= NUMBER) THEN
+Adr_max := NUMBER - 2;
+END_IF;
+(* Менее 5и элементов не вижу смысла сортировать. *)
+IF (Size <= 5) THEN
+Adr_max := 4;
+END_IF;
+
+(******************************************************************************)
+(* Ресэмплинг выключен если Ts_ms >= Ts_in *)
+IF (Ts_ms >= Ts_in) THEN
+TimerTs := 0;
+FlagRunCode := TRUE;
+ELSE
+  (* Ресэмплинг для возможности изменения времени между выборками. *)
+  IF (TimerTs >= Ts_in) THEN
+  TimerTs := 0;
+  FlagRunCode := TRUE;
+  ELSE
+  TimerTs := TimerTs + Ts_ms;
+  FlagRunCode := FALSE;
+  END_IF;
+END_IF;
+
+(******************************************************************************)
+(* Инициализация массива. *)
+(* При перезапуске ПЛК. *)
+(* При изменении настроек фильтра. *)
+IF (Reset OR (Size <> Size_prev) ) THEN
+  (* Цикл от 0 до Adr_max включительно с шагом +1. *)
+  FOR i := 0 TO Adr_max BY 1 DO
+    (* Заполняем весь массив значений входным сигналом. *)
+    InputArray[i] := In;
+    (* Заполняем массив времени жизни элемента. *)
+    TimeArray[i] := i;
+  END_FOR;
+(* После инициализации самый старый элемент вверху массива. *)
+Old_i := Adr_max;
+(*
+ Массив после инициализации при In = 0.0, Adr_max = 4.
+  InputArray TimeArray  i
+ +----------+---------+---+
+ |    0.0   |    4    | 4 | <- Old_i <- Adr_max
+ |    0.0   |    3    | 3 |
+ |    0.0   |    2    | 2 |
+ |    0.0   |    1    | 1 |
+ |    0.0   |    0    | 0 |
+ +----------+---------+---+
+ Направление работы цикла от 0 до 4.
+ *)
+END_IF;
+
+(*----------------------------------------------------------------------------*)
+(* Код выполняемый с шагом дискретизации Ts_in. *)
+IF (FlagRunCode AND (Size <> 0)) THEN
+
+(*----------------------------------------------------------------------------*)
+
+  FOR i := 0 TO Adr_max BY 1 DO
+    (* Обновляем массив возраста элементов. *)
+    IF (TimeArray[i] = Adr_max) THEN
+      (* Самый старый элемент становится самым новым. *)
+      TimeArray[i] := 0;
+    ELSE
+      (* Все остальные стареют на +1. *)
+      TimeArray[i] := TimeArray[i] + 1;
+      (* Ищем самый старый элемент массива. *)
+      IF (TimeArray[i] = Adr_max) THEN
+        (* Запоминаем самый старый элемент массива *)
+        (* В него потом запишем новое значение входа *)
+        Old_i := i;
+      END_IF;
+    END_IF;
+  END_FOR;
+
+(*----------------------------------------------------------------------------*)
+
+(* Записываем новое значение входа в самый старый элемент массива. *)
+InputArray[Old_i] := In;
+
+(*----------------------------------------------------------------------------*)
+
+(*
+ Сортировка по возрастанию массива значений InputArray.
+ Массив до сортировки 
+  InputArray TimeArray  i
+ +----------+---------+---+
+ |    1.0   |    0    | 0 | 
+ |    4.0   |    1    | 1 | 
+ |    3.0   |    2    | 2 | 
+ |    6.0   |    3    | 3 | 
+ |    5.0   |    4    | 4 | <- Adr_max <- Old_i
+ +----------+---------+---+
+ Массив после сортировки 
+  InputArray TimeArray  i
+ +----------+---------+---+
+ |    1.0   |    0    | 0 | 
+ |    3.0   |    2    | 1 | 
+ |    4.0   |    1    | 2 | 
+ |    5.0   |    4    | 3 | <- Old_i
+ |    6.0   |    3    | 4 | <- Adr_max
+ +----------+---------+---+
+ Пузырьковая сортировка.
+ Думаю при диком желании это можно свернуть до одного цикла while тк массив каждый раз оставляем отсортированным.
+ Так же для ускорения можно заменить вход / выход и массив значений с 32х битной плавающей точки на 16и битное целочисленное значение.
+ https://ru.wikibooks.org/wiki/%D0%AF%D0%B7%D1%8B%D0%BA_%D0%A1%D0%B8_%D0%B2_%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D1%80%D0%B0%D1%85/%D0%A1%D0%BE%D1%80%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%BA%D0%B0
+ У сименса for не такой как на си пришлось переписать на while.
+ Ну и индексы массива у сименса на единицу разнятся с си.
+*)
+  i := 0;
+  WHILE (i < Adr_max) DO
+    j := 0;
+    WHILE (j < Adr_max - i) DO
+      IF (InputArray[j] > InputArray[j + 1]) THEN
+        (* Если они идут в неправильном порядке, то меняем их местами. *)
+        TempValue := InputArray[j];
+        InputArray[j] := InputArray[j + 1] ;
+        InputArray[j + 1] := TempValue;
+        (* Сортируем второй массив устаревания в соответствии с первым массивом значений. *)
+        TempTime := TimeArray[j];
+        TimeArray[j] := TimeArray[j + 1] ;
+        TimeArray[j + 1] := TempTime;
+      END_IF;
+    j := j + 1;
+    END_WHILE;
+  i := i + 1;
+  END_WHILE;
+
+END_IF; (* IF (FlagRunCode) THEN *)
+(*----------------------------------------------------------------------------*)
+
+(*
+  InputArray TimeArray  i
+ +----------+---------+---+
+ |    1.0   |    0    | 0 | 
+ |    3.0   |    2    | 1 | 
+ |    4.0   |    1    | 2 | <- Out = [Adr_max / 2]
+ |    5.0   |    4    | 3 | 
+ |    6.0   |    3    | 4 | <- Adr_max
+ +----------+---------+---+
+*)
+
+(* Выход это середина отсортированного массива. *)
+IF (Size <> 0) THEN 
+Out := InputArray[Adr_max / 2];
+ELSE
+Out := In; (* Если Size = 0 фильтр выключен. *)
+END_IF;
+
+(******************************************************************************)
+
+(* Запомнить предыдущее значение настроек фильтра. *)
+Size_prev  := Size ; (* Предыдущее значение соответствующего входного параметра. *)
+
+(******************************************************************************)
+
+(*
+@COPYLEFT ALL WRONGS RESERVED :)
+Author: VA
+Contacts: DIY.PLC.314@gmail.com
+Date start LIB_PLC: 2014
+License: GNU GPL-2.0-or-later
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+https://www.youtube.com/watch?v=n1F_MfLRlX0
+https://www.youtube.com/@DIY_PLC
+https://github.com/DIYPLC/LIB_PLC
+https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+https://t.me/DIY_PLC
+*)
+END_FUNCTION_BLOCK
+
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/LIB_PLC' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK FbFilterNaN (* Фильтр NaN и Inf для чисел REAL. *)
+
+VAR_INPUT
+	In       :REAL := 0.0; (* Вход. *)
+	ErrValue :REAL := 0.0  ; (* Значение для Out при не корректном значении на входе In. *)
+END_VAR
+
+VAR_OUTPUT
+	Out :REAL := 0.0  ; (* Выход. *)
+	Err :BOOL := FALSE; (* Флаг ошибки. *)
+END_VAR
+
+VAR
+	Flag_nan_1   :BOOL := FALSE ; (* Флаг не число метод 1, по стандарту IEEE 754. *)
+	Flag_nan_2   :BOOL := FALSE ; (* Флаг не число метод 2, как в GCC. *)
+	Flag_nan_3   :BOOL := FALSE ; (* Флаг не число метод 3, математическое определение. *)
+	Flag_pos_inf :BOOL := FALSE ; (* Флаг плюс бесконечность, математическое определение. *)
+	Flag_neg_inf :BOOL := FALSE ; (* Флаг минус бесконечность, математическое определение. *)
+	ZERO :REAL := 0.0;
+END_VAR
+
+(* @END_DECLARATION := '0' *)
+(*
+ Фильтр NaN и Inf для чисел REAL.
+      DbFilterNaN
+    +-------------+
+    | FbFilterNaN |
+ ->-|In        Out|->-
+   -|ErrValue  Err|-
+    +-------------+
+*)
+
+(* Если In==(NaN или Inf или -Inf) то Out=0 иначе Out=In. *)
+(* 16#7F800000=2#01111111_10000000_00000000_00000000 *)
+(* Стандарт IEEE 754. *)
+Flag_nan_1   := ((REAL_TO_DWORD(In) AND 16#7F800000) = 16#7F800000);
+Flag_nan_2   := (In <> In);
+Flag_nan_3   := (( ZERO / ZERO) = In);
+Flag_pos_inf := (( 1.0 / ZERO) = In);
+Flag_neg_inf := ((-1.0 / ZERO) = In);
+
+Err := Flag_nan_1 OR Flag_nan_2 OR Flag_nan_3 OR Flag_pos_inf OR Flag_neg_inf;
+
+IF (Err) THEN
+Out := ErrValue;
+(* По умолчанию при ошибке на выходе будит 0. *)
+(* Если хотим показать последнее значение без ошибки то, *)
+(* при вызове данного блока сделать петлю с выхода на так: *)
+(* DbFilterNaN1.ErrValue := DbFilterNaN1.Out *)
+(* DbFilterNaN1(); *)
+ELSE
+(* Штатный режим работы без ошибок. *)
+Out := In;
+END_IF;
+
+(*
+@COPYLEFT ALL WRONGS RESERVED :)
+Author: VA
+Contacts: DIY.PLC.314@gmail.com
+Date start LIB_PLC: 2014
+License: GNU GPL-2.0-or-later
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+https://www.youtube.com/watch?v=n1F_MfLRlX0
+https://www.youtube.com/@DIY_PLC
+https://github.com/DIYPLC/LIB_PLC
+https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+https://t.me/DIY_PLC
+*)
+END_FUNCTION_BLOCK
+
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/LIB_PLC' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK FbGSS (* Генератор сигналов и псевдослучайных чисел. *)
+
+VAR_INPUT
+	Amplitude :REAL := 1.0 ; (* Амплитуда выходного сигнала. *)
+	Period    :REAL := 10.0; (* Период выходного сигнала [с]. *)
+	Phase     :REAL := 0.0 ; (* Фаза выходного сигнала [радиан]. *)
+	Offset    :REAL := 0.0 ; (* Постоянная составляющая выходного сигнала. *)
+	PulseTime :REAL := 5.0 ; (* Время импульса [с]. *)
+	Ts        :REAL := 0.1 ; (* Шаг дискретизации по времени [с]. *)
+END_VAR
+
+VAR_OUTPUT
+	Sine       :REAL := 0.0  ; (* Синусоидальный сигнал. *)
+	Cosine     :REAL := 0.0  ; (* Косинусоидальный сигнал. *)
+	RectangleR :REAL := 0.0  ; (* Прямоугольный сигнал вещественный. *)
+	RectangleB :BOOL := FALSE; (* Прямоугольный сигнал булевый. *)
+	Triangle   :REAL := 0.0  ; (* Треугольный, линейно нарастающий и убывающий сигнал. *)
+	Prnd       :REAL := 0.0  ; (* Псевдослучайные числа в диапазоне 0...1. *)
+END_VAR
+
+VAR
+	CurrentTime        :REAL := 0.0; (* Текущее время расчета [с]. *)
+	IntegratorTriangle :REAL := 0.0; (* Интегратор для треугольных импульсов. *)
+	SummatorRnd        :DINT := 1  ; (* Сумматор для псевдослучайных чисел. *)
+END_VAR
+
+VAR_TEMP
+	Tmp :DWORD; (* Временная переменная для псевдослучайных чисел. *)
+END_VAR
+
+VAR CONSTANT
+	PI :REAL := 3.14159265358979323846; (* Число Пи. *)
+END_VAR
+
+(* @END_DECLARATION := '0' *)
+(*
+ Генератор сигналов и псевдослучайных чисел.
+             DbGSS
+     +--------------------+
+     |       FbGSS        |
+    -|Amplitude       Sine|->-
+    -|Period        Cosine|->-
+    -|Phase     RectangleR|->-
+    -|Offset    RectangleB|->-
+    -|PulseTime   Triangle|->-
+    -|Ts              Prnd|->-
+     +--------------------+
+*)
+
+Sine   := Amplitude*SIN(2.0*PI*(1.0/Period)*CurrentTime+Phase) + Offset;
+Cosine := Amplitude*COS(2.0*PI*(1.0/Period)*CurrentTime+Phase) + Offset;
+
+IF (CurrentTime < PulseTime) THEN (* Прямоугольные импульсы. *)
+RectangleR := Amplitude + Offset;
+RectangleB := TRUE;
+ELSE
+RectangleR := Offset;
+RectangleB := FALSE;
+END_IF;
+
+IF (CurrentTime <= (Period * 0.5)) THEN (* Треугольные импульсы. *)
+IntegratorTriangle := IntegratorTriangle + Ts;
+ELSE
+IntegratorTriangle := IntegratorTriangle - Ts;
+END_IF;
+IF (Period <> 0.0) THEN
+Triangle := (((IntegratorTriangle*2.0)/Period)*Amplitude) + Offset;
+END_IF;
+
+(* Псевдослучайные числа линейный конгруэнтный метод. *)
+SummatorRnd := SummatorRnd * 1103515245 + 12345;
+(* Принудительно отбрасывающей младшие 16 и один старший разряд. *)
+Tmp := DINT_TO_DWORD(SummatorRnd) AND 2#01111111111111110000000000000000;
+(* Арифметический сдвиг вправо на 16бит. *)
+Tmp := SHR(Tmp, 16);
+(* Масштабирование 0...32767 -> 0...1 *)
+Prnd := (DINT_TO_REAL(DWORD_TO_DINT(Tmp))/32767.0)*Amplitude+Offset;
+
+CurrentTime := CurrentTime+Ts; (* Формирование периода. *)
+IF (CurrentTime >= Period) THEN
+CurrentTime := 0.0;
+IntegratorTriangle := 0.0;
+END_IF;
+
+(*
+@COPYLEFT ALL WRONGS RESERVED :)
+Author: VA
+Contacts: DIY.PLC.314@gmail.com
+Date start LIB_PLC: 2014
+License: GNU GPL-2.0-or-later
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+https://www.youtube.com/watch?v=n1F_MfLRlX0
+https://www.youtube.com/@DIY_PLC
+https://github.com/DIYPLC/LIB_PLC
+https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+https://t.me/DIY_PLC
+*)
+
+END_FUNCTION_BLOCK
+
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/LIB_PLC' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK FbIntegrator (* Интегратор W(s)=1/s. *)
+
+VAR_INPUT
+	In        :REAL := 0.0       ; (* Входной сигнал интегратора. *)
+	OutMax    :REAL :=  1000000.0; (* Максимальное значение выхода. *)
+	OutMin    :REAL := -1000000.0; (* Минимальное значение выхода. *)
+	InitValue :REAL := 0.0       ; (* Начальные условия интегрирования для Reset *)
+	Trapezoid :BOOL := FALSE     ; (* Интегрирование методом: 1-трапеций 0-прямоугольников. *)
+	Ts        :REAL := 0.1       ; (* Шаг дискретизации по времени [с]. *)
+	Reset     :BOOL := FALSE     ; (* Сброс при перезагрузке. *)
+END_VAR
+
+VAR_OUTPUT
+	Out :REAL := 0.0; (* Выходной сигнал интегратора. *)
+END_VAR
+
+VAR
+	InPrevious : REAL := 0.0; (* Предидущее значение входа только для трапециидального интегратора. *)
+END_VAR
+(* @END_DECLARATION := '0' *)
+(*
+ Интегратор W(s)=1/s.
+      DbIntegrator
+    +--------------+
+    | FbIntegrator |
+ ->-|In         Out|->-
+   -|OutMax        |
+   -|OutMin        |
+   -|InitValue     |
+   -|Trapezoid     |
+   -|Ts            |
+   -|Reset         |
+    +--------------+
+*)
+
+IF (Trapezoid) THEN
+(* При шаге дискретизации Ts>=1s есть смысл включить более точный алгоритм. *)
+(* Или если мы точно понимаем, что делаем и зачем. *)
+(* Все же не траекторию ракеты в космомосе считаем.  *)
+Out := Out + (In + InPrevious) * 0.5 * Ts; (* Трапецеидальный интегратор. *)
+ELSE
+(* По умолчанию простой алгоритм. *)
+(* Используем прямоугольный интегратор т.к. его обычно достаточно. *)
+Out := Out + In * Ts; (* Прямоугольный интегратор *)
+END_IF;
+
+InPrevious := In;
+
+IF (Reset) THEN (* Начальные условия интегрирования применяются при сбросе. *)
+Out := InitValue;
+END_IF;
+
+IF (Out >= OutMax) THEN (* Ограничение верх. *)
+Out := OutMax;
+END_IF;
+
+IF (Out <= OutMin) THEN (* Ограничение низ. *)
+Out := OutMin;
+END_IF;
+
+(*
+ Условное графическое обозначение (точное).
+
+    +----------+
+    |  Ts * z  |
+ ->-| -------- |->-
+    |   z - 1  |
+    +----------+
+
+ Условное графическое обозначение (приближенное).
+
+        +-----+
+        |  1  |
+ X(s)->-| --- |->-Y(s)
+        |  s  |
+        +-----+
+
+ W(s) = Y(s) / X(s).
+
+ Временная характеристика.
+
+ ^ Out
+ |
+ 3           *
+ |         *  
+ 2       *    
+ |     *      
+ 1   *        
+ | *          
+ 0---1---2---3---> t[s]
+
+ ^ In
+ |
+ 1************
+ |            
+ 0---1---2---3---> t[s]
+
+ Подаем на вход константу на выходе получаем линейную функцию.
+ Подаем на вход линейную функцию на выходе получаем параболу.
+ Подаем на вход функцию sin(t) на выходе получаем cos(t).
+ Подаем на вход функцию e(t)   на выходе получаем e(t).
+
+ Передаточная функция интегратора в изображении по Лапласу:
+         1
+ W(s) = ---
+         s
+ W(s) = Y(s) / X(s)
+ X(s) = L( X(t) )
+ Y(s) = L( Y(t) )
+ Например подали на вход константу 2:
+ X(t) = 2
+ Изображение константы 2:
+ L( X(t) ) = L( 2 ) = 2/s
+ На выходе получили линейную функцию 2t:
+ Y(t) = 2t
+ Изображение линейной функции 2t:
+ L( Y(t) ) = L( 2t ) = 2/(s*s)
+ Тогда по определению передаточной функции получаем для интегратора:
+ W(s) = Y(s) / X(s) = 2/(s*s)  /  2/s = 1/s
+ W(s) = 1/s
+ Преобразование Лапласа грубо говоря это преобразование Фурье в котором:
+ Исходную функцию умножили на затухающую экспоненту чтобы результирующая площадь (интеграл) была конечной.
+ Предел интегрирования не от -inf до +inf а 0 до +inf с той же целью чтобы площадь (интеграл) была конечной и проще было считать интеграл.
+ Если вы не знаете что такое интеграл смотрите и вам откроется:)
+ История математики ВВС: The Story of Maths (4 серии)
+ Механическая Вселенная The Mechanical Universe… And Beyond (52 серии)
+
+ Вывод разностного уравнения из дифференциального уравнения:
+         1
+ W(p) = ---
+         p
+ W(p) = Y(t) / X(t)
+ p = d/dt
+ Y(t) / X(t) = 1 / p
+ Y(t) * p = X(t)
+ Y(t) * d/dt = X(t)
+ d(Y(t)) / dt = X(t)
+ (Y(t) - Y(t-dt)) / dt = X(t)
+ Y(t) - Y(t-dt) = X(t) * dt
+ Y(t)  = Y(t-dt) + X(t) * dt
+ Y = Y + X * Ts
+
+ Прямоугольный интегратор (Integrator Backward Euler).
+ Алгебраический порядок точности численного метода = 0 (ODE0)
+ Вывод разностного уравнения из дискретной передаточной функции:
+         Ts * z
+ W(z) = --------
+          z - 1
+ W(z) = (Ts * z) / (z - 1)
+ Y(z) / X(z) = (Ts * z) / (z - 1)
+ Y(z) * (z - 1) = Ts * X(z) * z
+ Y(z) * z - Y(z) = Ts * X(z) * z
+ Y(z) * z  = Y(z) + Ts * X(z) * z
+ Y(z)  = Y(z) * (z^-1) + Ts * X(z)
+ Y[n]  = Y[n-1]  + Ts * X[n]
+ Y = Y + X * Ts
+ Практика применения в АСУТП показывает
+ что достаточно нулевой алгебраической точности интегратора
+ и шага дискретизации по времени Ts = 0.1s.
+
+ Трапецеидальный интегратор (Integrator Trapezoidal).
+ Алгебраический порядок точности численного метода = 1 (ODE1)
+ Вывод разностного уравнения из дискретной передаточной функции:
+         Ts * (z + 1)
+ W(z) = --------------
+          2 * (z - 1)
+ W(z) = Ts * (z + 1) / 2 * (z - 1)
+ Y(z) / X(z) = Ts * (z + 1) / 2 * (z - 1)
+ Y(z) * 2 * (z - 1) = X(z) * Ts * (z + 1)
+ Y(z) * z * 2 - Y(z) * 2 = X(z) * z * Ts + X(z) * Ts
+ Y(z) * 2 - Y(z) * (z^-1) * 2 = X(z) * Ts + X(z) * (z^-1) * Ts
+ Y(z) * 2 = Y(z) * (z^-1) * 2 + X(z) * Ts + X(z) * (z^-1) * Ts
+ Y(z) = Y(z) * (z^-1) + (X(z) * Ts + X(z) * (z^-1) * Ts) / 2
+ Y(z) = Y(z) * (z^-1) + (X(z) + X(z) * (z^-1)) * 0.5 * Ts
+ Y[n] = Y[n-1] + (X[n] + X[n-1]) * 0.5 * Ts
+ Y = Y + (X + Xprevious) * 0.5 * Ts
+ Xprevious = X
+
+@COPYLEFT ALL WRONGS RESERVED :)
+Author: VA
+Contacts: DIY.PLC.314@gmail.com
+Date start LIB_PLC: 2014
+License: GNU GPL-2.0-or-later
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+https://www.youtube.com/watch?v=n1F_MfLRlX0
+https://www.youtube.com/@DIY_PLC
+https://github.com/DIYPLC/LIB_PLC
+https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+https://t.me/DIY_PLC
+*)
+END_FUNCTION_BLOCK
+
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/LIB_PLC' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK FbLimit (* Амплитудный ограничитель. *)
+
+VAR_INPUT
+	In     :REAL := 0.0  ; (* Вход амплитудного ограничителя. *)
+	OutMax :REAL := 100.0; (* Максимальное значение выхода. *)
+	OutMin :REAL := 0.0  ; (* Минимальное значение выхода. *)
+END_VAR
+
+VAR_OUTPUT
+	Out :REAL := 0.0; (* Выход амплитудного ограничителя. *)
+END_VAR
+
+(* @END_DECLARATION := '0' *)
+(*
+ Амплитудный ограничитель.
+       DbLimit
+    +-----------+
+    |  FbLimit  |
+ ->-|In      Out|->-
+   -|OutMax     |
+   -|OutMin     |
+    +-----------+
+*)
+
+(* Амплитудный ограничитель. *)
+IF (In >= OutMax) THEN
+Out := OutMax; (* Ограничение выхода сверху. *)
+ELSE
+    IF (In <= OutMin) THEN
+    Out := OutMin; (* Ограничение выхода снизу. *)
+    ELSE
+    Out := In; (* Выход без ограничений. *)
+    END_IF;
+END_IF;
+
+(*
+ Условное графическое обозначение.
+
+         OutMax
+      +-----------+
+      |           |
+      |       +-- |
+      |      /    |
+ In->-|     /     |->-Out
+      |    /      |
+      | --+       |
+      |           |
+      +-----------+
+         OutMin
+
+ Статическая характеристика.
+
+                +Out
+                  |
+                  |     ********
+                  |    *   |
+                  |   *    |
+                  |  *     | OutMax
+                  | *      |
+                  |*       |
+ -In <------------+------------> +In
+         |       *|
+         |      * |
+  OutMin |     *  |
+         |    *   |
+         |   *    |
+     ********     |
+                  |
+                -Out
+
+ Временная характеристика.
+
+ +In
+ |            *
+ |           * *
+ |----------*---* -----------------
+ |         *     *               |
+ |        *       *              | OutMax
+ |       *         *             |
+ +------*-----------*----------------------> t[s]
+ |     *             *           |
+ |    *               *          | OutMin
+ |   *                 *         |
+ |--*-------------------*----------
+ | *                     *
+ |*                       *
+ -In
+
+ +Out
+ |
+ |
+ |----------***** -----------------
+ |         *     *               |
+ |        *       *              | OutMax
+ |       *         *             |
+ +------*-----------*----------------------> t[s]
+ |     *             *           |
+ |    *               *          | OutMin
+ |   *                 *         |
+ |***-------------------***--------
+ |
+ |
+ -Out
+
+@COPYLEFT ALL WRONGS RESERVED :)
+Author: VA
+Contacts: DIY.PLC.314@gmail.com
+Date start LIB_PLC: 2014
+License: GNU GPL-2.0-or-later
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+https://www.youtube.com/watch?v=n1F_MfLRlX0
+https://www.youtube.com/@DIY_PLC
+https://github.com/DIYPLC/LIB_PLC
+https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+https://t.me/DIY_PLC
+*)
+END_FUNCTION_BLOCK
+
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/LIB_PLC' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK FbModeSelector (* Переключатель режимов работы. *)
+
+VAR_INPUT
+ButtonStop   :BOOL := FALSE; (* Кнопка "Стоп". *)
+ButtonManual :BOOL := FALSE; (* Кнопка "Ручной режим". *)
+ButtonAuto   :BOOL := FALSE; (* Кнопка "Автоматический режим". *)
+Error        :BOOL := FALSE; (* Отсутствие готовности системы к работе. *)
+Reset        :BOOL := FALSE; (* Сброс при перезагрузке. *)
+END_VAR
+
+VAR_OUTPUT
+LampStop   :BOOL := FALSE; (* Флаг "Активен режим СТОП". *)
+LampManual :BOOL := FALSE; (* Флаг "Активен РУЧНОЙ режим". *)
+LampAuto   :BOOL := FALSE; (* Флаг "Активен АВТОМАТИЧЕСКИЙ режим. *)
+END_VAR
+
+VAR
+State1    :INT  := 0    ; (* Локальный граф состояний. *)
+FlagError :BOOL := FALSE; (* Флаг запрещенного состояния входов. *)
+END_VAR
+
+VAR CONSTANT
+STATE_STOP   :INT := 0; (* Состояние "СТОП РЕЖИМ". *)
+STATE_MANUAL :INT := 1; (* Состояние "РУЧНОЙ РЕЖИМ". *)
+STATE_AUTO   :INT := 2; (* Состояние "АВТОМАТИЧЕСКИЙ РЕЖИМ". *)
+END_VAR
+(* @END_DECLARATION := '0' *)
+(*
+ Переключатель режимов работы.
+          DbModeSelector
+    +------------------------+
+    |     FbModeSelector     |
+ ->-|ButtonStop      LampStop|->-
+ ->-|ButtonManual  LampManual|->-
+ ->-|ButtonAuto      LampAuto|->-
+   -|Error                   |
+   -|Reset                   |
+    +------------------------+
+*)
+
+(* Запрещенное состояние: *)
+(* Если вместе с кнопкой стоп одновременно нажали еще что-то. *)
+FlagError:=
+((ButtonStop AND ButtonAuto) OR
+( ButtonStop AND ButtonManual));
+
+(* При перезагрузке контроллера режим СТОП. *)
+IF (Reset OR FlagError) THEN
+    State1     := STATE_STOP;
+    LampStop   := TRUE;
+    LampManual := FALSE;
+    LampAuto   := FALSE;
+ELSE
+    (* Граф состояний. *)
+    CASE State1 OF
+
+    STATE_STOP: (* Режим СТОП. *)
+    LampStop   := TRUE;
+    LampManual := FALSE;
+    LampAuto   := FALSE;
+    (* Переход СТОП -> РУЧНОЙ. *)
+    IF ButtonManual THEN
+    State1     := STATE_MANUAL;
+    LampStop   := FALSE;
+    LampManual := TRUE;
+    LampAuto   := FALSE;
+    END_IF;
+    (* Переход СТОП -> АВТОМАТ. *)
+    IF (ButtonAuto AND NOT(Error)) THEN
+    State1     := STATE_AUTO;
+    LampStop   := FALSE;
+    LampManual := FALSE;
+    LampAuto   := TRUE;
+    END_IF;
+
+    STATE_MANUAL: (* Режим РУЧНОЙ. *)
+    LampStop   := FALSE;
+    LampManual := TRUE;
+    LampAuto   := FALSE;
+    (* Переход РУЧНОЙ -> СТОП. *)
+    IF ButtonStop THEN
+    State1     := 0;
+    LampStop   := TRUE;
+    LampManual := FALSE;
+    LampAuto   := FALSE;
+    END_IF;
+    (* Преход РУЧНОЙ -> АВТОМАТ. *)
+    IF (ButtonAuto AND NOT(Error)) THEN
+    State1     := STATE_AUTO;
+    LampStop   := FALSE;
+    LampManual := FALSE;
+    LampAuto   := TRUE;
+    END_IF;
+
+    STATE_AUTO: (* Режим АВТОМАТ. *)
+    LampStop   := FALSE;
+    LampManual := FALSE;
+    LampAuto   := TRUE;
+    (* Переход АВТОМАТ -> СТОП. *)
+    IF (ButtonStop OR Error) THEN
+    State1     := STATE_STOP;
+    LampStop   := TRUE;
+    LampManual := FALSE;
+    LampAuto   := FALSE;
+    END_IF;
+    (* Переход АВТОМАТ -> РУЧНОЙ. *)
+    IF ButtonManual THEN
+    State1     := STATE_MANUAL;
+    LampStop   := FALSE;
+    LampManual := TRUE;
+    LampAuto   := FALSE;
+    END_IF;
+
+    ELSE (*СТОП при неопределенном состоянии. *)
+    State1 := STATE_STOP;
+    END_CASE;
+
+END_IF; (* IF (Reset OR FlagError) THEN *)
+
+(*
+ Граф состояний.
+
+ Если ошибка Error активна можно работать только в ручном режиме.
+ Reset должен срабатывать при перезагрузке или включении питания.
+
+                                  |
+                                 -+-Reset OR FlagError
+                                  |
+                                  V
+                        +-------------------+
+                        | State1 =          |
+            +---------->| STATE_STOP        |-----------+
+            |           | LampStop = 1      |           |
+            |           +-------------------+           |
+            |                |         ^                |
+            |                |         |                |
+            |   ButtonManual-+-       -+-ButtonStop     |
+            |                |         |                |
+            |                V         |                |
+            |           +-------------------+           |
+ ButtonStop |           | State1 =          |           | ButtonAuto
+        OR -+-          | STATE_MANUAL      |          -+- AND
+      Error |           | LampManual = 1    |           | NOT(Error)
+            |           +-------------------+           |
+            |                |         ^                |
+            |     ButtonAuto |         |                |
+            |           AND -+-       -+-ButtonManual   |
+            |     NOT(Error) |         |                |
+            |                V         |                |
+            |           +-------------------+           |
+            |           | State1 =          |           |
+            +-----------| STATE_AUTO        |<----------+
+                        | LampAuto = 1      |
+                        +-------------------+
+
+ Пример организации интерфейса пользователя для HMI.
+ При нажатии кнопоки AUTO тег ButtonAuto = 1.
+ В автоматическом режиме работы тег LampAuto = 1 дает эффект нажатия на кнопку AUTO.
+ Кнопки MANUAL, STOP работают аналогично.
+ Так как кнопки без фиксации то можно параллельно кнопкам на экране подключать физические кнопки.
+
+ +--------------------------------------------------------+
+ | MENU: "Errors"                                         |
+ +--------------------------------------------------------+
+ | 0. No Error (OK).                                      |
+ |                                                        |
+ |                                                        |
+ |                                                        |
+ |                                                        |
+ |                                                        |
+ |                                                        |
+ +--------------------------------------------------------+
+ | +--------+ +--------+ +--------+ +--------+ +--------+ |
+ | | < MENU | |  AUTO  | | MANUAL | |  STOP  | | MENU > | |
+ | +--------+ +--------+ +--------+ +--------+ +--------+ |
+ +--------------------------------------------------------+
+
+@COPYLEFT ALL WRONGS RESERVED :)
+Author: VA
+Contacts: DIY.PLC.314@gmail.com
+Date start LIB_PLC: 2014
+License: GNU GPL-2.0-or-later
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+https://www.youtube.com/watch?v=n1F_MfLRlX0
+https://www.youtube.com/@DIY_PLC
+https://github.com/DIYPLC/LIB_PLC
+https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+https://t.me/DIY_PLC
+*)
+END_FUNCTION_BLOCK
+
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/LIB_PLC' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK FbMotor (* Двигатель с частотником и контактором. *)
+
+VAR_INPUT
+MotorRun       :BOOL := FALSE; (* Команда: включить двигатель. *)
+VoltageOk      :BOOL := FALSE; (* Схема собрана 380VAC Ok. *)
+DriveOk        :BOOL := FALSE; (* Обратная связь: нет ошибок на частотном приводе. *)
+ContactorOk    :BOOL := FALSE; (* Обратная связь: контактор включился. *)
+TimeMonitoring :DINT := 1000 ; (* Время гарантированного включения контактора [мс]. *)
+TimeDelayOn    :DINT := 1000 ; (* Время задержки включения частотника [мс]. *)
+TimeDelayOff   :DINT := 5000 ; (* Время задержки выключения контактора [мс]. *)
+Ts_ms          :DINT := 100  ; (* Шаг дискретизации по времени [мс]. *)
+Reset          :BOOL := FALSE; (* Сброс при перезагрузке. *)
+END_VAR
+
+VAR_OUTPUT
+MotorOn        :BOOL := FALSE; (* Включить двигатель. *)
+ContactorOn    :BOOL := FALSE; (* Включить контактор. *)
+ErrorVoltage   :BOOL := FALSE; (* Схема разобрана нет 380VAC. *)
+ErrorDrive     :BOOL := FALSE; (* Ошибка частотного привода. *)
+ErrorContactor :BOOL := FALSE; (* Ошибка контактора. *)
+END_VAR
+
+VAR
+State1 :INT  := 0; (* Граф сосояния частотника и контактора. *)
+Timer1 :DINT := 0; (* Таймер для задержки переключения между частотником и контактором [мс]. *)
+Timer2 :DINT := 0; (* Таймер для формирования ошибки контактора [мс]. *)
+END_VAR
+
+VAR CONSTANT
+STATE_STOP          :INT := 0; (* Состояние "Стоп". *)
+STATE_CONTACTOR_ON  :INT := 1; (* Состояние "Включение контактора". *)
+STATE_DRIVE_ON      :INT := 2; (* Состояние "Включение частотного привода". *)
+STATE_RUN           :INT := 3; (* Состояние "Работа". *)
+STATE_DRIVE_OFF     :INT := 4; (* Состояние "Выключение частотного привода". *)
+STATE_CONTACTOR_OFF :INT := 5; (* Состояние "Выключение контактора". *)
+END_VAR
+(* @END_DECLARATION := '0' *)
+(*
+ Двигатель с частотником и контактором.
+                 DbMotor
+    +-------------------------------+
+    |            FbMotor            |
+ ->-|MotorRun                MotorOn|->-
+   -|VoltageOk           ContactorOn|-
+   -|DriveOk            ErrorVoltage|-
+   -|ContactorOk          ErrorDrive|-
+   -|TimeMonitoring   ErrorContactor|-
+   -|TimeDelayOn                    |
+   -|TimeDelayOff                   |
+   -|Ts_ms                          |
+   -|Reset                          |
+    +-------------------------------+
+*)
+
+(* Схема разобрана нет 380VAC. *)
+ErrorVoltage := NOT(VoltageOk);
+
+(* Ошибка частотного привода. *)
+ErrorDrive := NOT(DriveOk);
+
+(* Формируем ошибку контактора. *)
+(* Контактор включается не сразу. *)
+(* За время TimeMonitoring контактор обязан включиться, иначе ошибка. *)
+(* Так же следим чтобы контактор выключился и контакты не залипли. *)
+IF (ContactorOn) THEN
+(* Следим чтобы контактор вовремя включился. *)
+  IF (ContactorOk) THEN
+  (* Контактор включился. *)
+  Timer2 := 0;
+  ErrorContactor := FALSE;
+  ELSE
+    IF (Timer2 <= TimeMonitoring) THEN
+    (* Контактор еще не включился. *)
+    Timer2 := Timer2 + Ts_ms;
+    ErrorContactor := FALSE;
+    ELSE
+    (* Ошибка контактор не включился за время TimeMonitoring *)
+    ErrorContactor := TRUE;
+    END_IF;
+  END_IF;
+ELSE
+(* Следим чтобы контактор вовремя выключился. *)
+  IF NOT(ContactorOk) THEN
+  (* Контактор выключился. *)
+  Timer2 := 0;
+  ErrorContactor := FALSE;
+  ELSE
+    IF (Timer2 <= TimeMonitoring) THEN
+    (* Контактор еще не выключился. *)
+    Timer2 := Timer2 + Ts_ms;
+    ErrorContactor := FALSE;
+    ELSE
+    (* Ошибка контактор не выключился за время TimeMonitoring *)
+    ErrorContactor := TRUE;
+    END_IF;
+  END_IF;
+END_IF;
+
+(* Сброс при перезагрузке или ошибке. *)
+IF (Reset OR ErrorVoltage OR ErrorDrive) THEN
+State1 := STATE_STOP;
+END_IF;
+
+(* При включении двигателя должен сначала включиться контактор затем частотный привод. *)
+(* При выключении двигателя должен сначала выключиться частотный привод, а затем контактор. *)
+(* Это необходимо для увеличения времени жизни контактора. *)
+(* Граф состояний. *)
+CASE State1 OF
+
+(* Состояние "Стоп". *)
+STATE_STOP:
+MotorOn     := FALSE;
+ContactorOn := FALSE;
+Timer1 := 0;
+(* Если получили разрешение на включение то включаем контактор. *)
+IF (MotorRun) THEN
+State1 := STATE_CONTACTOR_ON;
+END_IF;
+
+(* Состояние "Включение контактора". *)
+STATE_CONTACTOR_ON:
+MotorOn     := FALSE;
+ContactorOn := TRUE;
+Timer1 := Timer1 + Ts_ms;
+(* Перед включением частотника делаем паузу чтоб контактор успел включиться. *)
+IF (Timer1 >= TimeDelayOn) THEN
+State1 := STATE_DRIVE_ON;
+END_IF;
+
+(* Состояние "Включение частотного привода". *)
+STATE_DRIVE_ON:
+MotorOn     := TRUE;
+ContactorOn := TRUE;
+Timer1 := 0;
+State1 := STATE_RUN;
+
+(* Состояние "Работа". *)
+STATE_RUN:
+MotorOn     := TRUE;
+ContactorOn := TRUE;
+Timer1 := 0;
+(* Если пришла команда выключить двигатель то сначала выключаем частотник. *)
+IF NOT(MotorRun) THEN
+State1 := STATE_DRIVE_OFF;
+END_IF;
+
+(* Состояние "Выключение частотного привода". *)
+STATE_DRIVE_OFF:
+MotorOn     := FALSE;
+ContactorOn := TRUE;
+Timer1 := Timer1 + Ts_ms;
+(* Перед выключением контактора делаем паузу чтоб выключится без нагрузки. *)
+IF (Timer1 >= TimeDelayOff) THEN
+State1 := STATE_CONTACTOR_OFF;
+END_IF;
+
+(* Состояние "Выключение контактора". *)
+STATE_CONTACTOR_OFF:
+MotorOn     := FALSE;
+ContactorOn := FALSE;
+Timer1 := 0;
+(* Переходим в состояние стоп. *)
+State1 := STATE_STOP;
+
+(* СТОП при неопределенном состоянии. *)
+ELSE
+State1 := STATE_STOP;
+END_CASE;
+
+(*
+ Схема подключения блока FbMotor.
+
+                +-------------------+
+                | 380 VAC           |
+                +-------------------+
+                          |
+                          v
+                +-------------------+
+                | Вводной автомат   |--> VoltageOk
+                +-------------------+
+                          |
+                          v
+                +-------------------+
+     MotorOn -->| Частотный привод  |--> DriveOk
+                +-------------------+
+                          |
+                          v
+                +-------------------+
+ ContactorOn -->| Контактор         |--> ContactorOk
+                +-------------------+
+                          |
+                          v
+                +-------------------+
+                | Двигатель         |
+                +-------------------+
+
+@COPYLEFT ALL WRONGS RESERVED :)
+Author: VA
+Contacts: DIY.PLC.314@gmail.com
+Date start LIB_PLC: 2014
+License: GNU GPL-2.0-or-later
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+https://www.youtube.com/watch?v=n1F_MfLRlX0
+https://www.youtube.com/@DIY_PLC
+https://github.com/DIYPLC/LIB_PLC
+https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+https://t.me/DIY_PLC
+*)
+END_FUNCTION_BLOCK
+
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/LIB_PLC' *)
 (* @OBJECTFLAGS := '0, 8' *)
 (* @SYMFILEFLAGS := '2048' *)
 FUNCTION_BLOCK FbPIDcontrol (* ПИД-регулятор. *)
+
 VAR_INPUT
 	PV     :REAL := 0.0   ; (* Измеренное значение регулируемого параметра. *)
 	SP     :REAL := 0.0   ; (* Заданное значение регулируемого параметра. *)
@@ -973,9 +3015,11 @@ VAR_INPUT
 	Manual :REAL := 25.0  ; (* Сигнал управления в ручном режиме работы. *)
 	OnMan  :BOOL := FALSE ; (* Включить ручной режим работы регулятора. *)
 END_VAR
+
 VAR_OUTPUT
 	MV :REAL := 0.0; (* Сигнал управления на исполнительный механизм. *)
 END_VAR
+
 VAR
 	ER        :REAL := 0.0; (* Ошибка регулирования. *)
 	Ppart     :REAL := 0.0; (* Пропорциональная составляющая регулятора. *)
@@ -983,13 +3027,14 @@ VAR
 	Dpart     :REAL := 0.0; (* Дифференциальная составляющая регулятора. *)
 	Dintegral :REAL := 0.0; (* Интегратор дифференциальной составляющей регулятора. *)
 END_VAR
+
 VAR_TEMP
 	Auto :REAL; (* Выход ПИД- алгоритма и вход переключателя режимов работы. *)
 	Sw   :REAL; (* Выход с переключателя режимов работы. *)
 END_VAR
 (* @END_DECLARATION := '0' *)
 (*
-ПИД-регулятор.
+ ПИД-регулятор.
          DbPIDcontrol
     +--------------------+
     |    FbPIDcontrol    |
@@ -1070,7 +3115,7 @@ MV := Sw;
 END_IF;
 
 (*
-Передаточная функция регулятора (при Ts -> 0):
+ Передаточная функция регулятора (при Ts -> 0):
 
           MV(s)               1              s
  W(s) = -------- = Kp + Ki * --- + Kd * -------------
@@ -1079,82 +3124,83 @@ END_IF;
  ER(s) = SP(s) - PV(s).
  Tdf = 1 / Kdf
 
-Передаточная функция интегратора:
+ Передаточная функция интегратора:
 
          Ts * z
  W(z) = --------
          z - 1
 
-Численное интегрирование методом прямоугольников.
-y = y + x * Ts;
+ Численное интегрирование методом прямоугольников.
+ y = y + x * Ts;
 
-Перечень сокращений.
+ Перечень сокращений.
 
-Fb          - Function block       - Функциональный блок.
-Db          - Data block           - Блок данных.
-PIDcontrol  - PID Controller       - ПИД- регулятор (пропорционально интегрально дифференциальный регулятор).
-SP          - Set Point            - Заданное значение.
-PV          - Process Variable     - Измеренное значение.
-MV          - Manipulated Variable - Сигнал управления.
-ER          - Error                - Ошибка регулирования, рассогласование.
-ERMAX       - Erorr maximum        - Максимум зоны нечувствительности.
-ERMIN       - Erorr minimum        - Минимум зоны нечувствительности.
-MVMAX       - MV maximum           - Максимум сигнала управления.
-MVMIN       - MV minimum           - Минимум сигнала управления.
-Ts          - Sample Time          - Шаг дискретизации по времени.
-ManOn       - Manual on            - Включить ручной режим управления.
-Sw          - Switch               - Переключатель.
-CW          - Control Word         - Слово (ui16 бит) управления (по битам).
-SW          - Status Word          - Слово (ui16 бит) состояния (по битам).
-EW          - Error Word           - Слово (ui16 бит) ошибок (по битам).
-Альтернативные варианты имен.
-CV          - Control Variable     - Измеренное значение.
-PV          - Process Value        - Измеренное значение.
-CS          - Control Signal       - Сигнал управления.
-MV          - Manipulated Value    - Сигнал управления.
-OP          - Output Power         - Сигнал управления.
+ Fb          - Function block       - Функциональный блок.
+ Db          - Data block           - Блок данных.
+ PIDcontrol  - PID Controller       - ПИД- регулятор (пропорционально интегрально дифференциальный регулятор).
+ SP          - Set Point            - Заданное значение.
+ PV          - Process Variable     - Измеренное значение (переменная процесса).
+ MV          - Manipulated Variable - Сигнал управления.
+ ER          - Error                - Ошибка регулирования, рассогласование.
+ ERMAX       - Erorr maximum        - Максимум зоны нечувствительности.
+ ERMIN       - Erorr minimum        - Минимум зоны нечувствительности.
+ MVMAX       - MV maximum           - Максимум сигнала управления.
+ MVMIN       - MV minimum           - Минимум сигнала управления.
+ Ts          - Sample Time          - Шаг дискретизации по времени.
+ ManOn       - Manual on            - Включить ручной режим управления.
+ Sw          - Switch               - Переключатель.
+ CW          - Control Word         - Слово (ui16 бит) управления (по битам).
+ SW          - Status Word          - Слово (ui16 бит) состояния (по битам).
+ EW          - Error Word           - Слово (ui16 бит) ошибок (по битам).
+ Альтернативные варианты имен.
+ CV          - Control Variable     - Измеренное значение.
+ PV          - Process Value        - Измеренное значение.
+ CS          - Control Signal       - Сигнал управления.
+ MV          - Manipulated Value    - Сигнал управления.
+ OP          - Output Power         - Сигнал управления.
+ CO          - Controller Output    - Сигнал управления.
 
-Характеристики ПИД-регулятора.
+ Характеристики ПИД-регулятора.
 
-Ограничение интегральной составляющей методом обратного вычисления.
-Зона нечувствительности к ошибке регулирования для устранения небольших колебаний регулятора в установившемся режиме работы.
-Амплитудное ограничение выходного сигнала для предотвращения подачи сигнала управления, который превышает физические возможности исполнительного механизма.
-Встроенный в дифференциальную составляющую фильтр низких частот, для устранения дифференцирования шумов измерения.
-Фильтр шума- дискретное апериодическое звено первого порядка.
-Переключение режимов управления РУЧНОЙ / АВТОМАТ.
-Безударный переход из ручного режима в автоматический.
-Безударный переход из автоматического режима в ручной.
-Принудительное обнуление интегратора интегральной составляющей при Ki=0.
-Принудительное обнуление интегратора дифференциальной составляющей при Kd=0.
-Численное интегрирование методом прямоугольников.
-Нет ни одной операции деления.
-Протестировано на PLC SIEMENS SIMATIC S7-300 в блоке OB35 (Ts=0,1c).
+ Ограничение интегральной составляющей методом обратного вычисления.
+ Зона нечувствительности к ошибке регулирования для устранения небольших колебаний регулятора в установившемся режиме работы.
+ Амплитудное ограничение выходного сигнала для предотвращения подачи сигнала управления, который превышает физические возможности исполнительного механизма.
+ Встроенный в дифференциальную составляющую фильтр низких частот, для устранения дифференцирования шумов измерения.
+ Фильтр шума- дискретное апериодическое звено первого порядка.
+ Переключение режимов управления РУЧНОЙ / АВТОМАТ.
+ Безударный переход из ручного режима в автоматический.
+ Безударный переход из автоматического режима в ручной.
+ Принудительное обнуление интегратора интегральной составляющей при Ki=0.
+ Принудительное обнуление интегратора дифференциальной составляющей при Kd=0.
+ Численное интегрирование методом прямоугольников.
+ Нет ни одной операции деления.
+ Протестировано на PLC SIEMENS SIMATIC S7-300 в блоке OB35 (Ts=0,1c).
 
-Известные недостатки ПИД-регулятора.
+ Известные недостатки ПИД-регулятора.
 
-При переходе из автоматического режима в ручной безударный переход отсутствует, если не подвязать через внешний тег переменную выхода MV к входу MANUAL.
-Безударный переход работает только если Ki не равен нолю.
-Необходимо следить, чтобы верхняя граница зоны нечувствительности была больше или равна нижней.
-Необходимо следить, чтобы верхняя граница амплитудного ограничителя была больше нижней.
-Необходимо следить, чтобы коэффициент Kdf был больше ноля.
-Необходимо помнить, что коэффициент Kdf обратно пропорционален постоянной времени фильтра.
-Прямоугольный интегратор имеет меньшую точность, чем трапецеидальный.
-Арифметика с плавающей точкой работает медленнее целочисленной.
-Точность вычислений не контролируется.
-Необходимо следить при наладке, чтобы не было слишком малых измеренных значений и интегральной составляющей при большом выходном сигнале.
-Иначе интегрирование может остановиться и за того, что мы пытаемся прибавить очень маленькое число к очень большому, а точность типа данных не позволяет это сделать.
-ПИ- закон регулирования с апериодическим объектом управления по определе-нию не может безошибочно «отрабатывать» линейно нарастающий сигнал задания.
-Сигналы SP и PV нужно ограничивать вне регулятора,
-диаппазоны ограничения для SP и PV должны быть одинаковыми,
-если этого не сделать то будут проблемы в автоматическом режиме работы при активной работе амплитудного ограничителя,
-например SP=90% PV=110% ожидаем MV=0%, но при изменении PV возрастает MV хотя должно быть MV=0%.
+ При переходе из автоматического режима в ручной безударный переход отсутствует, если не подвязать через внешний тег переменную выхода MV к входу MANUAL.
+ Безударный переход работает только если Ki не равен нолю.
+ Необходимо следить, чтобы верхняя граница зоны нечувствительности была больше или равна нижней.
+ Необходимо следить, чтобы верхняя граница амплитудного ограничителя была больше нижней.
+ Необходимо следить, чтобы коэффициент Kdf был больше ноля.
+ Необходимо помнить, что коэффициент Kdf обратно пропорционален постоянной времени фильтра.
+ Прямоугольный интегратор имеет меньшую точность, чем трапецеидальный.
+ Арифметика с плавающей точкой работает медленнее целочисленной.
+ Точность вычислений не контролируется.
+ Необходимо следить при наладке, чтобы не было слишком малых измеренных значений и интегральной составляющей при большом выходном сигнале.
+ Иначе интегрирование может остановиться и за того, что мы пытаемся прибавить очень маленькое число к очень большому, а точность типа данных не позволяет это сделать.
+ ПИ- закон регулирования с апериодическим объектом управления по определе-нию не может безошибочно «отрабатывать» линейно нарастающий сигнал задания.
+ Сигналы SP и PV нужно ограничивать вне регулятора,
+ диаппазоны ограничения для SP и PV должны быть одинаковыми,
+ если этого не сделать то будут проблемы в автоматическом режиме работы при активной работе амплитудного ограничителя,
+ например SP=90% PV=110% ожидаем MV=0%, но при изменении PV возрастает MV хотя должно быть MV=0%.
 
-Полезная информация по теме:
-https://www.reallab.ru/bookasutp/5-pid-regulyatori/
+ Полезная информация по теме:
+ https://www.reallab.ru/bookasutp/5-pid-regulyatori/
 
-Структура регулятора:
+ Структура регулятора:
 
-Ошибка регулирования.
+ Ошибка регулирования.
       +---+
       |   |
  SP->-|+  |
@@ -1163,7 +3209,7 @@ https://www.reallab.ru/bookasutp/5-pid-regulyatori/
       |   |
       +---+
 
-Зона нечувствительности к ошибке.
+ Зона нечувствительности к ошибке.
           ERMAX
       +-----------+
       |           |
@@ -1178,7 +3224,7 @@ https://www.reallab.ru/bookasutp/5-pid-regulyatori/
       +-----------+
           ERMIN
 
-Пропорциональная составляющая.
+ Пропорциональная составляющая.
       +---+
       |   |
  ER->-|   |
@@ -1187,7 +3233,7 @@ https://www.reallab.ru/bookasutp/5-pid-regulyatori/
       |   |
       +---+
 
-Интегральная составляющая.
+ Интегральная составляющая.
       +---+   +----------+
       |   |   |          |
  ER->-|   |   |  Z * Ts  |
@@ -1196,7 +3242,7 @@ https://www.reallab.ru/bookasutp/5-pid-regulyatori/
       |   |   |          |
       +---+   +----------+
 
-Дифференциальная составляющая.
+ Дифференциальная составляющая.
                         +---+
                         |   |
       +---+       Kdf->-|   |
@@ -1212,7 +3258,7 @@ https://www.reallab.ru/bookasutp/5-pid-regulyatori/
                               |          |
                               +----------+
 
-Сигнал управления.
+ Сигнал управления.
          +---+
          |   |
  Ppart->-|+  |
@@ -1223,7 +3269,7 @@ https://www.reallab.ru/bookasutp/5-pid-regulyatori/
          |   |
          +---+
 
-Переключение режима работы "Ручной / Автоматический".
+ Переключение режима работы "Ручной / Автоматический".
           +-----+
           |     |
  Auto--->-|-+   |
@@ -1236,7 +3282,7 @@ https://www.reallab.ru/bookasutp/5-pid-regulyatori/
              |
  OnMan-->----+
 
-Амплитудный ограничитель.
+ Амплитудный ограничитель.
           MVMAX
       +-----------+
       |           |
@@ -1250,7 +3296,7 @@ https://www.reallab.ru/bookasutp/5-pid-regulyatori/
           MVMIN
 
 
-Реакция разомкнутого контура регулятора на единичное спупечатое воздействие по каналу управления.
+ Реакция разомкнутого контура регулятора на единичное спупечатое воздействие по каналу управления.
 
  ^ ER
  |
@@ -1303,14 +3349,14 @@ https://www.reallab.ru/bookasutp/5-pid-regulyatori/
  |
  0------------------------------------> t[s]
 
-Интерфейс пользователя SCADA, HMI.
+ Интерфейс пользователя SCADA, HMI.
 
-Шрифт: Arial 12pt
-Цвет фона: R212 G208 B200
-Цвет тени: R169 G169 B169
-Цвет "Заданное значение"  : R0 G0 B255
-Цвет "Измеренное значение": R0 G176 B80
-Цвет "Сигнал управления"  : R255 G0 B0
+ Шрифт: Arial 12pt
+ Цвет фона: R212 G208 B200
+ Цвет тени: R169 G169 B169
+ Цвет "Заданное значение"  : R0 G0 B255
+ Цвет "Измеренное значение": R0 G176 B80
+ Цвет "Сигнал управления"  : R255 G0 B0
 
  +------------------------------------------------------+---+
  | 1PIRCA1 ПИД Регулятор давления воды.                 | X |
@@ -1381,26 +3427,26 @@ https://www.reallab.ru/bookasutp/5-pid-regulyatori/
  | +-------+ +---------------------------------+ |
  +-----------------------------------------------+
 
-Пересчет коэффициентов регулятора "CONT_C" 
-в коэффициенты ПИД- регулятора MATLAB SIMULINK PID Controller.
+ Пересчет коэффициентов регулятора "CONT_C" 
+ в коэффициенты ПИД- регулятора MATLAB SIMULINK PID Controller.
 
-Передаточная функция регулятора SIMATIC FB 41 "CONT_C":
+ Передаточная функция регулятора SIMATIC FB 41 "CONT_C":
 
-        LMN(s)                   1      (TD / TM_LAG) * s
-W(s) = -------- = GAIN * (1 + ------ + -------------------)
-         ER(s)                TI * s      TM_LAG * s + 1
+         LMN(s)                   1      (TD / TM_LAG) * s
+ W(s) = -------- = GAIN * (1 + ------ + -------------------)
+          ER(s)                TI * s      TM_LAG * s + 1
 
-Единицы измерения.
-ER(s) = SP_INT(s) - PV_IN(s). 0...100[%]
-TI,TD,TM_LAG [s].
-Итого получаем формулы для пересчета настроек:
-P = Kp  = GAIN
-I = Ki  = GAIN / TI
-D = Kd  = (TD / TM_LAG) * GAIN
-N = Kdf = 1 / TM_LAG
-Так же необходимо учесть что данные настройки актуальны
-только для диаппазонов входного и выходного сигнала 0...100[%].
-Время необходимо привести в секунды.
+ Единицы измерения.
+ ER(s) = SP_INT(s) - PV_IN(s). 0...100[%]
+ TI,TD,TM_LAG [s].
+ Итого получаем формулы для пересчета настроек:
+ P = Kp  = GAIN
+ I = Ki  = GAIN / TI
+ D = Kd  = (TD / TM_LAG) * GAIN
+ N = Kdf = 1 / TM_LAG
+ Так же необходимо учесть что данные настройки актуальны
+ только для диаппазонов входного и выходного сигнала 0...100[%].
+ Время необходимо привести в секунды.
 
 @COPYLEFT ALL WRONGS RESERVED :)
 Author: VA
@@ -1414,7 +3460,1773 @@ https://github.com/DIYPLC/LIB_PLC
 https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
 https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
 https://t.me/DIY_PLC
+*)
+END_FUNCTION_BLOCK
 
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/LIB_PLC' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK FbPIDstep (* ПИД-регулятор с двумя дискретными выходами. *)
+
+VAR_INPUT
+	PV       :REAL := 0.0  ; (* Измеренное значение регулируемого параметра 0...100[%]. *)
+	SP       :REAL := 0.0  ; (* Заданное значение регулируемого параметра 0...100[%]. *)
+	COM_RST  :BOOL := FALSE; (* Полная перезагрузка. *)
+	LMNR_HS  :BOOL := FALSE; (* Датчик обранной связи клапан открыт. *)
+	LMNR_LS  :BOOL := FALSE; (* Датчик обранной связи клапан закрыт. *)
+	LMNS_ON  :BOOL := FALSE; (* Включить ружной режим управления. *)
+	LMNUP    :BOOL := FALSE; (* Команда открыть в ручном режиме. *)
+	LMNDN    :BOOL := FALSE; (* Команда закрыть в ручном режиме. *)
+	GAIN     :REAL := 2.0  ; (* Пропорциональное усиление ошибки регулирования. *)
+	TI       :REAL := 20.0 ; (* Время интегрирования [с]. *)
+	DEADB_W  :REAL := 0.5  ; (* Зона нечувствительности к ошибке регулирования [%]. *)
+	PULSE_TM :REAL := 1.0  ; (* Минимальное время выходного импульса [с]. *)
+	BREAK_TM :REAL := 1.0  ; (* Минимально время между выходными импульсами [с]. *)
+	MTR_TM   :REAL := 55.0 ; (* Время открытия исполнительного механизма с 0 до 100 [с]. *)
+	DISV     :REAL := 0.0  ; (* Возмущающее воздействие к ошибке регулирования [%]. *)
+	CYCLE    :REAL := 0.1  ; (* Шаг дискретизации по времени [с]. *)
+END_VAR
+
+VAR_OUTPUT
+	QLMNUP :BOOL :=  FALSE; (* Открыть задвижку. *)
+	QLMNDN :BOOL :=  FALSE; (* Закрыть задвижку. *)
+END_VAR
+
+VAR
+	ER          :REAL := 0.0  ; (* Ошибка регулирования [%]. *)
+	LMNRS_ON    :BOOL := FALSE; (* *)
+	LMNRSVAL    :REAL := 0.0  ; (* *)
+	LMNR_SIM    :REAL := 0.0  ; (* *)
+	sFbPVal     :REAL := 0.0  ; (* Меняется во время регулирования. *)
+	sThrOn      :REAL := 0.0  ; (* Иногда меняется во время регулирования (похоже на адаптивный гистерезис). *)
+	siImpAus    :INT  := 0    ; (* -100...0...+100 *)
+	stImpDauer  :REAL := 0.0  ; (* *)
+	stPausDauer :REAL := 0.0  ; (* *)
+END_VAR
+
+VAR_TEMP
+	Hvar     :REAL := 0.0 ; (* Вспомогательная переменная *)
+	ErKp     :REAL := 0.0 ; (* Вспомогательная переменная *)
+	rTi      :REAL := 0.0 ; (* Время интегрирования в real !!! не удалять !!! *)
+	AdapIn1  :REAL := 0.0 ; (* Eingang 1 der Adaption der Ansprechschwelle *)
+	AdapIn2  :REAL := 0.0 ; (* Eingang 2 der Adaption der Ansprechschwelle *)
+	iImpEin  :INT  := 0   ; (* Eingang des Impulsformers *)
+	rThrOff  :REAL := 0.0 ; (* Abschaltschwelle *)
+	dInteg   :REAL := 0.0 ; (* Eingang des Integrierers in der Rьckfьhrung *)
+	dThrStIn :REAL := 0.0 ; (* Three - step element input *)
+	LmnrSim  :REAL := 0.0 ; (* Simulierte Stellungsrьckmeldung *)
+END_VAR
+(* @END_DECLARATION := '0' *)
+(*
+ ПИД-регулятор с двумя дискретными выходами.
+             DbPIDstep
+    +-------------------------+
+    |        FbPIDstep        |
+ ->-|PV                 QLMNUP|->-
+   -|SP                 QLMNDN|->-
+   -|COM_RST                  |
+   -|LMNR_HS                  |
+   -|LMNR_LS                  |
+   -|LMNS_ON                  |
+   -|LMNUP                    |
+   -|LMNDN                    |
+   -|GAIN                     |
+   -|TI                       |
+   -|DEADB_W                  |
+   -|PULSE_TM                 |
+   -|BREAK_TM                 |
+   -|MTR_TM                   |
+   -|DISV                     |
+   -|CYCLE                    |
+    +-------------------------+
+*)
+
+IF COM_RST
+THEN 
+    LMNR_SIM    := LMNRSVAL;
+    QLMNUP      := 0       ;
+    QLMNDN      := 0       ;
+    PV          := 0.0     ;
+    ER          := 0.0     ;
+    LMNRS_ON    := 0       ;
+    LMNRSVAL    := 0.0     ;
+    LMNR_SIM    := 0.0     ;
+    sFbPVal     := 0.0     ;
+    sThrOn      := 0.0     ;
+    siImpAus    := 0       ;
+    stImpDauer  := 0.0     ;
+    stPausDauer := 0.0     ;
+ELSE
+    ErKp := SP - PV;
+    IF    ErKp < ( -DEADB_W) THEN  ER := ErKp + DEADB_W;
+    ELSIF ErKp > DEADB_W      THEN  ER := ErKp - DEADB_W;
+    ELSE  ER := 0.0; END_IF;
+    ErKp := ER * GAIN;
+    rTi := TI;
+    IF rTi < CYCLE * 0.5 THEN rTi := CYCLE * 0.5; END_IF; 
+    Hvar := rTi - ABS(0.01 * ErKp * MTR_TM);
+    IF Hvar < (rTi * 0.1)THEN rTi := rTi * 0.1; ELSE rTi := Hvar; END_IF;
+    IF LMNS_ON 
+    THEN 
+        sFbPVal := 0.0;
+    ELSE  
+        IF siImpAus <> 0 
+        THEN  
+            dInteg := DINT_TO_REAL(INT_TO_DINT(siImpAus)) * CYCLE / MTR_TM;
+        ELSE 
+            IF (ErKp > 0.0 AND LMNR_HS) OR (ErKp < 0.0 AND LMNR_LS) OR (TI = 0.0)
+            THEN 
+                dInteg := 0.0;
+            ELSE    
+                dInteg  := (-ErKp) * CYCLE / rTi;
+            END_IF;
+        END_IF;
+        sFbPVal := sFbPVal + dInteg;
+        IF TI = 0.0
+        THEN  
+            IF    sFbPVal > 100.0 THEN sFbPVal := 100.0;
+            ELSIF sFbPVal < 0.0   THEN sFbPVal := 0.0;
+            END_IF;
+        END_IF;
+    END_IF;
+    dThrStIn := ErKp - sFbPVal + DISV;
+    AdapIn1 := ErKp;
+    AdapIn2 := sFbPVal;
+    rThrOff := 55.0 / MTR_TM * CYCLE;
+    IF PULSE_TM > CYCLE
+    THEN
+    Hvar := PULSE_TM;
+    ELSE
+    Hvar := CYCLE;
+    END_IF;
+    Hvar := 100.0 * Hvar / MTR_TM;
+    IF NOT(LMNR_HS OR LMNR_LS)
+    THEN
+        IF NOT (QLMNUP OR QLMNDN)
+        THEN
+            IF TI <> 0.0
+            THEN
+                IF ABS(AdapIn1) < ABS(AdapIn2)
+                THEN
+                    sThrOn := AdapIn1;
+                ELSE
+                    sThrOn := AdapIn2; 
+                END_IF;
+            ELSE
+                IF PV = 0.0
+                THEN
+                    sThrOn := Hvar;
+                ELSE 
+                    sThrOn := ABS(ErKp) * 0.5;
+                END_IF;
+            END_IF;
+            IF sThrOn > 10.0 THEN sThrOn := 10.0; END_IF;
+            IF sThrOn < Hvar THEN sThrOn := Hvar; END_IF;
+        END_IF;
+    ELSE
+        sThrOn := Hvar;
+    END_IF;
+    IF (siImpAus = 100 AND dThrStIn > rThrOff) OR (dThrStIn >= sThrOn)             THEN iImpEin := 100;
+    ELSIF (siImpAus = -100 AND dThrStIn < ( -rThrOff)) OR (dThrStIn <= ( -sThrOn)) THEN iImpEin := -100;
+    ELSE                                                                                iImpEin := 0;
+    END_IF;
+    IF LMNS_ON
+    THEN
+        IF LMNUP XOR LMNDN
+        THEN
+            IF LMNUP
+            THEN
+                iImpEin := 100;
+            ELSE
+                iImpEin := -100;
+            END_IF;
+        ELSE
+            iImpEin := 0;
+        END_IF;
+    END_IF;
+    IF (iImpEin = 100 AND LMNR_HS) OR (iImpEin = -100 AND LMNR_LS) THEN iImpEin := 0; END_IF;
+    IF (siImpAus = -100 AND iImpEin = 100) OR (siImpAus = 100 AND iImpEin = -100)THEN iImpEin := 0; END_IF;
+    IF siImpAus <> iImpEin
+    THEN
+        IF iImpEin = 0
+        THEN
+            IF stImpDauer <= 0.0
+            THEN 
+                siImpAus := 0;
+                stPausDauer := BREAK_TM;
+            END_IF;
+        ELSE
+            siImpAus := iImpEin;
+            stImpDauer := PULSE_TM;
+        END_IF;
+    END_IF;
+    IF stImpDauer > 0.0
+    THEN
+    stImpDauer := stImpDauer - CYCLE;
+    ELSE
+    stImpDauer := 0.0;
+    END_IF;
+    IF stPausDauer > 0.0
+    THEN
+    stPausDauer := stPausDauer - CYCLE;
+    ELSE
+    stPausDauer := 0.0;
+    END_IF;
+    IF ((siImpAus = 100) AND LMNR_HS) OR ((siImpAus = -100) AND LMNR_LS)
+    THEN 
+      siImpAus := 0;
+      stImpDauer := 0.0;
+    END_IF;
+    IF NOT LMNRS_ON
+    THEN
+        LmnrSim := LMNRSVAL;
+    ELSE
+        LmnrSim := DINT_TO_REAL(INT_TO_DINT(siImpAus)) * CYCLE / MTR_TM + LMNR_SIM;
+        IF LmnrSim >= 100.0
+        THEN
+            LmnrSim := 100.0;
+        ELSIF  LmnrSim <= 0.0
+        THEN
+            LmnrSim := 0.0;
+        END_IF;
+    END_IF;
+    LMNR_SIM := LmnrSim;
+    IF siImpAus = 0
+    THEN
+        QLMNUP := 0;
+        QLMNDN := 0;
+    ELSIF siImpAus = 100
+    THEN 
+        QLMNUP := 1;
+        QLMNDN := 0;
+    ELSE 
+        QLMNUP := 0;
+        QLMNDN := 1;
+    END_IF;
+END_IF;
+
+(*
+src CONT_S FB42
+reversed by komatic
+cross platforms by VA
+https://web.archive.org/web/20220322202418/http://plc4good.org.ua/view_post.php?id=65
+https://github.com/komatic1/SCL_regulation_control/blob/main/CONT_S.scl
+
+Добавлен: 1exan    Дата: 2020-04-26
+
+В этом месте есть отличия от TCONT и там похоже реализация более правильная:
+Здесь:
+IF iImpEin=0
+THEN
+IF stImpDauer<=T#0MS
+THEN
+siImpAus:=0;
+stPausDauer:=BREAK_TM;
+END_IF;
+ELSE
+siImpAus:=iImpEin;
+stImpDauer:=PULSE_TM;
+END_IF;
+В TCONT:
+IF iImpEin = 0 THEN
+IF stImpDauer <= 0.0 THEN
+siImpAus := 0 ; stPausDauer := BREAK_TM ;
+END_IF ;
+ELSIF stPausDauer <= 0.0 THEN
+siImpAus := iImpEin ; stImpDauer := PULSE_TM ; END_IF ;
+
+Добавлен: 1exan    Дата: 2020-04-26
+
+Конкретно вот эта строка:
+ELSIF stPausDauer <= 0.0 (или T#0s) THEN
+должна быть вместо простого
+ELSE
+
+Добавлен: Roman    Дата: 2021-12-02
+
+Правильные строки:
+sThrOn:=ABS(AdapIn1);
+sThrOn:=ABS(AdapIn2);
+
+IF iImpEin=0
+THEN
+IF stImpDauer<=T#0MS
+THEN
+siImpAus:=0;
+stPausDauer:=BREAK_TM;
+END_IF;
+ELSE IF stPausDauer<=T#0MS
+THEN
+siImpAus:=iImpEin;
+stImpDauer:=PULSE_TM;
+END_IF; END_IF;
+
+@COPYLEFT ALL WRONGS RESERVED :)
+Author: VA
+Contacts: DIY.PLC.314@gmail.com
+Date start LIB_PLC: 2014
+License: GNU GPL-2.0-or-later
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+https://www.youtube.com/watch?v=n1F_MfLRlX0
+https://www.youtube.com/@DIY_PLC
+https://github.com/DIYPLC/LIB_PLC
+https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+https://t.me/DIY_PLC
+*)
+END_FUNCTION_BLOCK
+
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/LIB_PLC' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK FbRamp (* Рампа разгона / торможения. *)
+
+VAR_INPUT
+	In    :REAL := 0.0  ; (* Входной сигнал. *)
+	Scale :REAL := 100.0; (* Диапазон времени разгона и торможения. *)
+	TAcc  :REAL := 5.0  ; (* Время разгона от 0 до Scale [с]. *)
+	TDec  :REAL := 5.0  ; (* Время торможения от Scale до 0 [c]. *)
+	Ts    :REAL := 0.1  ; (* Шаг дискретизации по времени [с]. *)
+END_VAR
+
+VAR_OUTPUT
+	Out :REAL := 0.0; (* Выходной сигнал. *)
+END_VAR
+
+VAR_TEMP
+	AccMode :BOOL := FALSE; (* Активен режим ускорения. *)
+	DecMode :BOOL := FALSE; (* Активен режим замедления. *)
+END_VAR
+(* @END_DECLARATION := '0' *)
+(*
+ Рампа разгона / торможения.
+         DbRamp
+    +--------------+
+    |    FbRamp    |
+ ->-|In         Out|->-
+   -|Scale         |
+   -|TAcc          |
+   -|TDec          |
+   -|Ts            |
+    +--------------+
+*)
+
+(* Режим байпаса интегратора рампы с безударным переходом. *)
+IF (Scale <= 0.0) THEN
+    Out := In;
+ELSE (* Штатный режим работы. *)
+
+    (* Состояние Out до отработки шага интегрирования. *)
+    (* Оптимизировать и переместить сравнения нельзя. *)
+    AccMode := (In > Out); (* Активен режим ускорения. *)
+    DecMode := (In < Out); (* Активен режим замедления. *)
+
+    (* Режим ускорения рампы. *)
+    IF (AccMode) THEN
+        IF (TAcc <= 0.0) THEN
+        Out := In;
+        ELSE
+        Out := Out + ((Ts * Scale) / TAcc);
+        END_IF;
+    END_IF;
+
+    (* Режим замедления рампы. *)
+    IF (DecMode) THEN
+        IF (TDec <= 0.0) THEN
+        Out := In;
+        ELSE
+        Out := Out - ((Ts * Scale) / TDec);
+        END_IF;
+    END_IF;
+
+    (* Установившийся режим рампы. *)
+    (* Состояние Out после отработки шага интегрирования. *)
+    IF ( ((AccMode) AND (Out >= In))
+      OR ((DecMode) AND (Out <= In))
+      OR (In = Out) ) THEN
+    Out := In;
+    END_IF;
+
+END_IF;
+
+(*
+ Пример использования №1.
+ Скорость открытия парового клапана от 0 до 100 процентов за 90  секунд.
+ Скорость закрытия парового клапана от 100 до 0 процентов за 150 секунд.
+ Параметры рампы для решения этой задачи:
+ DbRamp1.Scale := 100.0; //Диапазон времени разгона и торможения.
+ DbRamp1.TAcc  := 90.0 ; //Время разгона от 0 до Scale [с].
+ DbRamp1.TDec  := 150.0; //Время торможения от Scale до 0 [c].
+
+ Пример использования №2.
+ Скорость разгона частотного привода от 0 до 50 Герц за 20 секунд.
+ Скорость торможения частотного привода от 50 до 0 Герц за 15 секунд. 
+ Параметры рампы для решения этой задачи:
+ DbRamp2.Scale := 50.0; //Диапазон времени разгона и торможения.
+ DbRamp2.TAcc  := 20.0; //Время разгона от 0 до Scale [с].
+ DbRamp2.TDec  := 15.0; //Время торможения от Scale до 0 [c].
+
+ Пример использования №3.
+ Необходимо отключть рампу и передать сигнал напрямую с входа на выход. 
+ Параметры рампы для решения этой задачи:
+ DbRamp3.Scale := 0.0; //Диапазон времени разгона и торможения.
+
+ Временная характеристика.
+
+ ^ In
+ |
+ 100 *************
+ |   *           *
+ |   *           *
+ |   *           *
+ 0---------------------------------> t[s]
+
+ ^ Out
+ |
+ |   TAcc         TDec
+ |    10s          5s
+ |  <----->       <-->
+ 100       *******     ^
+ |       *        *    | Scale 100%
+ |     *           *   |
+ |   *              *  v
+ 0---------------------------------> t[s]
+
+ Угол наклона рампы.
+ tg(a) = Scale / TAcc
+
+
+ Блок схема.
+
+ Константы    Переключатель    Интегратор
+ +-------+     +-----------+
+ | Scale |     | In > Out  |
+ | ----- |-->--|--+        |
+ | TAcc  |     |   \       |
+ +-------+     |    \      |
+               |     \     |
+ +-------+     |      \    |     +-----+
+ |       |     |       \   |     |  1  |
+ |   0   |-->--|--+     +--|-->--| --- |-->-- Out
+ |       |     | In ~= Out |     |  s  |
+ +-------+     |           |     +-----+
+               |           |
+ +-------+     |           |
+ | Scale |     |           |
+ | ----- |-->--|--+        |
+ | TDec  |     | In < Out  |
+ +-------+     +-----------+
+
+@COPYLEFT ALL WRONGS RESERVED :)
+Author: VA
+Contacts: DIY.PLC.314@gmail.com
+Date start LIB_PLC: 2014
+License: GNU GPL-2.0-or-later
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+https://www.youtube.com/watch?v=n1F_MfLRlX0
+https://www.youtube.com/@DIY_PLC
+https://github.com/DIYPLC/LIB_PLC
+https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+https://t.me/DIY_PLC
+*)
+END_FUNCTION_BLOCK
+
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/LIB_PLC' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK FbScale (* Масштабирование InMin...InMax -> OutMin...OutMax. *)
+
+VAR_INPUT
+	In     :REAL:= 0.0    ; (* Вход до масштабирования. *)
+	InMax  :REAL:= 27648.0; (* Максимум входного диапазона. *)
+	InMin  :REAL:= 0.0    ; (* Минимум входного диапазона. *)
+	OutMax :REAL:= 20.0   ; (* Максимум выходного диапазона. *)
+	OutMin :REAL:= 4.0    ; (* Минимум выходного диапазона. *)
+END_VAR
+
+VAR_OUTPUT
+	Out :REAL := 0.0; (* Выход после масштабирования. *)
+END_VAR
+(* @END_DECLARATION := '0' *)
+(*
+ Масштабирование InMin...InMax -> OutMin...OutMax.
+       DbScale
+    +-----------+
+    |  FbScale  |
+ ->-|In      Out|->-
+   -|InMax      |
+   -|InMin      |
+   -|OutMax     |
+   -|OutMin     |
+    +-----------+
+*)
+
+(* Масштабирование сигнала. *)
+IF (InMax = InMin) THEN (* Деление на 0 может остановить процессор. *)
+(* При ошибке исходных данных. *)
+Out := 0.0;
+ELSE
+(* Масштабирование. *)
+Out := (OutMax - OutMin) * ((In - InMin)/(InMax - InMin)) + OutMin;
+END_IF;
+
+(*
+ Статическая характеристика.
+
+       ^ Out
+       |
+ OutMax|<---------------*
+       |              * |
+       |            *   |
+    Out|<---------*     |
+       |        * |     |
+       |      *   |     |
+ OutMin|<---*     |     |
+       |    |     |     |
+       |    |     |     |
+       +---------------------> In
+          InMin  In   InMax
+
+ Выход сигнал
+ Out = k * In + b
+
+ Для расчета k, b надо решить систему двух линейных уравнений с двумя неизвестными.
+ {OutMax = k * InMax + b
+ {OutMin = k * InMin + b
+
+ Усиление:
+      OutMax - OutMin 
+ k = -----------------
+       InMax - InMin  
+
+ Смещение:
+ b = OutMax - k * InMax
+
+ После подстановки в уравнение Out = k * In + b констант k, b,
+ и сокращения числа арифметических операций до минимума получаем:
+ Out := (OutMax - OutMin) * ((In - InMin)/(InMax - InMin)) + OutMin;
+
+ Данное линейное преобразование на практике легко вывести через промежуточный диаппазон 0...1:
+ InMin...InMax -> 0...(InMax-InMin) -> 0...1 -> 0...(OutMax-OutMin) -> OutMin...OutMax.
+ Пример рассчета давления с датчика  4...20мА -> 0...10Бар.
+ 4...20 -  4 = 0...16
+ 0...16 / 16 = 0...1
+ 0...1  * 10 = 0...10
+ При токе 12мА
+ 12  -   4 = 8
+ 8   /  16 = 0.5
+ 0.5 *  10 = 5Бар
+ Давление 5Бар.
+
+@COPYLEFT ALL WRONGS RESERVED :)
+Author: VA
+Contacts: DIY.PLC.314@gmail.com
+Date start LIB_PLC: 2014
+License: GNU GPL-2.0-or-later
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+https://www.youtube.com/watch?v=n1F_MfLRlX0
+https://www.youtube.com/@DIY_PLC
+https://github.com/DIYPLC/LIB_PLC
+https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+https://t.me/DIY_PLC
+*)
+END_FUNCTION_BLOCK
+
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/LIB_PLC' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK FbSimMotorGear (* Виртуальный МЭО для отладки шагового регулятора. *)
+
+VAR_INPUT
+CmdOpen   :BOOL := FALSE; (* Команда на открытие +. *)
+CmdClose  :BOOL := FALSE; (* Команда на закрытие -. *)
+TimeOpen  :REAL := 60.0 ; (* Время необходимое для открытия задвижки [с]. *)
+TimeClose :REAL := 50.0 ; (* Время необходимое для закрытия задвижки [с]. *)
+Ts        :REAL := 0.1  ; (* Шаг дискретизации по времени в секундах. *)
+Reset     :BOOL := FALSE; (* Сброс при перезагрузке. *)
+END_VAR
+
+VAR_OUTPUT
+Position    :REAL := 0.0  ; (* Положение штока 0...100 [%]. *)
+SensorOpen  :BOOL := FALSE; (* Датчик на открытие задвижки. *)
+SensorClose :BOOL := FALSE; (* Датчик на закрытие задвижки. *)
+END_VAR
+
+VAR_TEMP
+SpeedPos :REAL := 0.0; (* Скорость открытия. *)
+SpeedNeg :REAL := 0.0; (* Скорость закрытия. *)
+END_VAR
+(* @END_DECLARATION := '0' *)
+(*
+ Виртуальный МЭО для отладки шагового регулятора.
+           DbSimMotorGear
+    +--------------------------+
+    |      FbSimMotorGear      |
+ ->-|CmdOpen           Position|->-
+ ->-|CmdClose        SensorOpen|-
+   -|TimeOpen       SensorClose|-
+   -|TimeClose                 |
+   -|Ts                        |
+   -|Reset                     |
+    +--------------------------+
+*)
+
+IF(Reset) THEN
+Position := 0.0;
+END_IF;
+
+SpeedPos := 100.0 / TimeOpen ; (* [%/s] *)
+SpeedNeg := 100.0 / TimeClose; (* [%/s] *)
+
+IF(CmdOpen) THEN
+Position := Position + SpeedPos * Ts; (* [%] *)
+END_IF;
+
+IF(CmdClose) THEN
+Position := Position - SpeedNeg * Ts; (* [%] *)
+END_IF;
+
+IF(Position >= 100.0) THEN
+Position := 100.0;
+SensorOpen := TRUE;
+ELSE
+SensorOpen := FALSE;
+END_IF;
+
+IF(Position <= 0.0) THEN
+Position := 0.0;
+SensorClose := TRUE;
+ELSE
+SensorClose := FALSE;
+END_IF;
+
+(*
+@COPYLEFT ALL WRONGS RESERVED :)
+Author: VA
+Contacts: DIY.PLC.314@gmail.com
+Date start LIB_PLC: 2014
+License: GNU GPL-2.0-or-later
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+https://www.youtube.com/watch?v=n1F_MfLRlX0
+https://www.youtube.com/@DIY_PLC
+https://github.com/DIYPLC/LIB_PLC
+https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+https://t.me/DIY_PLC
+*)
+END_FUNCTION_BLOCK
+
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/LIB_PLC' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK FbSoftPWM (* ШИМ генератор двухканальный. *)
+
+VAR_INPUT
+	DutyCucle      :REAL := 50.0;   (* Коэффициент заполнения -100...0...100 [%]. *)
+	PeriodPositive :REAL := 10.0;   (* Период ШИМ для положительного коэффициента заполнения [с]. *)
+	PeriodNegative :REAL := 10.0;   (* Период ШИМ для отрицательного коэффициента заполнения [с]. *)
+	DBMAX          :REAL := 0.001;  (* dead band - Зона нечувствительности, верхняя граница [%]. *)
+	DBMIN          :REAL := -0.001; (* dead band - Зона нечувствительности, нижняя граница [%]. *)
+	Ts             :REAL := 0.1;    (* Шаг дискретизации по времени [с]. *)
+END_VAR
+
+VAR_OUTPUT
+	PWMPOS :BOOL := FALSE; (* Выход ШИМ для положительных значений входа. *)
+	PWMNEG :BOOL := FALSE; (* Выход ШИМ для отрицательных значений входа. *)
+END_VAR
+
+VAR
+	TimerPositive :REAL := 0.0; (* Таймер для положительного коэффициента заполнения [с]. *)
+	TimerNegative :REAL := 0.0; (* Таймер для отрицательного коэффициента заполнения [с]. *)
+END_VAR
+
+VAR_TEMP
+	Percent           :REAL := 0.0; (* Входной сигнал после зоны нечувствительности и амплитудного ограничителя -100...0...100[%]. *)
+	TimePulsePositive :REAL := 0.0; (* Время импульса для положительного коэффициента заполнения [с]. *)
+	TimePulseNegative :REAL := 0.0; (* Время импульса для отрицательного коэффициента заполнения [с]. *)
+END_VAR
+(* @END_DECLARATION := '0' *)
+(*
+ ШИМ генератор двухканальный.
+            DbSoftPWM
+     +---------------------+
+     |      FbSoftPWM      |
+  ->-|DutyCucle      PWMPOS|->-
+    -|PeriodPositive PWMNEG|->-
+    -|PeriodNegative       |
+    -|DBMAX                |
+    -|DBMIN                |
+    -|Ts                   |
+     +---------------------+
+*)
+
+(* Зона нечувствительности для входного сигнала. *)
+IF ((DBMIN<DutyCucle)AND(DutyCucle<DBMAX)) THEN
+Percent:=0.0;
+ELSE
+Percent:=DutyCucle;
+END_IF;
+
+(* Амплитудный ограничитель входного сигнала от -100% до 100%. *)
+IF (Percent>=100.0) THEN
+Percent:=100.0;
+END_IF;
+IF (Percent<=-100.0) THEN
+Percent:=-100.0;
+END_IF;
+
+(* Формирование импульсов на открытие. *)
+IF (Percent>0.0) THEN
+PWMNEG:=FALSE;
+TimerNegative:=0.0;
+TimePulsePositive:=PeriodPositive*Percent*0.01;
+    IF (TimerPositive<=TimePulsePositive) THEN
+    PWMPOS:=TRUE;
+    ELSE
+    PWMPOS:=FALSE;
+    END_IF;
+TimerPositive:=TimerPositive+Ts;
+    IF (TimerPositive>=PeriodPositive) THEN
+    TimerPositive:=0.0;
+    END_IF;
+END_IF;
+
+(* Формирование импульсов на закрытие. *)
+IF (Percent<0.0) THEN
+PWMPOS:=FALSE;
+TimerPositive:=0.0;
+TimePulseNegative:=PeriodNegative*Percent*(-0.01);
+    IF (TimerNegative<=TimePulseNegative) THEN
+    PWMNEG:=TRUE;
+    ELSE
+    PWMNEG:=FALSE;
+    END_IF;
+TimerNegative:=TimerNegative+Ts;
+    IF (TimerNegative>=PeriodNegative) THEN
+    TimerNegative:=0.0;
+    END_IF;
+END_IF;
+
+(* Нет импульсов. *)
+IF (Percent=0.0) THEN
+PWMPOS:=FALSE;
+PWMNEG:=FALSE;
+TimerPositive:=0.0;
+TimerNegative:=0.0;
+END_IF;
+
+(*
+@COPYLEFT ALL WRONGS RESERVED :)
+Author: VA
+Contacts: DIY.PLC.314@gmail.com
+Date start LIB_PLC: 2014
+License: GNU GPL-2.0-or-later
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+https://www.youtube.com/watch?v=n1F_MfLRlX0
+https://www.youtube.com/@DIY_PLC
+https://github.com/DIYPLC/LIB_PLC
+https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+https://t.me/DIY_PLC
+*)
+END_FUNCTION_BLOCK
+
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/LIB_PLC' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK FbStpForPD (* Аналоговый ПД-регулятор превращаем в дискретный ПИ. *)
+
+VAR_INPUT
+InFromPD    :REAL := 0.0  ; (* Задание скорости с обычного ПД- регулятора -100...+100 [%/c]. *)
+TimeOpen    :REAL := 60.0 ; (* Время открытия задвижки [c]. *)
+TimeClose   :REAL := 50.0 ; (* Время закрытия задвижки [c]. *)
+TimeMin     :REAL := 0.5  ; (* Минимальное время импульса [c]. *)
+Smax        :REAL := 10.0 ; (* Ограничение внутреннего интегратора положения максимум [%]. *)
+Smin        :REAL := -10.0; (* Ограничение внутреннего интегратора положения минимум [%]. *)
+SensorOpen  :BOOL := FALSE; (* Датчик на открытие задвижки 100 [%]. *)
+SensorClose :BOOL := FALSE; (* Датчик на закрытие задвижки 0 [%]. *)
+Ts          :REAL := 0.1  ; (* Шаг дискретизации по времени в секундах. *)
+Reset       :BOOL := FALSE; (* Сброс при перезагрузке. *)
+END_VAR
+
+VAR_OUTPUT
+CmdOpen  :BOOL := FALSE; (* Команда на открытие +. *)
+CmdClose :BOOL := FALSE; (* Команда на закрытие -. *)
+END_VAR
+
+VAR
+Pos :REAL := 0.0; (* Положение клапана интеграл скорости по времени есть путь [%]. *)
+END_VAR
+
+VAR_TEMP
+Vin        :REAL := 0.0; (* Скорость на входе [%/с]. *)
+Vopen      :REAL := 0.0; (* Скорость открытия [%/с]. *)
+Vclose     :REAL := 0.0; (* Скорость закрытия [%/с]. *)
+SopenMin   :REAL := 0.0; (* Минимальная дистанция доступная для перемещения на открытие[%]. *)
+ScloseMin  :REAL := 0.0; (* Минимальная дистанция доступная для перемещения на закрытие[%]. *)
+END_VAR
+(* @END_DECLARATION := '0' *)
+(*
+ Аналоговый ПД-регулятор превращаем в дискретный ПИ.
+           DbStpForPD
+    +----------------------+
+    |      FbStpForPD      |
+ ->-|InFromPD       CmdOpen|->-
+   -|TimeOpen      CmdClose|->-
+   -|TimeClose             |
+   -|TimeMin               |
+   -|Smax                  |
+   -|Smin                  |
+   -|SensorOpen            |
+   -|SensorClose           |
+   -|Ts                    |
+   -|Reset                 |
+    +----------------------+
+*)
+
+(* Вычисления основаны на том, что интегрирующий исполнительный механизм работает в пределах 0...100 [%]. *)
+Vin := InFromPD;               (* [%/с]. *)
+Vopen  := 100.0 / TimeOpen;    (* [%/с]. *)
+Vclose := 100.0 / TimeClose;   (* [%/с]. *)
+SopenMin  := Vopen  * TimeMin; (* [%]. *)
+ScloseMin := Vclose * TimeMin; (* [%]. *)
+Pos := Pos + Vin * Ts;         (* [%]. *)
+
+IF(Reset) THEN
+Pos := 0.0;
+END_IF;
+
+(* Импульс открытия (положительный). *)
+IF(Pos >= SopenMin) THEN (* RS-Триггер на открытие. *)
+CmdOpen := TRUE;
+END_IF;
+
+IF((Pos <= 0.0) OR SensorOpen) THEN (* RS-Триггер на открытие. *)
+CmdOpen := FALSE;
+END_IF;
+
+IF(CmdOpen) THEN (* Вход положительный итератор отрицательный. *)
+Pos := Pos - Vopen * Ts; (* [%]. *)
+END_IF;
+
+(* Импульс закрытия (отрицательный). *)
+IF(Pos <= (ScloseMin * (-1.0))) THEN (* RS-Триггер на закрытие. *)
+CmdClose := TRUE;
+END_IF;
+
+IF((Pos >= 0.0) OR SensorClose) THEN (* RS-Триггер на закрытие. *)
+CmdClose := FALSE;
+END_IF;
+
+IF(CmdClose) THEN (* Вход отрицательный интегратор положительный. *)
+Pos := Pos + Vclose * Ts; (* [%]. *)
+END_IF;
+
+(* Амплитудный ограничитель интегратора. *)
+IF(Pos >= Smax) THEN
+Pos := Smax;
+END_IF;
+
+IF(Pos <= Smin) THEN
+Pos := Smin;
+END_IF;
+
+(*
+ Описание.
+ Данный блок это приставка к обычному аналоговому ПИД- регулятору которая превращает его в регулятор с двумя дискретными выходами.
+ Применять данный блок можно на котлах с интегральными исполнительными механизмами.
+ Например, если у вас есть мотор редуктор, который управляется двумя пускателями и выходной вал имеет датчик положения и концевики положений 0% и 100%,
+ то данный блок в паре с ПИД- регулятором позволит управлять положением этого механизма.
+ Вместо датчика положения можно завести датчик температуры или давления и получить соответственно систему стабилизации температуры или давления.
+
+ Основная идея данного блока состоит в том, что интегральный исполнительный механизм вместе с регулятором должен иметь передаточную функцию ПИ-регулятора.
+ Из чего следует что интегральный исполнительный механизм должен управляться ПД- регулятором и тогда они вместе дадут передаточную функцию ПИ-регулятора.
+ Но выход с ПД- регулятора аналоговый а исполнительный механизм дискретный.
+ Так как аналоговый выход с ПД- регулятора это по сути задание скорости на интегральный исполнительный механизм, а
+ дискретные сигналы это тоже суть задание положительной и отрицательной постоянной скорости,
+ то остается вычислить площадь аналоговой кривой который дает ПД- регулятор, и выдать эту площадь в виде эквивалентных по площади дискретных импульсах управления.
+ Другими словами можно сказать, что данный блок считает площадь сигнала произвольной формы на входе
+ и выдает эквивалентную площадь дискретных сигналов на выходе с учетом его полярности.
+ Так же необходимо учесть, что есть минимальное значение импульса, который может отработать исполнительный механизм.
+ Еще учесть, что в общем случае, что время открытия и закрытия исполнительного механизма может быть разное.
+
+ Изначальной данный блок планировался как самостоятельный ПИ- регулятор с двумя дискретными выходами для интегральных исполнительных механизмов.
+ Но во время реализации стало понятно что более оптимально сделать приставке к обычному ПИД- регулятору который должен работать как ПД- регулятор.
+ Между ПИД- регулятором и данным блоком на время отладки можно поставить дополнительный амплитудный ограничитель и зону не чувствительности.
+
+ Данный блок проектировался ручкой в тетрадке в терминах языка CFC.
+ При трансляции на структурированный текст сумматор и триггеры были реализованны не явно.
+
+ Блок схема.
+
+        Сумматор
+          +---+    Интегратор
+          |   |   +----------+
+  Vopen->-|-  |   |          |
+          |   |   |  Z * Ts  |
+    Vin->-|+  |->-| -------- |->-S
+          |   |   |  Z - 1   |
+ Vclose->-|+  |   |          |
+          |   |   +----------+
+          +---+
+
+ Амплитудный ограничитель
+           Smax
+       +-----------+
+       |           |
+       |       +-- |
+       |      /    |
+ Pos->-|     /     |->-Pos
+       |    /      |
+       | --+       |
+       |           |
+       +-----------+
+           Smin
+
+                                Триггер на открытие
+                                  +-------------+
+                                  | FbTriggerRS |
+       +--------------+           |             |
+ Pos->-| Pos >= Smin  |--------->-|Set       Out|->-CmdOpen
+       +--------------+           |             |
+                                  |             |
+       +--------------+   +---+   |             |
+ Pos->-|   Pos <= 0   |->-| 1 |->-|Rst          |
+       +--------------+   |   |   |             |
+                          |   |   +-------------+
+             SensorOpen->-|   |
+                          |   |
+                          +---+
+
+           +--------------+   +---+
+ CmdOpen->-| BOOL_TO_REAL |->-| * |->-Vopen
+           +--------------+   |   |
+                              |   |
+           100.0 / TimeOpen->-|   |
+                              |   |
+                              +---+
+
+                                Триггер на закрытие
+                                  +-------------+
+                                  | FbTriggerRS |
+       +--------------+           |             |
+ Pos->-| Pos <= -Smin |--------->-|Set       Out|->-CmdClose
+       +--------------+           |             |
+                                  |             |
+       +--------------+   +---+   |             |
+ Pos->-|   Pos >= 0   |->-| 1 |->-|Rst          |
+       +--------------+   |   |   |             |
+                          |   |   +-------------+
+            SensorClose->-|   |
+                          |   |
+                          +---+
+
+            +--------------+   +---+
+ CmdClose->-| BOOL_TO_REAL |->-| * |->-Vclose
+            +--------------+   |   |
+                               |   |
+           100.0 / TimeClose->-|   |
+                               |   |
+                               +---+
+
+               <-Pos->
+                  |
+                  V
+ <----------|-----------|-----------|----------->
+         -Smin          0         +Smin
+        CmdClose                 CmdOpen
+
+@COPYLEFT ALL WRONGS RESERVED :)
+Author: VA
+Contacts: DIY.PLC.314@gmail.com
+Date start LIB_PLC: 2014
+License: GNU GPL-2.0-or-later
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+https://www.youtube.com/watch?v=n1F_MfLRlX0
+https://www.youtube.com/@DIY_PLC
+https://github.com/DIYPLC/LIB_PLC
+https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+https://t.me/DIY_PLC
+*)
+END_FUNCTION_BLOCK
+
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/LIB_PLC' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK FbSum1bit (* Сумматор 1бит. *)
+
+VAR_INPUT
+	A   :BOOL := FALSE; (* Первое слагаемое. *)
+	B   :BOOL := FALSE; (* Второе слагаемое. *)
+	Cin :BOOL := FALSE; (* Входной флаг переноса при сложении. *)
+END_VAR
+
+VAR_OUTPUT
+	Sum  :BOOL := FALSE; (* Сумма. *)
+	Cout :BOOL := FALSE; (* Выходной флаг переноса при сложении. *)
+END_VAR
+(* @END_DECLARATION := '0' *)
+(* Сумма. *)
+Sum := (NOT(A) AND NOT(B) AND Cin) OR (NOT(A) AND B AND NOT(Cin)) OR (A AND NOT(B) AND NOT(Cin)) OR (A AND B AND Cin);
+(* Перенос. *)
+Cout := (NOT(A) AND B AND Cin) OR (A AND NOT(B) AND Cin) OR (A AND B AND NOT(Cin)) OR (A AND B AND Cin);
+
+(*
+ Таблица истинности сумматора.
+ +---+---+-----+-----+------+
+ | A | B | Cin | Sum | Cout |
+ +---+---+-----+-----+------+
+ | 0 | 0 | 0   | 0   | 0    |
+ +---+---+-----+-----+------+
+ | 0 | 0 | 1   | 1   | 0    |
+ +---+---+-----+-----+------+
+ | 0 | 1 | 0   | 1   | 0    |
+ +---+---+-----+-----+------+
+ | 0 | 1 | 1   | 0   | 1    |
+ +---+---+-----+-----+------+
+ | 1 | 0 | 0   | 1   | 0    |
+ +---+---+-----+-----+------+
+ | 1 | 0 | 1   | 0   | 1    |
+ +---+---+-----+-----+------+
+ | 1 | 1 | 0   | 0   | 1    |
+ +---+---+-----+-----+------+
+ | 1 | 1 | 1   | 1   | 1    |
+ +---+---+-----+-----+------+
+ Получившийся сумматор состоит из 31ой элементарной операций типа И,ИЛИ,НЕ.
+ Данная реализация самая наглядная но не факт, что оптимальная.
+ Сумма формируется 4мя дешифраторами соединенными по схеме ИЛИ.
+ Флаг переноса формируется 4мя дешифраторами соединенными по схеме ИЛИ.
+ Сумматор подходит для целых 8битных чисел без знаком 0...255. (тестировано.)
+ Сумматор подходит для целых 7битных чисел со знаком -127...127. (надо протестировать заем...)
+
+********************************************************
+
+ AND
+ |    X1       X2       Y1   |
+ +---| |------| |------( )---+
+ |                           |
+
+ OR
+ |    X1           Y1   |
+ +---| |---+------( )---+
+ |         |            |
+ |    X2   |            |
+ +---| |---+            |
+ |                      |
+
+ NOT
+ |    X1       Y1   |
+ +---|/|------( )---+
+ |                  |
+
+********************************************************
+
+        +-----+   +-----+   +----+
+   A ->-| NOT |->-| AND |->-| OR |->- Sum
+        +-----+   |     |   |    |
+        +-----+   |     |   |    |
+   B ->-| NOT |->-|     |   |    |
+        +-----+   |     |   |    |
+                  |     |   |    |
+ Cin ->-----------|     |   |    |
+                  +-----+   |    |
+        +-----+   +-----+   |    |
+   A ->-| NOT |->-| AND |->-|    |
+        +-----+   |     |   |    |
+                  |     |   |    |
+   B ->-----------|     |   |    |
+                  |     |   |    |
+        +-----+   |     |   |    |
+ Cin ->-| NOT |->-|     |   |    |
+        +-----+   +-----+   |    |
+                  +-----+   |    |
+   A ->-----------| AND |->-|    |
+                  |     |   |    |
+        +-----+   |     |   |    |
+   B ->-| NOT |->-|     |   |    |
+        +-----+   |     |   |    |
+        +-----+   |     |   |    |
+ Cin ->-| NOT |->-|     |   |    |
+        +-----+   +-----+   |    |
+                  +-----+   |    |
+   A ->-----------| AND |   |    |
+                  |     |   |    |
+                  |     |   |    |
+   B ->-----------|     |   |    |
+                  |     |   |    |
+                  |     |   |    |
+ Cin ->-----------|     |   |    |
+                  +-----+   +----+
+
+    +--------+
+ ->-|Cin  Sum|->-
+ ->-|A       |
+ ->-|B       |
+    +--------+
+
+        +-----+   +-----+   +----+
+   A ->-| NOT |->-| AND |->-| OR |->- Cout
+        +-----+   |     |   |    |
+                  |     |   |    |
+   B ->-----------|     |   |    |
+                  |     |   |    |
+                  |     |   |    |
+ Cin ->-----------|     |   |    |
+                  +-----+   |    |
+                  +-----+   |    |
+   A ->-----------| AND |->-|    |
+                  |     |   |    |
+        +-----+   |     |   |    |
+   B ->-| NOT |->-|     |   |    |
+        +-----+   |     |   |    |
+                  |     |   |    |
+ Cin ->-----------|     |   |    |
+                  +-----+   |    |
+                  +-----+   |    |
+   A ->-----------| AND |->-|    |
+                  |     |   |    |
+                  |     |   |    |
+   B ->-----------|     |   |    |
+                  |     |   |    |
+        +-----+   |     |   |    |
+ Cin ->-| NOT |->-|     |   |    |
+        +-----+   +-----+   |    |
+                  +-----+   |    |
+   A ->-----------| AND |->-|    |
+                  |     |   |    |
+                  |     |   |    |
+   B ->-----------|     |   |    |
+                  |     |   |    |
+                  |     |   |    |
+ Cin ->-----------|     |   |    |
+                  +-----+   +----+
+
+    +--------+
+ ->-|Cin Cout|->-
+ ->-|A       |
+ ->-|B       |
+    +--------+
+
+********************************************************
+
+       +--------+
+  0 ->-|Cin  Sum|->- Sum0
+ A0 ->-|A   Cout|->-+
+ B0 ->-|B       |   |
+       +--------+   |
+                    |
+   +----------------+
+   |
+   |   +--------+
+   +->-|Cin  Sum|->- Sum1
+ A1 ->-|A   Cout|->-+
+ B1 ->-|B       |   |
+       +--------+   |
+                    |
+   +----------------+
+   |
+   |   +--------+
+   +->-|Cin  Sum|->- Sum2
+ A2 ->-|A   Cout|->-+
+ B2 ->-|B       |   |
+       +--------+   |
+                    |
+   +----------------+
+   |
+   |   +--------+
+   +->-|Cin  Sum|->- Sum3
+ A3 ->-|A   Cout|->-+
+ B3 ->-|B       |   |
+       +--------+   |
+                    |
+   +----------------+
+   |
+   |   +--------+
+   +->-|Cin  Sum|->- Sum4
+ A4 ->-|A   Cout|->-+
+ B4 ->-|B       |   |
+       +--------+   |
+                    |
+   +----------------+
+   |
+   |   +--------+
+   +->-|Cin  Sum|->- Sum5
+ A5 ->-|A   Cout|->-+
+ B5 ->-|B       |   |
+       +--------+   |
+                    |
+   +----------------+
+   |
+   |   +--------+
+   +->-|Cin  Sum|->- Sum6
+ A6 ->-|A   Cout|->-+
+ B6 ->-|B       |   |
+       +--------+   |
+                    |
+   +----------------+
+   |
+   |   +--------+
+   +->-|Cin  Sum|->- Sum7
+ A7 ->-|A   Cout|->- Cout
+ B7 ->-|B       |
+       +--------+
+
+********************************************************
+
+ AVR ASM
+ LDI R16,2
+ LDI R17,3
+ ADD R16, R17
+
+********************************************************
+
+ GCC
+ uint8_t add(uint8_t A, uint8_t B) {
+ return (A + B); }
+
+********************************************************
+
+@COPYLEFT ALL WRONGS RESERVED :)
+Author: VA
+Contacts: DIY.PLC.314@gmail.com
+Date start LIB_PLC: 2014
+License: GNU GPL-2.0-or-later
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+https://www.youtube.com/watch?v=n1F_MfLRlX0
+https://www.youtube.com/@DIY_PLC
+https://github.com/DIYPLC/LIB_PLC
+https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+https://t.me/DIY_PLC
+*)
+END_FUNCTION_BLOCK
+
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/LIB_PLC' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK FbTOF (* Таймер с задержкой на выключение. *)
+
+VAR_INPUT
+	In           :BOOL := FALSE; (* Вход таймера. *)
+	TimeDelayOff :UDINT := 5000 ; (* Время задержки выключения [мс]. *)
+	Ts_ms        :UDINT := 100  ; (* Шаг дискретизации по времени [мс]. *)
+END_VAR
+
+VAR_OUTPUT
+	Out :BOOL := FALSE; (* Выход таймера. *)
+END_VAR
+
+VAR
+	Timer1 :UDINT := 0; (* Текущее время таймер1 [мс]. *)
+END_VAR
+(* @END_DECLARATION := '0' *)
+(*
+ Таймер с задержкой на выключение.
+          DbTOF
+    +----------------+
+    |     FbTOF      |
+ ->-|In           Out|->-
+   -|TimeDelayOff    |
+   -|Ts_ms           |
+    +----------------+
+*)
+
+IF (TimeDelayOff > 0) THEN (* Таймер включен. *)
+  IF (In) THEN (* На входе 1 то на выходе тоже 1. *)
+  Out := TRUE;
+  Timer1 := 0;   
+  ELSE (* Если на входе 0. *)
+    IF (Out) THEN (* На выходе 1. *)
+      IF (Timer1 >= TimeDelayOff) THEN (* Задержка включения закончилась. *)
+      Out := FALSE;
+      Timer1 := 0;
+      ELSE (* Задержка включения активна. *)
+      Out := TRUE;
+      Timer1 := Timer1 + Ts_ms;
+      END_IF;
+    ELSE (* На выходе 0. *)
+    Out := FALSE;
+    Timer1 := 0;
+    END_IF;
+  END_IF;
+ELSE (* Таймер выключен. *)
+Out := In;
+Timer1 := 0;
+END_IF;
+
+(*
+ Применение.
+
+ Блок может применятся как фильтр дребезга контактов и как расширитель импульсов.
+
+ Временная характеристика.
+
+  In
+  ^
+  |     TimeDelayOff          TimeDelayOff
+  |       |<--->|               |<--->|
+ 1|   *****     |     ***** *** *     |
+  |   *   *     |     *   * * * *     |
+ 0*****---*************---***-*************----> t[s]
+
+  Out
+  ^
+  |     TimeDelayOff          TimeDelayOff
+  |       |<--->|               |<--->|
+ 1|   ***********     *****************
+  |   *         *     *               *
+ 0*****---------*******---------------*****----> t[s]
+
+@COPYLEFT ALL WRONGS RESERVED :)
+Author: VA
+Contacts: DIY.PLC.314@gmail.com
+Date start LIB_PLC: 2014
+License: GNU GPL-2.0-or-later
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+https://www.youtube.com/watch?v=n1F_MfLRlX0
+https://www.youtube.com/@DIY_PLC
+https://github.com/DIYPLC/LIB_PLC
+https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+https://t.me/DIY_PLC
+*)
+END_FUNCTION_BLOCK
+
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/LIB_PLC' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK FbTON (* Таймер с задержкой на включение. *)
+
+VAR_INPUT
+	In          :BOOL := FALSE; (* Вход таймера. *)
+	TimeDelayOn :UDINT := 5000 ; (* Время задержки включения [мс]. *)
+	Ts_ms       :UDINT := 100  ; (* Шаг дискретизации по времени [мс]. *)
+END_VAR
+
+VAR_OUTPUT
+	Out :BOOL := FALSE; (* Выход таймера. *)
+END_VAR
+
+VAR
+	Timer1 :UDINT := 0; (* Текущее время таймер1 [мс]. *)
+END_VAR
+(* @END_DECLARATION := '0' *)
+(*
+ Таймер с задержкой на включение.
+          DbTON
+    +----------------+
+    |     FbTON      |
+ ->-|In           Out|->-
+   -|TimeDelayOn     |
+   -|Ts_ms           |
+    +----------------+
+*)
+
+IF (TimeDelayOn > 0) THEN (* Таймер включен. *)
+  IF (In) THEN (* На входе 1. *)
+    IF (Out) THEN (* На выходе 1. *)
+    Out := TRUE;
+    Timer1 := 0;
+    ELSE (* На выходе 0. *)
+      IF (Timer1 >= TimeDelayOn) THEN (* Задержка включения закончилась. *)
+      Out := TRUE;
+      Timer1 := 0;
+      ELSE (* Задержка включения активна. *)
+      Out := FALSE;
+      Timer1 := Timer1 + Ts_ms;
+      END_IF;
+    END_IF;
+  ELSE (* Если на входе 0 то на выходе тоже 0. *)
+  Out := FALSE;
+  Timer1 := 0;
+  END_IF;
+ELSE (* Таймер выключен. *)
+Out := In;
+Timer1 := 0;
+END_IF;
+
+(*
+ Применение.
+
+ При поступлении входного сигнала выходной сигнал появляется не сразу, а с задержкой TimeDelayOn.
+ Блок может применятся как фильтр дребезга контактов дискретных входов.
+ Совместно с инвертором может применяться для генерации импульсов.
+
+ Временная характеристика.
+
+  In
+  ^
+  | TimeDelayOn           TimeDelayOn
+  |   |<--->|               |<--->|
+ 1|   ***********     * *   ***********
+  |   *         *     * *   *         *
+ 0*****---------*************---------*****----> t[s]
+
+  Out
+  ^
+  | TimeDelayOn           TimeDelayOn
+  |   |<--->|               |<--->|
+ 1|   |     *****           |     *****
+  |   |     *   *           |     *   *
+ 0***********---*******************---*****----> t[s]
+
+@COPYLEFT ALL WRONGS RESERVED :)
+Author: VA
+Contacts: DIY.PLC.314@gmail.com
+Date start LIB_PLC: 2014
+License: GNU GPL-2.0-or-later
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+https://www.youtube.com/watch?v=n1F_MfLRlX0
+https://www.youtube.com/@DIY_PLC
+https://github.com/DIYPLC/LIB_PLC
+https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+https://t.me/DIY_PLC
+*)
+END_FUNCTION_BLOCK
+
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/LIB_PLC' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK FbTriggerRS (* RS- Триггер с приоритетом на сброс.' *)
+
+VAR_INPUT
+	Set :BOOL := FALSE; (* Set — установить единицу. *)
+	Rst :BOOL := FALSE; (* Reset — сбросить на ноль. *)
+END_VAR
+
+VAR_OUTPUT
+	Out :BOOL := FALSE; (* Выход триггера. *)
+END_VAR
+(* @END_DECLARATION := '0' *)
+(*
+ RS- Триггер с приоритетом на сброс.
+       DbTriggerRS
+     +-------------+
+     | FbTriggerRS |
+  ->-|Set       Out|->-
+  ->-|Rst          |
+     +-------------+
+*)
+
+(* RS- Триггер. *)
+Out := (Out OR Set) AND (NOT(Rst));
+
+(*
+  Релейная интерпритация. 
+ |                       |
+ |  Rst     Set     Out  |
+ +--|/|--+--| |--+--( )--+
+ |       |       |       |
+ |       |  Out  |       |
+ |       +--| |--+       |
+ |                       |
+
+@COPYLEFT ALL WRONGS RESERVED :)
+Author: VA
+Contacts: DIY.PLC.314@gmail.com
+Date start LIB_PLC: 2014
+License: GNU GPL-2.0-or-later
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+https://www.youtube.com/watch?v=n1F_MfLRlX0
+https://www.youtube.com/@DIY_PLC
+https://github.com/DIYPLC/LIB_PLC
+https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+https://t.me/DIY_PLC
+*)
+END_FUNCTION_BLOCK
+
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/LIB_PLC' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK FbValve (* Пневмоцилиндр с концевиками. *)
+
+VAR_INPUT
+	CommandOpen     :BOOL := FALSE; (* Команда открыть клапан. *)
+	FeedbackOpen    :BOOL := FALSE; (* Датчик обратной связи "Клапан открылся". *)
+	FeedbackClose   :BOOL := FALSE; (* Датчик обратной связи "Клапан закрылся". *)
+	OnFeedbackOpen  :BOOL := FALSE; (* Включить датчик обратной связи "Клапан открылся". *)
+	OnFeedbackClose :BOOL := FALSE; (* Включить датчик обратной связи "Клапан закрылся". *)
+	Reset           :BOOL := FALSE; (* Сброс драйвера в исходное состояние. *)
+	TimeOpen        :DINT := 5000 ; (* Время открытия клапана [мс]. *)
+	TimeClose       :DINT := 5000 ; (* Время закрытия клапана [мс]. *)
+	Ts_ms           :DINT := 100  ; (* Шаг дискретизации по времени [мс]. *)
+END_VAR
+
+VAR_OUTPUT
+	CoilOpen   :BOOL := FALSE; (* Сигнал на электромагнит "Открыть клапан". *)
+	StateOpen  :BOOL := FALSE; (* Сосотение "Клапан открыт". *)
+	StateClose :BOOL := FALSE; (* Сосотение "Клапан закрыт". *)
+	Error      :BOOL := FALSE; (* Ошибка "Неисправность клапана". *)
+END_VAR
+
+VAR
+	Timer1 :DINT := 0; (* Таймер [мс]. *)
+	State1 :INT  := 0; (* Граф состояния. *)
+END_VAR
+
+VAR CONSTANT
+	STATE_RESET         :INT := 0; (* Сброс алгоритма. *)
+	STATE_VALVE_CLOSING :INT := 1; (* Закрытие клапана. *)
+	STATE_VALVE_CLOSE   :INT := 2; (* Клапан закрыт. *)
+	STATE_VALVE_OPENING :INT := 3; (* Открытие клапана. *)
+	STATE_VALVE_OPEN    :INT := 4; (* Клапан открыт. *)
+	STATE_ERROR_CLOSE   :INT := 5; (* Клапан не закрылся. *)
+	STATE_ERROR_OPEN    :INT := 6; (* Клапан не открылся. *)
+END_VAR
+(* @END_DECLARATION := '0' *)
+(*
+ Пневмоцилиндр с концевиками.
+                DbValve
+    +-----------------------------+
+    |           FbValve           |
+ ->-|CommandOpen          CoilOpen|->-
+   -|FeedbackOpen        StateOpen|-
+   -|FeedbackClose      StateClose|-
+   -|OnFeedbackOpen          Error|-
+   -|OnFeedbackClose              |
+   -|Reset                        |
+   -|TimeOpen                     |
+   -|TimeClose                    |
+   -|Ts_ms                        |
+    +-----------------------------+
+*)
+
+CoilOpen := CommandOpen; (* Это основная часть блока все остальное нужно для удобства использования. *)
+
+(* Сброс алгоритма. *)
+IF (Reset) THEN
+State1 := STATE_RESET;
+END_IF;
+
+(* Граф состояний. *)
+CASE State1 OF
+
+STATE_RESET: (* Сброс алгоритма. *)
+Timer1     := 0;
+StateOpen  := FALSE;
+StateClose := FALSE;
+Error      := FALSE;
+(* Смотрим куда надо перейти на закрытие или открытие. *)
+IF (CommandOpen) THEN
+State1 := STATE_VALVE_OPENING;
+ELSE
+State1 := STATE_VALVE_CLOSING;
+END_IF;
+
+STATE_VALVE_CLOSING: (* Закрытие клапана. *)
+Timer1     := Timer1 + Ts_ms;
+StateOpen  := FALSE;
+StateClose := FALSE;
+Error      := FALSE;
+(* Если доехали до датчика то переходим в состояние закрыто. *)
+(* Если нет обратной связи по датчику то переходим в состояние закрыто по таймеру. *)
+IF (FeedbackClose OR (NOT(OnFeedbackClose) AND (Timer1>=TimeClose)) ) THEN
+State1 := STATE_VALVE_CLOSE;
+END_IF;
+(* Если клапан заклинил и не доехал до датчика за заданное время уходим в состояние ошибки. *)
+IF (OnFeedbackClose AND (Timer1>=TimeClose) ) THEN
+State1 := STATE_ERROR_CLOSE;
+END_IF;
+(* Если во время закрытия пришла команда на открытие переходим в режим открытие. *)
+IF (CommandOpen) THEN
+State1 := STATE_VALVE_OPENING;
+END_IF;
+
+STATE_VALVE_CLOSE: (* Клапан закрыт. *)
+Timer1     := 0;
+StateOpen  := FALSE;
+StateClose := TRUE;
+Error      := FALSE;
+(* Если пришла команда на открытие то переходим в состояние открытие. *)
+IF (CommandOpen) THEN
+State1 := STATE_VALVE_OPENING;
+END_IF;
+
+STATE_VALVE_OPENING: (* Открытие клапана. *)
+Timer1     := Timer1 + Ts_ms;
+StateOpen  := FALSE;
+StateClose := FALSE;
+Error      := FALSE;
+(* Если доехали до датчика то переходим в состояние открыто. *)
+(* Если нет обратной связи по датчику то переходим в состояние открыто по таймеру. *)
+IF (FeedbackOpen OR (NOT(OnFeedbackOpen) AND (Timer1>=TimeOpen)) ) THEN
+State1 := STATE_VALVE_OPEN;
+END_IF;
+(* Если клапан заклинил и не доехал до датчика за заданное время уходим в состояние ошибки. *)
+IF (OnFeedbackOpen AND (Timer1>=TimeOpen) ) THEN
+State1 := STATE_ERROR_OPEN;
+END_IF;
+(* Если во время открытия пришла команда на закрытие переходим в режим закрытие. *)
+IF NOT(CommandOpen) THEN
+State1 := STATE_VALVE_CLOSING;
+END_IF;
+
+STATE_VALVE_OPEN: (* Клапан открыт. *)
+Timer1     := 0;
+StateOpen  := TRUE;
+StateClose := FALSE;
+Error      := FALSE;
+(* Если пришла команда на закрытие то переходим в состояние закрытие. *)
+IF NOT(CommandOpen) THEN
+State1 := STATE_VALVE_CLOSING;
+END_IF;
+
+STATE_ERROR_CLOSE: (* Клапан не закрылся. *)
+Timer1     := 0;
+StateOpen  := FALSE;
+StateClose := FALSE;
+Error      := TRUE;
+(* Если все таки доехали до датчика то сброс для перехода на правильное состояние. *)
+(* Если пришла команда на отрытие то сброс для перехода на правильное состояние. *)
+(* Если выключили контроль обратной связи то сброс для перехода на правильное состояние. *)
+IF (FeedbackClose OR CommandOpen OR NOT(OnFeedbackClose)) THEN
+State1 := STATE_RESET;
+END_IF;
+
+STATE_ERROR_OPEN: (* Клапан не открылся. *)
+Timer1     := 0;
+StateOpen  := FALSE;
+StateClose := FALSE;
+Error      := TRUE;
+(* Если все таки доехали до датчика то сброс для перехода на правильное состояние. *)
+(* Если пришла команда на закрытие то сброс для перехода на правильное состояние. *)
+(* Если выключили контроль обратной связи то сброс для перехода на правильное состояние. *)
+IF (FeedbackOpen OR NOT(CommandOpen) OR NOT(OnFeedbackOpen)) THEN
+State1 := STATE_RESET;
+END_IF;
+
+ELSE (* СТОП при неопределенном состоянии. *)
+State1 := STATE_RESET;
+END_CASE;
+
+(*
+@COPYLEFT ALL WRONGS RESERVED :)
+Author: VA
+Contacts: DIY.PLC.314@gmail.com
+Date start LIB_PLC: 2014
+License: GNU GPL-2.0-or-later
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+https://www.youtube.com/watch?v=n1F_MfLRlX0
+https://www.youtube.com/@DIY_PLC
+https://github.com/DIYPLC/LIB_PLC
+https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+https://t.me/DIY_PLC
+*)
+END_FUNCTION_BLOCK
+
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/LIB_PLC' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK FbWordToBits (* Преобразование слова в 16 бит. *)
+
+VAR_INPUT
+	In :WORD := 0; (* Входной сигнал. *)
+END_VAR
+
+VAR_OUTPUT
+	Out0  :BOOL := FALSE; (* Выходной сигнал бит0. *)
+	Out1  :BOOL := FALSE; (* Выходной сигнал бит1. *)
+	Out2  :BOOL := FALSE; (* Выходной сигнал бит2. *)
+	Out3  :BOOL := FALSE; (* Выходной сигнал бит3. *)
+	Out4  :BOOL := FALSE; (* Выходной сигнал бит4. *)
+	Out5  :BOOL := FALSE; (* Выходной сигнал бит5. *)
+	Out6  :BOOL := FALSE; (* Выходной сигнал бит6. *)
+	Out7  :BOOL := FALSE; (* Выходной сигнал бит7. *)
+	Out8  :BOOL := FALSE; (* Выходной сигнал бит8. *)
+	Out9  :BOOL := FALSE; (* Выходной сигнал бит9. *)
+	Out10 :BOOL := FALSE; (* Выходной сигнал бит10. *)
+	Out11 :BOOL := FALSE; (* Выходной сигнал бит11. *)
+	Out12 :BOOL := FALSE; (* Выходной сигнал бит12. *)
+	Out13 :BOOL := FALSE; (* Выходной сигнал бит13. *)
+	Out14 :BOOL := FALSE; (* Выходной сигнал бит14. *)
+	Out15 :BOOL := FALSE; (* Выходной сигнал бит15. *)
+END_VAR
+(* @END_DECLARATION := '0' *)
+(*
+ Преобразование слова в 16 бит.
+      DbWordToBits
+    +--------------+
+    | FbWordToBits |
+ ->-|In        Out0|->-
+    |          Out1|->-
+    |          Out2|->-
+    |          Out3|->-
+    |          Out4|->-
+    |          Out5|->-
+    |          Out6|->-
+    |          Out7|->-
+    |          Out8|->-
+    |          Out9|->-
+    |         Out10|->-
+    |         Out11|->-
+    |         Out12|->-
+    |         Out13|->-
+    |         Out14|->-
+    |         Out15|->-
+    +--------------+
+*)
+
+(* Логическое условие без оператора if. *)
+Out0:= ((In AND 2#0000000000000001) <> 0);
+Out1:= ((In AND 2#0000000000000010) <> 0);
+Out2:= ((In AND 2#0000000000000100) <> 0);
+Out3:= ((In AND 2#0000000000001000) <> 0);
+Out4:= ((In AND 2#0000000000010000) <> 0);
+Out5:= ((In AND 2#0000000000100000) <> 0);
+Out6:= ((In AND 2#0000000001000000) <> 0);
+Out7:= ((In AND 2#0000000010000000) <> 0);
+Out8:= ((In AND 2#0000000100000000) <> 0);
+Out9:= ((In AND 2#0000001000000000) <> 0);
+Out10:=((In AND 2#0000010000000000) <> 0);
+Out11:=((In AND 2#0000100000000000) <> 0);
+Out12:=((In AND 2#0001000000000000) <> 0);
+Out13:=((In AND 2#0010000000000000) <> 0);
+Out14:=((In AND 2#0100000000000000) <> 0);
+Out15:=((In AND 2#1000000000000000) <> 0);
+
+(*
+@COPYLEFT ALL WRONGS RESERVED :)
+Author: VA
+Contacts: DIY.PLC.314@gmail.com
+Date start LIB_PLC: 2014
+License: GNU GPL-2.0-or-later
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+https://www.youtube.com/watch?v=n1F_MfLRlX0
+https://www.youtube.com/@DIY_PLC
+https://github.com/DIYPLC/LIB_PLC
+https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+https://t.me/DIY_PLC
 *)
 END_FUNCTION_BLOCK
 
@@ -1430,6 +5242,7 @@ VAR_INPUT
 	Reset: BOOL := TRUE;
 END_VAR
 VAR_OUTPUT
+	DbGSS: FbGSS;
 END_VAR
 VAR
 	Timer1_ms: UDINT:= 0;
@@ -1444,6 +5257,35 @@ VAR
 	DbReadMe: ReadMe;
 	DbBitsToWord: FbBitsToWord;
 	DbCounter: FbCounter;
+	DbDeadBand: FbDeadBand;
+	DbDelayN: FbDelayN;
+	DbDeriveF: FbDeriveF;
+	DbDispersion: FbDispersion;
+	DbDriverAi420: FbDriverAi420;
+	DbDriverAo420: FbDriverAo420;
+	DbDriverDi: FbDriverDi;
+	DbDriverDo: FbDriverDo;
+	DbEdgeNeg: FbEdgeNeg;
+	DbEdgePos: FbEdgePos;
+	DbFilterA: FbFilterA;
+	DbFilterM: FbFilterM;
+	DbFilterNaN: FbFilterNaN;
+	DbIntegrator: FbIntegrator;
+	DbLimit: FbLimit;
+	DbModeSelector: FbModeSelector;
+	DbMotor: FbMotor;
+	DbPIDstep: FbPIDstep;
+	DbRamp: FbRamp;
+	DbScale: FbScale;
+	DbSimMotorGear: FbSimMotorGear;
+	DbSoftPWM: FbSoftPWM;
+	DbStpForPD: FbStpForPD;
+	DbSum1bit: FbSum1bit;
+	DbTOF: FbTOF;
+	DbTON: FbTON;
+	DbTriggerRS: FbTriggerRS;
+	DbWordToBits: FbWordToBits;
+	DbValve: FbValve;
 END_VAR
 (* @END_DECLARATION := '0' *)
 (*  Мигающий светодиод.
@@ -1489,6 +5331,43 @@ DbAlarm();
 DbReadMe();
 DbBitsToWord();
 DbCounter();
+DbDeadBand();
+DbDelayN();
+DbDeriveF();
+DbDispersion();
+DbDriverAi420();
+DbDriverAo420();
+DbDriverDi();
+DbDriverDo();
+DbEdgeNeg();
+DbEdgePos();
+DbFilterA();
+DbFilterM();
+DbFilterNaN();
+DbGSS.Ts := Ts;
+DbGSS();
+DbIntegrator();
+DbLimit();
+DbModeSelector();
+DbMotor();
+DbPIDstep();
+DbRamp();
+DbScale();
+DbSimMotorGear();
+DbSoftPWM();
+DbStpForPD();
+DbSum1bit();
+DbTOF();
+DbTON();
+DbTriggerRS();
+DbWordToBits();
+DbValve();
+
+
+
+
+
+
 
 END_FUNCTION_BLOCK
 
@@ -1496,7 +5375,7 @@ END_FUNCTION_BLOCK
 (* @NESTEDCOMMENTS := 'Yes' *)
 (* @PATH := '' *)
 (* @OBJECTFLAGS := '0, 8' *)
-(* @SYMFILEFLAGS := '2048' *)
+(* @SYMFILEFLAGS := '4096' *)
 PROGRAM PLC_PRG
 VAR
 	Uptime_ms: UDINT := 0;
@@ -1559,7 +5438,7 @@ END_VAR
 ;(*
 Проект с примером портирования библиотеки https://github.com/DIYPLC/LIB_PLC
 LIB_PLC porting CoDeSys V2
-24-apr-2026
+05-may-2026
 CoDeSys V2.3
 Windows XP 32bit
 Для корректного отображение комментариев ASCII ART необходимо использовать шрифт Courier New 10
@@ -1568,6 +5447,9 @@ Windows XP 32bit
 Заказной номер : ОВЕН ПЛК110-24.60.Р-М
 CoDeSys_v23941.exe
 targets_v3.3_for_plc1xx_m02.zip \ PLC110.60-M_v2 \ InstallTarget.bat
+
+CoDeSys V2.3 - Работа с OPC-сервером
+https://rutube.ru/video/e702e0e96686f772e7a091c5d2915123/?r=wd
 
 @COPYLEFT ALL WRONGS RESERVED :)
 Author: VA
@@ -1589,7 +5471,7 @@ END_FUNCTION_BLOCK
 (* @GLOBAL_VARIABLE_LIST := 'Global_Variables' *)
 (* @PATH := '' *)
 (* @OBJECTFLAGS := '0, 8' *)
-(* @SYMFILEFLAGS := '2048' *)
+(* @SYMFILEFLAGS := '6144' *)
 VAR_GLOBAL
 	Di0: BOOL := FALSE; (* Дискретный вход 0. *)
 	Di1: BOOL := FALSE; (* Дискретный вход 1. *)
