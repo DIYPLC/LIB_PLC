@@ -102,9 +102,9 @@ BEGIN
 // Система стабилизации давления жидкости в баке.
 // Поддерживаем постоянное давление после насоса с частотных приводом.
 //
-//                   Db1PC1
+//                  Db1PC1
 //    +---------------------------------+
-//    |              Fb1PC1             |
+//    |             Fb1PC1              |
 // ->-|ADC_Pressure        DAC_Frequency|->-
 //   -|RemoteStartButton         MotorOn|-
 //   -|RemoteStopButton      ContactorOn|-
@@ -371,16 +371,16 @@ END_IF;
 //   -|SimValue                   |
 //   -|SimOn                      |
 //    +---------------------------+
-DbDriverAi420_PV.ADC      := ADC_Pressure              ; // АЦП Сигнал от датчика 0...27648.
-DbDriverAi420_PV.OutMax   := "Db1PC1Hmi".PressureMaxAi ; // Диаппазон датчика максимум.
-DbDriverAi420_PV.OutMin   := "Db1PC1Hmi".PressureMinAi ; // Диаппазон датчика минимум.
-DbDriverAi420_PV.ErrValue := 0.0                       ; // Значение для SensorValue при ошибке датчика.
-DbDriverAi420_PV.SimValue := "Db1PC1Hmi".SimulationAi  ; // Значение для SensorValue при симуляции.
-DbDriverAi420_PV.SimOn    := "Db1PC1Hmi".SimulationAiOn; // Включить симуляцию.
-DbDriverAi420_PV()                                     ; // Драйвер аналогово входа 4...20мА.
-//                        := DbDriverAi420_PV.Out      ; // Выход в единицах датчика.
-//                        := DbDriverAi420_PV.I_mA     ; // Ток на аналоговом входе 4...20мА.
-//                        := DbDriverAi420_PV.Error    ; // Ошибка аналогово входа или датчика.
+DbDriverAi420_PV.ADC      := ADC_Pressure          ; // АЦП Сигнал от датчика 0...27648.
+DbDriverAi420_PV.OutMax   := "Db1PC1Hmi".PV_max_Ai ; // Диаппазон датчика максимум.
+DbDriverAi420_PV.OutMin   := "Db1PC1Hmi".PV_min_Ai ; // Диаппазон датчика минимум.
+DbDriverAi420_PV.ErrValue := 0.0                   ; // Значение для SensorValue при ошибке датчика.
+DbDriverAi420_PV.SimValue := "Db1PC1Hmi".Sim_Ai    ; // Значение для SensorValue при симуляции.
+DbDriverAi420_PV.SimOn    := "Db1PC1Hmi".Sim_Ai_On ; // Включить симуляцию.
+DbDriverAi420_PV()                                 ; // Драйвер аналогово входа 4...20мА.
+//                        := DbDriverAi420_PV.Out  ; // Выход в единицах датчика.
+//                        := DbDriverAi420_PV.I_mA ; // Ток на аналоговом входе 4...20мА.
+//                        := DbDriverAi420_PV.Error; // Ошибка аналогово входа или датчика.
 
 // Фильтрация сигнала с датчика давления 0...10[Бар].
 //      DbFilterA
@@ -390,11 +390,11 @@ DbDriverAi420_PV()                                     ; // Драйвер аналогово вх
 //   -|Tf         |
 //   -|Ts         |
 //    +-----------+
-DbFilterA_PV.In := DbDriverAi420_PV.Out          ; // Входной сигнал до фильтрации.
-DbFilterA_PV.Tf := "Db1PC1Hmi".PressureFilterTime; // Постоянная времени фильтра [с].
-DbFilterA_PV.Ts := Ts                            ; // Шаг дискретизации по времени [с].
-DbFilterA_PV()                                   ; // Фильтр апериодический.
-//              := DbFilterA_PV.Out              ; // Выходной сигнал после фильтрации.
+DbFilterA_PV.In := DbDriverAi420_PV.Out      ; // Входной сигнал до фильтрации.
+DbFilterA_PV.Tf := "Db1PC1Hmi".PV_filter_time; // Постоянная времени фильтра [с].
+DbFilterA_PV.Ts := Ts                        ; // Шаг дискретизации по времени [с].
+DbFilterA_PV()                               ; // Фильтр апериодический.
+//              := DbFilterA_PV.Out          ; // Выходной сигнал после фильтрации.
 
 // Ограничение измеренного значения давления 0...10[Бар].
 //       DbLimit
@@ -404,11 +404,11 @@ DbFilterA_PV()                                   ; // Фильтр апериодический.
 //   -|OutMax     |
 //   -|OutMin     |
 //    +-----------+
-DbLimit_PV.In     := DbFilterA_PV.Out         ; // Вход амплитудного ограничителя.
-DbLimit_PV.OutMax := "Db1PC1Hmi".PressureMaxAi; // Максимальное значение выхода.
-DbLimit_PV.OutMin := "Db1PC1Hmi".PressureMinAi; // Минимальное значение выхода.
-DbLimit_PV()                                  ; // Амплитудный ограничитель.
-PV                := DbLimit_PV.Out           ; // Выход амплитудного ограничителя.
+DbLimit_PV.In     := DbFilterA_PV.Out     ; // Вход амплитудного ограничителя.
+DbLimit_PV.OutMax := "Db1PC1Hmi".PV_max_Ai; // Максимальное значение выхода.
+DbLimit_PV.OutMin := "Db1PC1Hmi".PV_min_Ai; // Минимальное значение выхода.
+DbLimit_PV()                              ; // Амплитудный ограничитель.
+PV                := DbLimit_PV.Out       ; // Выход амплитудного ограничителя.
 
 // Отображение давления на SCADA/HMI.
 "Db1PC1Hmi".PV := PV;
@@ -421,11 +421,11 @@ PV                := DbLimit_PV.Out           ; // Выход амплитудного ограничите
 //   -|OutMax     |
 //   -|OutMin     |
 //    +-----------+
-DbLimit_SP.In     := "Db1PC1Hmi".SP           ; // Вход амплитудного ограничителя.
-DbLimit_SP.OutMax := "Db1PC1Hmi".PressureMaxAi; // Максимальное значение выхода.
-DbLimit_SP.OutMin := "Db1PC1Hmi".PressureMinAi; // Минимальное значение выхода.
-DbLimit_SP()                                  ; // Амплитудный ограничитель.
-SP                := DbLimit_SP.Out           ; // Выход амплитудного ограничителя.
+DbLimit_SP.In     := "Db1PC1Hmi".SP       ; // Вход амплитудного ограничителя.
+DbLimit_SP.OutMax := "Db1PC1Hmi".PV_max_Ai; // Максимальное значение выхода.
+DbLimit_SP.OutMin := "Db1PC1Hmi".PV_min_Ai; // Минимальное значение выхода.
+DbLimit_SP()                              ; // Амплитудный ограничитель.
+SP                := DbLimit_SP.Out       ; // Выход амплитудного ограничителя.
 
 // Сигнал управления от SADA/HMI.
 MV := "Db1PC1Hmi".MV;
@@ -474,13 +474,13 @@ DbPIDcontrol1()                          ; // ПИД-регулятор.
 //   -|TDec          |
 //   -|Ts            |
 //    +--------------+
-DbRamp_MV.In    := DbPIDcontrol1.MV    ; // Входной сигнал.
-DbRamp_MV.Scale := 50.0                ; // Диапазон времени разгона и торможения.
-DbRamp_MV.TAcc  := "Db1PC1Hmi".RampTAcc; // Время разгона от 0 до Scale [с].
-DbRamp_MV.TDec  := "Db1PC1Hmi".RampTDec; // Время торможения от Scale до 0 [c].
-DbRamp_MV.Ts    := Ts                  ; // Шаг дискретизации по времени [с].
-DbRamp_MV()                            ; // Рампа разгона / торможения.
-MV              := DbRamp_MV.Out       ; // Выходной сигнал.
+DbRamp_MV.In    := DbPIDcontrol1.MV         ; // Входной сигнал.
+DbRamp_MV.Scale := 50.0                     ; // Диапазон времени разгона и торможения.
+DbRamp_MV.TAcc  := "Db1PC1Hmi".Ramp_Time_Acc; // Время разгона от 0 до Scale [с].
+DbRamp_MV.TDec  := "Db1PC1Hmi".Ramp_Time_Dec; // Время торможения от Scale до 0 [c].
+DbRamp_MV.Ts    := Ts                       ; // Шаг дискретизации по времени [с].
+DbRamp_MV()                                 ; // Рампа разгона / торможения.
+MV              := DbRamp_MV.Out            ; // Выходной сигнал.
 
 // Сигнал управления отображение на SADA/HMI.
 "Db1PC1Hmi".MV := MV;
@@ -495,14 +495,14 @@ MV              := DbRamp_MV.Out       ; // Выходной сигнал.
 //   -|SimValue               |
 //   -|SimOn                  |
 //    +-----------------------+
-DbDriverAo420_MV.In       := MV                        ; // Вход сигнала на исполнительный механизм.
-DbDriverAo420_MV.InMax    := "Db1PC1Hmi".MotorMaxAo    ; // Исполнительный механизм максимум.
-DbDriverAo420_MV.InMin    := "Db1PC1Hmi".MotorMinAo    ; // Исполнительный механизм минимум.
-DbDriverAo420_MV.SimValue := "Db1PC1Hmi".SimulationAo  ; // Значение для исполнительного механизма при симуляции.
-DbDriverAo420_MV.SimOn    := "Db1PC1Hmi".SimulationAoOn; // Включить симуляцию.
-DbDriverAo420_MV()                                     ; // Драйвер аналогово выхода 4...20мА.
-DAC_Frequency             := DbDriverAo420_MV.DAC      ; // ЦАП Сигнал на исполнительный механизм 0...27648.
-//                        := DbDriverAo420_MV.I_mA  ; // Ток на аналоговом выходе 4...20мА.
+DbDriverAo420_MV.In       := MV                   ; // Вход сигнала на исполнительный механизм.
+DbDriverAo420_MV.InMax    := "Db1PC1Hmi".MV_max_Ao; // Исполнительный механизм максимум.
+DbDriverAo420_MV.InMin    := "Db1PC1Hmi".MV_min_Ao; // Исполнительный механизм минимум.
+DbDriverAo420_MV.SimValue := "Db1PC1Hmi".Sim_Ao   ; // Значение для исполнительного механизма при симуляции.
+DbDriverAo420_MV.SimOn    := "Db1PC1Hmi".Sim_Ao_On; // Включить симуляцию.
+DbDriverAo420_MV()                                ; // Драйвер аналогово выхода 4...20мА.
+DAC_Frequency             := DbDriverAo420_MV.DAC ; // ЦАП Сигнал на исполнительный механизм 0...27648.
+//                        := DbDriverAo420_MV.I_mA; // Ток на аналоговом выходе 4...20мА.
 
 // Предупреждение о выходе за допустимые пределы измеренного значения.
 //          DbAlarm
@@ -514,14 +514,14 @@ DAC_Frequency             := DbDriverAo420_MV.DAC      ; // ЦАП Сигнал на исполн
 //   -|TimeDelay        |
 //   -|Ts_ms            |
 //    +-----------------+
-DbAlarm_PV.In        := PV                        ; // Входной сигнал.
-DbAlarm_PV.LevelHi   := "Db1PC1Hmi".AlarmPV_Hi    ; // Верхняя граница предупреждения.
-DbAlarm_PV.LevelLo   := "Db1PC1Hmi".AlarmPV_Lo    ; // Нижняя граница предупреждения.
-DbAlarm_PV.TimeDelay := "Db1PC1Hmi".AlarmDelayTime; // Время задержки включения [мс].
-DbAlarm_PV.Ts_ms     := Ts_ms                     ; // Шаг дискретизации по времени [мс].
-DbAlarm_PV()                                      ; // Блок предупреждений.
-//                   := DbAlarm_PV.AlarmHi        ; // Достигнут верхний предел.
-//                   := DbAlarm_PV.AlarmLo        ; // Достигнут нижний предел.
+DbAlarm_PV.In        := PV                          ; // Входной сигнал.
+DbAlarm_PV.LevelHi   := "Db1PC1Hmi".Alarm_PV_Hi     ; // Верхняя граница предупреждения.
+DbAlarm_PV.LevelLo   := "Db1PC1Hmi".Alarm_PV_Lo     ; // Нижняя граница предупреждения.
+DbAlarm_PV.TimeDelay := "Db1PC1Hmi".Alarm_Delay_Time; // Время задержки включения [мс].
+DbAlarm_PV.Ts_ms     := Ts_ms                       ; // Шаг дискретизации по времени [мс].
+DbAlarm_PV()                                        ; // Блок предупреждений.
+//                   := DbAlarm_PV.AlarmHi          ; // Достигнут верхний предел.
+//                   := DbAlarm_PV.AlarmLo          ; // Достигнут нижний предел.
 
 // Предупреждение о выходе за допустимые пределы сигнала управления.
 //          DbAlarm
@@ -533,14 +533,14 @@ DbAlarm_PV()                                      ; // Блок предупреждений.
 //   -|TimeDelay        |
 //   -|Ts_ms            |
 //    +-----------------+
-DbAlarm_MV.In        := MV                        ; // Входной сигнал.
-DbAlarm_MV.LevelHi   := "Db1PC1Hmi".AlarmMV_Hi    ; // Верхняя граница предупреждения.
-DbAlarm_MV.LevelLo   := "Db1PC1Hmi".AlarmMV_Lo    ; // Нижняя граница предупреждения.
-DbAlarm_MV.TimeDelay := "Db1PC1Hmi".AlarmDelayTime; // Время задержки включения [мс].
-DbAlarm_MV.Ts_ms     := Ts_ms                     ; // Шаг дискретизации по времени [мс].
-DbAlarm_MV()                                      ; // Блок предупреждений.
-//                   := DbAlarm_MV.AlarmHi        ; // Достигнут верхний предел.
-//                   := DbAlarm_MV.AlarmLo        ; // Достигнут нижний предел.
+DbAlarm_MV.In        := MV                          ; // Входной сигнал.
+DbAlarm_MV.LevelHi   := "Db1PC1Hmi".Alarm_MV_Hi     ; // Верхняя граница предупреждения.
+DbAlarm_MV.LevelLo   := "Db1PC1Hmi".Alarm_MV_Lo     ; // Нижняя граница предупреждения.
+DbAlarm_MV.TimeDelay := "Db1PC1Hmi".Alarm_Delay_Time; // Время задержки включения [мс].
+DbAlarm_MV.Ts_ms     := Ts_ms                       ; // Шаг дискретизации по времени [мс].
+DbAlarm_MV()                                        ; // Блок предупреждений.
+//                   := DbAlarm_MV.AlarmHi          ; // Достигнут верхний предел.
+//                   := DbAlarm_MV.AlarmLo          ; // Достигнут нижний предел.
 
 // Наименование технологической позиции согласно ГОСТ 21.404-85.
 //
@@ -567,7 +567,7 @@ DbAlarm_MV()                                      ; // Блок предупреждений.
 //                                DbDriverAi420                DbScale          DbFilterA          DbLimit                           
 //                        +---------------------------+     +-----------+     +-----------+     +-----------+                        
 // +----------------+     |       FbDriverAi420       |     |  FbScale  |     | FbFilterA |     |  FbLimit  |     +-----------------+
-// | SensorPressure |-->--|ADC                     Out|-->--|In      Out|-->--|In      Out|-->--|In      Out|-->--| PV              |
+// | ADC_Pressure   |-->--|ADC                     Out|-->--|In      Out|-->--|In      Out|-->--|In      Out|-->--| PV              |
 // +----------------+    -|OutMax                 I_mA|-   -|InMax      |    -|Tf         |    -|OutMax     |     +-----------------+
 //                       -|OutMin                Error|-   -|InMin      |    -|Ts         |    -|OutMin     |                        
 // +-------+             -|ErrValue                   |    -|OutMax     |     +-----------+     +-----------+                        
@@ -623,7 +623,7 @@ DbAlarm_MV()                                      ; // Блок предупреждений.
 //                             DbDriverAo420                  
 //                       +-----------------------+            
 // +---------------+     |     FbDriverAo420     |     +----------------+
-// | MV            |-->--|In                  DAC|-->--| DriveFrequency |
+// | MV            |-->--|In                  DAC|-->--| DAC_Frequency  |
 // +---------------+    -|InMax              I_mA|-    +----------------+
 //                      -|InMin                  |            
 //                      -|SimValue               |            
@@ -633,7 +633,7 @@ DbAlarm_MV()                                      ; // Блок предупреждений.
 // GUI SCADA/HMI
 //
 // +------------------------------------------------------+---+
-// | 1LIRCA1 ПИД- регулятор давления.                     | X |
+// | 1PC1 ПИД- регулятор давления.                        | X |
 // +------------------------------------------------------+---+
 // | +-------+ +--------------------------------------------+ |
 // | |  5.00 | | Заданное значение            0...10[Бар] B | | <- Db1PC1Hmi.SP
@@ -650,9 +650,9 @@ DbAlarm_MV()                                      ; // Блок предупреждений.
 // | Код ошибки: 0 (OK).                                      | <- Db1PC1Hmi.EW
 // +----------------------------------------------------------+
 //
-//                       Db1LIRCA1            
+//                        Db1PC1
 //          +---------------------------------+
-//          |            Fb1LIRCA1            |
+//          |             Fb1PC1              |
 // Di/Ai ->-|                                 |->- Do/Ao
 //          +----------------+----------------+
 //                           |
