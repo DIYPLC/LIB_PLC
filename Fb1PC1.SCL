@@ -187,6 +187,8 @@ TimerForCW := TimerForCW + Ts_ms;
 END_IF;
 
 // Предупреждение: Нажата кнопка СТОП на пульте местного управления.
+// Кнопку стоп сделать в виде красного грибка безопасности с механической фиксацией нажатия.
+// Контакт стоповой кнопки должен аппаратно отключать силовой контактор насоса и цепи безопасности на частотнике.
 ErrorButtonStop := NOT(RemoteStopButton);
 // Флаг ошибки.
 Error := ErrorButtonStop OR DbDriverAi420_PV.Error OR DbMotor1.ErrorVoltage OR DbMotor1.ErrorDrive OR DbMotor1.ErrorContactor;
