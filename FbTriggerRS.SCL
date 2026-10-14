@@ -39,6 +39,14 @@ Out := (Out OR Set) AND (NOT(Rst));
 //  |       +--| |--+       |
 //  |                       |
 
+//       \ /
+//       oVo
+//   \___XXX___/
+//    __XXXXX__
+//   /__XXXXX__\
+//   /   XXX   \
+//        V
+
 // @COPYLEFT ALL WRONGS RESERVED :)
 // Author: VA
 // Contacts: DIY.PLC.314@gmail.com
