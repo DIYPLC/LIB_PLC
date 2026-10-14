@@ -175,7 +175,7 @@ typedef void (*pvMBFrameClose)(void);
 static uint8_t ucMBAddress;
 
 static uint16_t usTimerOCRADelta;
-static uint16_t usTimerOCRBDelta;
+//static uint16_t usTimerOCRBDelta;
 
 static eMBEventType eQueuedEvent;
 static bool xEventInQueue;
@@ -189,7 +189,7 @@ static volatile uint16_t usRcvBufferPos;
 
 static peMBFrameSend peMBFrameSendCur;
 static pvMBFrameStart pvMBFrameStartCur;
-static pvMBFrameStop pvMBFrameStopCur;
+//static pvMBFrameStop pvMBFrameStopCur;
 static peMBFrameReceive peMBFrameReceiveCur;
 static pvMBFrameClose pvMBFrameCloseCur;
 

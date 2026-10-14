@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifdef __cplusplus
 extern "C"
@@ -30,9 +30,6 @@ void PLC_Digital_input_cyclic(struct GlobalVar *p);
 #define D13_ON();   asm volatile ("sbi %0,%1" :/* no outputs */: "I" (_SFR_IO_ADDR(PORTB)),"I" (5) );
 #define PB5_OFF();  asm volatile ("cbi %0,%1" :/* no outputs */: "I" (_SFR_IO_ADDR(PORTB)),"I" (5) );
 #define D13_OFF();  asm volatile ("cbi %0,%1" :/* no outputs */: "I" (_SFR_IO_ADDR(PORTB)),"I" (5) );
-#define LED_ON();   asm volatile ("sbi %0,%1" :/* no outputs */: "I" (_SFR_IO_ADDR(PORTB)),"I" (5) );
-#define LED_OFF();  asm volatile ("cbi %0,%1" :/* no outputs */: "I" (_SFR_IO_ADDR(PORTB)),"I" (5) );
-#define INIT_LED(); asm volatile ("sbi %0,%1" :/* no outputs */: "I" (_SFR_IO_ADDR(DDRB )),"I" (5) );
 #define INIT_PB5(); asm volatile ("sbi %0,%1" :/* no outputs */: "I" (_SFR_IO_ADDR(DDRB )),"I" (5) );
 
 #define PB4_ON();   asm volatile ("sbi %0,%1" :/* no outputs */: "I" (_SFR_IO_ADDR(PORTB)),"I" (4) );

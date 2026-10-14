@@ -4,6 +4,7 @@
 // Ресурсы ПЛК в GlobalVar.h
 // Arduino Nano ATmega328p 16MHz 5VDC
 // Arduino IDE 1.8.19
+// Для компиляции в AVR Studio 4.18 + WinAVR 2010 перекодировать файлы в формат ANSI
 // Windows 10 pro 64bit
 // Программатор по умолчанию AVRISP mkll old boot loader
 
