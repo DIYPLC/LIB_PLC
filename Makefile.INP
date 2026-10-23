@@ -8,7 +8,7 @@
   MonitorArrayLimits    := 'y' ;
   OptimizeObjectCode    := 'y' }
 
-// Бибилиотека блоков для ПЛК LIB_PLC.
+// Библиотека блоков для ПЛК LIB_PLC.
 
 // Базовые блоки обработки аналоговых сигналов, упорядочил по частоте использования.
 FbPIDcontrol       // LIB_PLC Регулятор ПИД.
@@ -30,7 +30,7 @@ FbSoftPWM          // LIB_PLC ШИМ генератор двухканальный.
 FbDelayN           // LIB_PLC Задержка на N тактов.
 FbIntegrator       // LIB_PLC Интегратор W(s)=1/s.
 FbDeadBand         // LIB_PLC Зона нечувствительности.
-FbS5TimeToReal     // LIB_PLC Конвертор S5TIME в милисекунды.
+FbS5TimeToReal     // LIB_PLC Конвертор S5TIME в миллисекунды.
 Fb2oo3             // LIB_PLC Резервирование датчиков методом голосования.
 
 // Базовые дискретные блоки, упорядочил по частоте использования.
@@ -48,18 +48,18 @@ FbCounter          // LIB_PLC Счетчик импульсов.
 
 // Блоки для конкретных технологических железок.
 FbMotor            // LIB_PLC Двигатель с частотником и контактором.
-FbValve            // LIB_PLC Пневмоцилиндр с коцевиками.
+FbValve            // LIB_PLC Пневмоцилиндр с концевиками.
 FbPIDsteam         // LIB_PLC ПИД-регулятор давления пара быстромедленный.
 FbSimMotorGear     // LIB_PLC Виртуальный МЭО для отладки шагового регулятора.
 
 // Платформозависимые блоки SIEMENS.
-FbDriverAi420      // LIB_PLC Драйвер аналогово входа 4...20мА.
-FbDriverAo420      // LIB_PLC Драйвер аналогово выхода 4...20мА.
+FbDriverAi420      // LIB_PLC Драйвер аналогового входа 4...20мА.
+FbDriverAo420      // LIB_PLC Драйвер аналогового выхода 4...20мА.
 FbDriverDi         // LIB_PLC Драйвер дискретного входа.
 FbDriverDo         // LIB_PLC Драйвер дискретного выхода.
-FbDriverFRA        // LIB_PLC Управление приводом MITSUBISHI FR-A740, FR-A840 по PROFIBUS PD.
-FbDriverMM440PPO3  // LIB_PLC Управление приводом SIEMENS MICROMASTER 440 по PROFIBUS PD.
-FbDriverAD800PPO4  // LIB_PLC Управление приводом OPTUMUS DRIVE AD800 по PROFIBUS PD.
+FbDriverFRA        // LIB_PLC Управление приводом MITSUBISHI FR-A740, FR-A840 по PROFIBUS DP.
+FbDriverMM440PPO3  // LIB_PLC Управление приводом SIEMENS MICROMASTER 440 по PROFIBUS DP.
+FbDriverAD800PPO4  // LIB_PLC Управление приводом OPTIMUS DRIVE AD800 по PROFIBUS DP.
 
 // Блоки зависимые от компилятора CFC PCS7.
 FbOsBoolPls        // LIB_PLC WinCC interface CFC PCS7.
@@ -70,7 +70,7 @@ FbOsDint           // LIB_PLC WinCC interface CFC PCS7.
 FbOsWord           // LIB_PLC WinCC interface CFC PCS7.
 FbOsDword          // LIB_PLC WinCC interface CFC PCS7.
 FbSampleTime       // LIB_PLC Шаг дискретизации по времени CFC PCS7.
-FbSubstReal        // LIB_PLC Замещение аналогово сигнала для PCS7v9.
+FbSubstReal        // LIB_PLC Замещение аналогового сигнала для PCS7v9.
 
 // Блок зависит от SFC6 RD_SINFO SFB5 TOF
 FbReset            // LIB_PLC Флаг первого скана с TOF задержкой CFC PCS7.
@@ -86,7 +86,7 @@ FbS7conTx          // LIB_PLC Данные отправленные через S7 connection в NetPro.
 
 // Блоки данных для сопряжения с SCADA HMI.
 // При компиляции блоков данных возможна потеря технологических значений переменных в блоках данных.
-// Для сохранения данных истользовать VAT таблицу ReadBack.
+// Для сохранения данных использовать VAT таблицу ReadBack.
 DbDebug      // Временные переменные для отладки.
 
 // Технологические программы.
@@ -96,7 +96,7 @@ Fb1PC1       // 1PC1 ПИД- регулятор давления.
 // Компилируем блоки данных.
 DbInstance   // Файл генерирует блоки данных к функциональным блокам.
 
-// Задачи для вызова технологисеских программ.
+// Задачи для вызова технологических программ.
 FbTaskCyclic // Задача вызывается циклически.
 FbTask100ms  // Задача вызывается каждые 100ms.
 DbTask       // Блоки данных для задач.

@@ -38,14 +38,14 @@ ArrayByte:ARRAY[0..7] OF BYTE; // Массив из 8 байт.
 // ArrayByte[3] Час в формате BCD.
 // ArrayByte[4] Минута в формате BCD.
 // ArrayByte[5] Секунда в формате BCD.
-// ArrayByte[6] Милисекунда в формате BCD.
-// ArrayByte[7] Милисекунды и день недели в формате BCD.
+// ArrayByte[6] Миллисекунда в формате BCD.
+// ArrayByte[7] Миллисекунды и день недели в формате BCD.
 END_STRUCT;
-Time_ms_previous :DINT := 0; // RTC предидущее значение 0...59999ms.
+Time_ms_previous :DINT := 0; // RTC предыдущее значение 0...59999ms.
 END_VAR
 
 VAR_TEMP  // Временные переменные, не сохраняемые.
-ErrorCode       :INT ; // Код ошики SFC должен быть 0.
+ErrorCode       :INT ; // Код ошибки SFC должен быть 0.
 TmpBYTE         :BYTE; // Временная переменная.
 ms_x10          :BYTE; // Временная переменная 1.
 ms_x100         :BYTE; // Временная переменная 2.
@@ -162,7 +162,7 @@ Ts_ms := (60000 - Time_ms_previous) + Time_ms_current;
 // 4
 END_IF;
 
-// Запомнить предидущее время.
+// Запомнить предыдущее время.
 Time_ms_previous := Time_ms_current;
 
 // Время скана не может быть больше 1000ms

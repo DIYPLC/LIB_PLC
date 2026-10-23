@@ -52,14 +52,14 @@ Summator := Summator + Buffer1[Counter1];
 END_FOR;
 Mean := Summator /(INT_TO_REAL(NUMBER + 1));
 
-// Рассчет дисперсии.
+// Расчет дисперсии.
 Summator := 0.0;
 FOR Counter1 := 0 TO NUMBER BY 1 DO
 Summator := Summator + ((Buffer1[Counter1] - Mean) * (Buffer1[Counter1] - Mean));
 END_FOR;
 Variance := Summator / (INT_TO_REAL(NUMBER + 1));
 
-// Рассчет среднеквадратического отклонения.
+// Расчет среднеквадратического отклонения.
 Deviation := SQRT(Variance);
 
 // @COPYLEFT ALL WRONGS RESERVED :)

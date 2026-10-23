@@ -1,5 +1,5 @@
 FUNCTION_BLOCK "FbS5TimeToReal"
-TITLE = 'Конвертор S5TIME в милисекунды.'
+TITLE = 'Конвертор S5TIME в миллисекунды.'
 
 { S7_read_back := 'true' ;
   S7_blockview := 'big'  }
@@ -17,7 +17,7 @@ END_STRUCT;
 END_VAR
 
 VAR_OUTPUT // Выходные переменные, сохраняемые.
-Y :REAL := 0.0; // Выход милисекунды.
+Out :REAL := 0.0; // Выход миллисекунды.
 END_VAR
 
 VAR // Внутренние переменные, сохраняемые.
@@ -30,13 +30,13 @@ END_VAR
 BEGIN
 
 // Разбиваем BCD на части по 4 бита
-// Байты в слове поменяны местами из за архитектуры процессора.
+// Байты в слове поменяны местами из-за архитектуры процессора.
 Digit1   := BYTE_TO_INT(LocalStructTime.ArrayByte[1] AND 2#0000_1111);
 Digit10  := BYTE_TO_INT(LocalStructTime.ArrayByte[1] AND 2#1111_0000)/16;
 Digit100 := BYTE_TO_INT(LocalStructTime.ArrayByte[0] AND 2#0000_1111);
 Base     := BYTE_TO_INT(LocalStructTime.ArrayByte[0] AND 2#0011_0000)/16;
-// Вычислем количество милисекунд согласно спецификации формата S5TIME.
-Y := ( 10**(INT_TO_REAL(Base+1)) ) * 
+// Вычисляем количество миллисекунд согласно спецификации формата S5TIME.
+Out := ( 10**(INT_TO_REAL(Base+1)) ) * 
 (
 INT_TO_REAL(Digit100*100) + 
 INT_TO_REAL(Digit10*10) + 

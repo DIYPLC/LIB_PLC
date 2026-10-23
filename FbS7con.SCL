@@ -10,21 +10,21 @@ VERSION : '4.4'
 
 VAR_INPUT
 
-Cucle_ms   { S7_dynamic := 'true'; S7_link := 'false' } :DINT  := 100 ; // GET,PUT Период обмена данными между ПЛК 0...10 000 мс.
+Cycle_ms   { S7_dynamic := 'true'; S7_link := 'false' } :DINT  := 100 ; // GET,PUT Период обмена данными между ПЛК 0...10 000 мс.
 ID         { S7_dynamic := 'true'; S7_link := 'false' } :WORD  := 1   ; // GET,PUT NetPro ID S7 connection.
 
 RxOn       { S7_dynamic := 'true'; S7_link := 'false' } :BOOL  := TRUE; // GET Включить прием данных из удаленного ПЛК.
 RxDbNumRem { S7_dynamic := 'true'; S7_link := 'false' } :INT   := 4   ; // GET Номер DB в удаленном ПЛК.
-RxDbAdrRem { S7_dynamic := 'true'; S7_link := 'false' } :DWORD := 0   ; // GET Cтартовый адрес байта внутри DB в удаленном ПЛК.
-RxDbNumLoc { S7_dynamic := 'true'; S7_link := 'false' } :INT   := 30  ; // GET Номер DB этом ПЛК (FbS7conRx).
-RxDbAdrLoc { S7_dynamic := 'true'; S7_link := 'false' } :DWORD := 0   ; // GET Cтартовый адрес байта внутри DB в этом ПЛК.
+RxDbAdrRem { S7_dynamic := 'true'; S7_link := 'false' } :DWORD := 0   ; // GET Стартовый адрес байта внутри DB в удаленном ПЛК.
+RxDbNumLoc { S7_dynamic := 'true'; S7_link := 'false' } :INT   := 30  ; // GET Номер DB в этом ПЛК (FbS7conRx).
+RxDbAdrLoc { S7_dynamic := 'true'; S7_link := 'false' } :DWORD := 0   ; // GET Стартовый адрес байта внутри DB в этом ПЛК.
 RxLen      { S7_dynamic := 'true'; S7_link := 'false' } :INT   := 64  ; // GET Количество принимаемых байт в датаблоке.
 
 TxOn       { S7_dynamic := 'true'; S7_link := 'false' } :BOOL  := TRUE; // PUT Включить передачу данных в удаленный ПЛК.
 TxDbNumRem { S7_dynamic := 'true'; S7_link := 'false' } :INT   := 3   ; // PUT Номер DB в удаленном ПЛК.
-TxDbAdrRem { S7_dynamic := 'true'; S7_link := 'false' } :DWORD := 0   ; // PUT Cтартовый адрес байта внутри DB в удаленном ПЛК.
-TxDbNumLoc { S7_dynamic := 'true'; S7_link := 'false' } :INT   := 40  ; // PUT Номер DB этом ПЛК (FbS7conTx).
-TxDbAdrLoc { S7_dynamic := 'true'; S7_link := 'false' } :DWORD := 0   ; // PUT Cтартовый адрес байта внутри DB в этом ПЛК.
+TxDbAdrRem { S7_dynamic := 'true'; S7_link := 'false' } :DWORD := 0   ; // PUT Стартовый адрес байта внутри DB в удаленном ПЛК.
+TxDbNumLoc { S7_dynamic := 'true'; S7_link := 'false' } :INT   := 40  ; // PUT Номер DB в этом ПЛК (FbS7conTx).
+TxDbAdrLoc { S7_dynamic := 'true'; S7_link := 'false' } :DWORD := 0   ; // PUT Стартовый адрес байта внутри DB в этом ПЛК.
 TxLen      { S7_dynamic := 'true'; S7_link := 'false' } :INT   := 64  ; // PUT Количество передаваемых байт в датаблоке.
 
 END_VAR
@@ -96,7 +96,7 @@ BEGIN
 
 // VA 11-04-2023
 // Вызывать Данный FB из OB1.
-// Блок сомместим с CFC PCS7v9.1 но поддерживается не всеми типами CPU/CP.
+// Блок совместим с CFC PCS7v9.1 но поддерживается не всеми типами CPU/CP.
 // NetPro необходимо прогружать отдельно.
 // При использовании надо сначала сгенерировать DB для FbS7conTx, FbS7conRx.
 // Пример работы с типом ANY:
@@ -107,13 +107,13 @@ BEGIN
 // Три блока работают совместно.
 // FbS7con FbS7conTx FbS7conRx
 
-IF (Cucle_ms <= 0) THEN
+IF (Cycle_ms <= 0) THEN
 // Для максимальной скорости обмена убрать SFB4 TON таймер.
 PulseGen := NOT(PulseGen);
 ELSE
 // Генератор импульсов задает темп обмена.
 DbTON.IN := NOT(PulseGen);
-DbTON.PT := DINT_TO_TIME(Cucle_ms);
+DbTON.PT := DINT_TO_TIME(Cycle_ms);
 DbTON();
 PulseGen := DbTON.Q;
 END_IF;
@@ -128,7 +128,7 @@ GET_ADDR_1_st.w2 := RxLen     ; // Количество байт.
 GET_ADDR_1_st.w3 := RxDbNumRem; // Номер DB.
 GET_ADDR_1_st.d4 := SHL(IN := RxDbAdrRem, N := 3) OR DW#16#84000000; // Стартовый адрес внутри DB.
 
-// Адрес и размер DB этом ПЛК (FbS7conRx).
+// Адрес и размер DB в этом ПЛК (FbS7conRx).
 // RD_1 := P#DB30.DBX0.0 BYTE 64;
 GET_RD_1_st.b0 := B#16#10   ; // Magic Constant.
 GET_RD_1_st.b1 := B#16#2    ; // Magic Constant.
@@ -141,7 +141,7 @@ IF(RxOn) THEN
 DbGET(REQ    := GET_REQ 
      ,ID     := ID
      ,ADDR_1 := GET_ADDR_1 // Адрес и размер DB в удаленном ПЛК.
-     ,RD_1   := GET_RD_1); // Адрес и размер DB этом ПЛК (FbS7conRx).
+     ,RD_1   := GET_RD_1); // Адрес и размер DB в этом ПЛК (FbS7conRx).
 
 
 // Запрос на прием если статус блока не занято.
@@ -162,7 +162,7 @@ PUT_ADDR_1_st.w2 := TxLen     ; // Количество байт.
 PUT_ADDR_1_st.w3 := TxDbNumRem; // Номер DB.
 PUT_ADDR_1_st.d4 := SHL(IN := TxDbAdrRem, N := 3) OR DW#16#84000000; // Стартовый адрес внутри DB.
 
-// Адрес и размер DB этом ПЛК (FbS7conTx).
+// Адрес и размер DB в этом ПЛК (FbS7conTx).
 // SD_1 := P#DB40.DBX0.0 BYTE 64;
 PUT_SD_1_st.b0 := B#16#10   ; // Magic Constant.
 PUT_SD_1_st.b1 := B#16#2    ; // Magic Constant.
@@ -174,7 +174,7 @@ PUT_SD_1_st.d4 := SHL(IN := TxDbAdrLoc, N := 3) OR DW#16#84000000; // Стартовый 
 DbPUT(REQ    := PUT_REQ 
      ,ID     := ID
      ,ADDR_1 := PUT_ADDR_1 // Адрес и размер DB в удаленном ПЛК.
-     ,SD_1   := PUT_SD_1); // Адрес и размер DB этом ПЛК (FbS7conRx).
+     ,SD_1   := PUT_SD_1); // Адрес и размер DB в этом ПЛК (FbS7conRx).
 
 // Запрос на передачу если статус блока не занято.
 PUT_REQ := PulseGen AND (DbPUT.STATUS <> 25);

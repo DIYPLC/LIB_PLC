@@ -17,7 +17,7 @@ Out :BOOL := FALSE; // Выход.
 END_VAR
 
 VAR // Внутренние переменные, сохраняемые.
-In_previos :BOOL := FALSE; // Предыдущее состояние входа.
+In_previous :BOOL := FALSE; // Предыдущее состояние входа.
 END_VAR
 
 BEGIN
@@ -30,9 +30,9 @@ BEGIN
 //     +-----------+
 
 // Детектор нарастающего фронта.
-Out := In AND NOT(In_previos);
+Out := In AND NOT(In_previous);
 // Запомнить предыдущее состояние входа.
-In_previos := In;
+In_previous := In;
 
 // @COPYLEFT ALL WRONGS RESERVED :)
 // Author: VA

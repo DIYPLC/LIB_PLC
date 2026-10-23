@@ -12,16 +12,16 @@ VAR_INPUT
 PV       :REAL := 0.0  ; // Измеренное значение регулируемого параметра 0...100[%].
 SP       :REAL := 0.0  ; // Заданное значение регулируемого параметра 0...100[%].
 COM_RST  :BOOL := FALSE; // Полная перезагрузка.
-LMNR_HS  :BOOL := FALSE; // Датчик обранной связи клапан открыт.
-LMNR_LS  :BOOL := FALSE; // Датчик обранной связи клапан закрыт.
-LMNS_ON  :BOOL := FALSE; // Включить ружной режим управления.
+LMNR_HS  :BOOL := FALSE; // Датчик обратнной связи клапан открыт.
+LMNR_LS  :BOOL := FALSE; // Датчик обратнной связи клапан закрыт.
+LMNS_ON  :BOOL := FALSE; // Включить ручной режим управления.
 LMNUP    :BOOL := FALSE; // Команда открыть в ручном режиме.
 LMNDN    :BOOL := FALSE; // Команда закрыть в ручном режиме.
 GAIN     :REAL := 2.0  ; // Пропорциональное усиление ошибки регулирования.
 TI       :REAL := 20.0 ; // Время интегрирования [с].
 DEADB_W  :REAL := 0.5  ; // Зона нечувствительности к ошибке регулирования [%].
 PULSE_TM :REAL := 1.0  ; // Минимальное время выходного импульса [с].
-BREAK_TM :REAL := 1.0  ; // Минимально время между выходными импульсами [с].
+BREAK_TM :REAL := 1.0  ; // Минимальное время между выходными импульсами [с].
 MTR_TM   :REAL := 55.0 ; // Время открытия исполнительного механизма с 0 до 100 [с].
 DISV     :REAL := 0.0  ; // Возмущающее воздействие к ошибке регулирования [%].
 CYCLE    :REAL := 0.1  ; // Шаг дискретизации по времени [с].
@@ -52,9 +52,9 @@ AdapIn1  :REAL ; // Eingang 1 der Adaption der Ansprechschwelle.
 AdapIn2  :REAL ; // Eingang 2 der Adaption der Ansprechschwelle.
 iImpEin  :INT  ; // Eingang des Impulsformers.
 rThrOff  :REAL ; // Abschaltschwelle.
-dInteg   :REAL ; // Eingang des Integrierers in der Rьckfьhrung.
+dInteg   :REAL ; // Eingang des Integrierers in der Ruckfuhrung.
 dThrStIn :REAL ; // Three - step element input.
-LmnrSim  :REAL ; // Simulierte Stellungsrьckmeldung.
+LmnrSim  :REAL ; // Simulierte Stellungsruckmeldung.
 END_VAR
 
 BEGIN

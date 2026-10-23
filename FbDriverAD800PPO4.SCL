@@ -1,5 +1,5 @@
 FUNCTION_BLOCK "FbDriverAD800PPO4"
-TITLE = 'Управление приводом OPTUMUS DRIVE AD800 по PROFIBUS PD.'
+TITLE = 'Управление приводом OPTIMUS DRIVE AD800 по PROFIBUS DP.'
 
 { S7_read_back := 'true' ;
   S7_blockview := 'big'  }
@@ -11,16 +11,16 @@ VERSION : '2.1'
 VAR_INPUT // Входные переменные.
 ADR_I :DINT := 256;   // Стартовый адрес IW256? в HardWare.
 ADR_Q :DINT := 256;   // Стартовый адрес QW256? в HardWare.
-FSP   :REAL := 25.0;  // Заданое значение частоты [Гц].
+FSP   :REAL := 25.0;  // Заданное значение частоты [Гц].
 FWD   :BOOL := FALSE; // Вкл вперед.
 REV   :BOOL := FALSE; // Вкл назад.
-RST   :BOOL := FALSE; // Сброс ошибки привода импусьсом или перезагрузка по питанию привода.
+RST   :BOOL := FALSE; // Сброс ошибки привода импульсом или перезагрузка по питанию привода.
 END_VAR
 
 VAR_OUTPUT // Выходные переменные.
-FPV  :REAL := 0.0;   // Измереное значение частоты [Гц].
+FPV  :REAL := 0.0;   // Измеренное значение частоты [Гц].
 IPV  :REAL := 0.0;   // Ток двигателя [A].
-UPV  :REAL := 0.0;   // Напряжене звена пост. тока [В].
+UPV  :REAL := 0.0;   // Напряжение звена пост. тока [В].
 ERR  :BOOL := FALSE; // Ошибка привода.
 ALM  :BOOL := FALSE; // Предупреждение от привода.
 RUN  :BOOL := FALSE; // Привод в работе.
@@ -31,10 +31,10 @@ VAR // Внутренние сохраняемые переменные.
 StatusWord        :WORD := W#16#0000; // Слово состояния.
 FrequencyMeasured :WORD := W#16#0000; // Фактическая скорость [F*10].
 MotorCurrent      :WORD := W#16#0000; // Ток двигателя [A*10].
-VoltageRectifier  :WORD := W#16#0000; // Напряжене звена пост. тока [В].
+VoltageRectifier  :WORD := W#16#0000; // Напряжение звена пост. тока [В].
 
 ControlWord  :WORD := W#16#0000; // Слово управления.
-FrequencySet :WORD := W#16#0000; // Заданая скорость.
+FrequencySet :WORD := W#16#0000; // Заданная скорость.
 
 ControlWord_B00 :BOOL := FALSE; // Вращение вперед.
 ControlWord_B01 :BOOL := FALSE; // Вращение назад. 
@@ -76,7 +76,7 @@ END_VAR
 BEGIN
 
 // PROFIDRIVE profile PPO4.
-// Управление приводом OPTUMUS DRIVE AD800 по PROFIBUS PD.
+// Управление приводом OPTIMUS DRIVE AD800 по PROFIBUS DP.
 //      DbDriverAD800PPO4
 //    +-------------------+
 //    | FbDriverAD800PPO4 |
@@ -92,7 +92,7 @@ BEGIN
 StatusWord        := PIW[ADR_I + 0]; // PZD1 Слово состояния.
 FrequencyMeasured := PIW[ADR_I + 2]; // PZD2 Фактическая скорость [F*10].
 MotorCurrent      := PIW[ADR_I + 4]; // PZD3 Ток двигателя [A*10].
-VoltageRectifier  := PIW[ADR_I + 6]; // PZD4 Напряжене звена пост. тока [В].
+VoltageRectifier  := PIW[ADR_I + 6]; // PZD4 Напряжение звена пост. тока [В].
 
 // Измеренное значение частоты FVD [Гц].
 FPV := INT_TO_REAL(WORD_TO_INT(FrequencyMeasured)) / 10.0;
@@ -100,7 +100,7 @@ FPV := INT_TO_REAL(WORD_TO_INT(FrequencyMeasured)) / 10.0;
 // Ток двигателя [A].
 IPV := INT_TO_REAL(WORD_TO_INT(MotorCurrent)) / 100.0;
 
-// Напряжене звена пост. тока [В].
+// Напряжение звена пост. тока [В].
 UPV := INT_TO_REAL(WORD_TO_INT(VoltageRectifier));
 
 // Декодирование слова состояния StatusWord.
@@ -178,9 +178,9 @@ ControlWord_B13 := ((ControlWord AND W#2#0010_0000_0000_0000) = W#2#0010_0000_00
 ControlWord_B14 := ((ControlWord AND W#2#0100_0000_0000_0000) = W#2#0100_0000_0000_0000);
 ControlWord_B15 := ((ControlWord AND W#2#1000_0000_0000_0000) = W#2#1000_0000_0000_0000);
 
-// Записать слов по сети.
+// Записать слова по сети.
 PQW[ADR_Q + 0] := ControlWord ; // PZD1 Слово управления.
-PQW[ADR_Q + 2] := FrequencySet; // PZD2 Заданая скорость.
+PQW[ADR_Q + 2] := FrequencySet; // PZD2 Заданная скорость.
 PQW[ADR_Q + 4] := 0           ; // PZD3.
 PQW[ADR_Q + 6] := 0           ; // PZD4.
 
@@ -202,7 +202,7 @@ P0-18 = 2 Пуск по сети PROFIBUS DP.
 P0-51 = 8 Время ускорения [с].
 P0-52 = 5 Время замедления [с].
 P0-80 = 7 Адрес PROFIBUS DP.
-P1-03 = 0.25 Двигатель [КВт].
+P1-03 = 0.25 Двигатель [кВт].
 P1-04 = 220  Двигатель [В].
 P1-05 = 50   Двигатель [Гц].
 P1-06 = 1.6  Двигатель [А].
@@ -217,7 +217,7 @@ https://optimusdrive.ru/imagesod/files/ad800/ad800-pd.zip
 
 TODO:
 Останов на выбеге.
-Задание частоты по профибасу с точность до 0,01 Гц. Фактически PZD2=500 -> 50Hz
+Задание частоты по профибасу с точностью до 0,01 Гц. Фактически PZD2=500 -> 50Hz
 
 ---Начало файла AD800_PD.GSD (эту строчку не копировать)---
 ;

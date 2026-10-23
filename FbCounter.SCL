@@ -22,8 +22,8 @@ OVERFLOW :BOOL := FALSE; // Флаг переполнения счетчика.
 END_VAR
 
 VAR // Внутренние переменные, сохраняемые.
-INCPrevios :BOOL := FALSE; // Предыдущее состояние входа +1.
-DECPrevios :BOOL := FALSE; // Предыдущее состояние входа -1.
+INCPrevious :BOOL := FALSE; // Предыдущее состояние входа +1.
+DECPrevious :BOOL := FALSE; // Предыдущее состояние входа -1.
 END_VAR
 
 CONST // Константы.
@@ -45,7 +45,7 @@ BEGIN
 //    +-----------------+
 
 // Прямой счет по нарастающему фронту импульсов +1.
-IF (INC AND NOT(INCPrevios)) THEN
+IF (INC AND NOT(INCPrevious)) THEN
     IF (CNT >= LIMIT_MAX) THEN // Ограничение сверху.
     CNT := LIMIT_MAX;
     OVERFLOW := TRUE;
@@ -56,7 +56,7 @@ IF (INC AND NOT(INCPrevios)) THEN
 END_IF;
 
 // Обратный счет по нарастающему фронту импульсов -1.
-IF (DEC AND NOT(DECPrevios)) THEN
+IF (DEC AND NOT(DECPrevious)) THEN
     IF (CNT <= LIMIT_MIN) THEN // Ограничение снизу.
     CNT := LIMIT_MIN;
     OVERFLOW := TRUE;
@@ -77,8 +77,8 @@ CNT := 0;
 END_IF;
 
 // Запомнить предыдущее состояние входа.
-INCPrevios := INC;
-DECPrevios := DEC;
+INCPrevious := INC;
+DECPrevious := DEC;
 
 // @COPYLEFT ALL WRONGS RESERVED :)
 // Author: VA

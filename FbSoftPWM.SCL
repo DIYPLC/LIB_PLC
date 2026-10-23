@@ -9,7 +9,7 @@ FAMILY  : LIB_PLC
 VERSION : '2.1'
 
 VAR_INPUT // Входные переменные, сохраняемые.
-DutyCucle      :REAL := 50.0;   // Коэффициент заполнения -100...0...100 [%].
+DutyCycle      :REAL := 50.0;   // Коэффициент заполнения -100...0...100 [%].
 PeriodPositive :REAL := 10.0;   // Период ШИМ для положительного коэффициента заполнения [с].
 PeriodNegative :REAL := 10.0;   // Период ШИМ для отрицательного коэффициента заполнения [с].
 DBMAX          :REAL := 0.001;  // dead band - Зона нечувствительности, верхняя граница [%].
@@ -39,7 +39,7 @@ BEGIN
 //            DbSoftPWM
 //     +---------------------+
 //     |      FbSoftPWM      |
-//  ->-|DutyCucle      PWMPOS|->-
+//  ->-|DutyCycle      PWMPOS|->-
 //    -|PeriodPositive PWMNEG|->-
 //    -|PeriodNegative       |
 //    -|DBMAX                |
@@ -48,58 +48,58 @@ BEGIN
 //     +---------------------+
 
 // Зона нечувствительности для входного сигнала.
-IF ((DBMIN<DutyCucle)AND(DutyCucle<DBMAX)) THEN
-Percent:=0.0;
+IF ( (DBMIN < DutyCycle) AND (DutyCycle < DBMAX) ) THEN
+Percent := 0.0;
 ELSE
-Percent:=DutyCucle;
+Percent := DutyCycle;
 END_IF;
 
 // Амплитудный ограничитель входного сигнала от -100% до 100%.
 IF (Percent>=100.0) THEN
 Percent:=100.0;
 END_IF;
-IF (Percent<=-100.0) THEN
-Percent:=-100.0;
+IF (Percent <= -100.0) THEN
+Percent := -100.0;
 END_IF;
 
 // Формирование импульсов на открытие.
-IF (Percent>0.0) THEN
-PWMNEG:=FALSE;
-TimerNegative:=0.0;
-TimePulsePositive:=PeriodPositive*Percent*0.01;
-    IF (TimerPositive<=TimePulsePositive) THEN
-    PWMPOS:=TRUE;
+IF (Percent > 0.0) THEN
+PWMNEG := FALSE;
+TimerNegative := 0.0;
+TimePulsePositive := PeriodPositive * Percent * 0.01;
+    IF (TimerPositive <= TimePulsePositive) THEN
+    PWMPOS := TRUE;
     ELSE
-    PWMPOS:=FALSE;
+    PWMPOS := FALSE;
     END_IF;
-TimerPositive:=TimerPositive+Ts;
-    IF (TimerPositive>=PeriodPositive) THEN
-    TimerPositive:=0.0;
+TimerPositive := TimerPositive + Ts;
+    IF (TimerPositive >= PeriodPositive) THEN
+    TimerPositive := 0.0;
     END_IF;
 END_IF;
 
 // Формирование импульсов на закрытие.
-IF (Percent<0.0) THEN
-PWMPOS:=FALSE;
-TimerPositive:=0.0;
-TimePulseNegative:=PeriodNegative*Percent*(-0.01);
-    IF (TimerNegative<=TimePulseNegative) THEN
-    PWMNEG:=TRUE;
+IF (Percent < 0.0) THEN
+PWMPOS := FALSE;
+TimerPositive := 0.0;
+TimePulseNegative := PeriodNegative * Percent * (-0.01);
+    IF (TimerNegative <= TimePulseNegative) THEN
+    PWMNEG := TRUE;
     ELSE
-    PWMNEG:=FALSE;
+    PWMNEG := FALSE;
     END_IF;
-TimerNegative:=TimerNegative+Ts;
-    IF (TimerNegative>=PeriodNegative) THEN
-    TimerNegative:=0.0;
+TimerNegative := TimerNegative + Ts;
+    IF (TimerNegative >= PeriodNegative) THEN
+    TimerNegative := 0.0;
     END_IF;
 END_IF;
 
 // Нет импульсов.
-IF (Percent=0.0) THEN
-PWMPOS:=FALSE;
-PWMNEG:=FALSE;
-TimerPositive:=0.0;
-TimerNegative:=0.0;
+IF (Percent = 0.0) THEN
+PWMPOS := FALSE;
+PWMNEG := FALSE;
+TimerPositive := 0.0;
+TimerNegative := 0.0;
 END_IF;
 
 // @COPYLEFT ALL WRONGS RESERVED :)
