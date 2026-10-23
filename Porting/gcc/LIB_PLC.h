@@ -5,7 +5,7 @@ extern "C"
 {
 #endif
 
-// Информация о аппаратной платформе.
+// Информация об аппаратной платформе.
 #define CPU_ATMEGA168P (0)
 #define CPU_ATMEGA32   (0)
 #define CPU_ATMEGA328P (1)
@@ -30,7 +30,7 @@ extern "C"
 #define MODBUS_RTU_SLAVE_EN (1)
 #define RTC_DS3231_EN (0)
 
-// Бибилиотека блоков для ПЛК LIB_PLC.
+// Библиотека блоков для ПЛК LIB_PLC.
 #include "GlobalVar.h"
 
 // Базовые блоки обработки аналоговых сигналов, упорядочил по частоте использования.

@@ -1,12 +1,12 @@
 // Программирование в стиле ПЛК версия от 01.04.2025.
 // Библиотека LIB_PLC.
-// В файле MODBUS.c Сеть MODBUS RTU SALVE ADR1 RS485 для SCADA/HMI.
+// В файле MODBUS.c Сеть MODBUS RTU SLAVE ADR1 RS485 для SCADA/HMI.
 // Ресурсы ПЛК в GlobalVar.h
 // Arduino Nano ATmega328p 16MHz 5VDC
 // Arduino IDE 1.8.19
 // Для компиляции в AVR Studio 4.18 + WinAVR 2010 перекодировать файлы в формат ANSI
 // Windows 10 pro 64bit
-// Программатор по умолчанию AVRISP mkll old boot loader
+// Программатор по умолчанию AVRISP mkII old boot loader
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -16,7 +16,7 @@
 #include "GlobalVar.h" // Глобальные переменные ПЛК.
 #include "M328P_HW.h" // Аппаратно зависимые функции ATmega328p 16MHz 5VDC
 #include "FcTaskCyclic.h" // Задача выполняется с плавающим временем цикла.
-#include "MODBUS.h" // MODBUS RTU SALVE.
+#include "MODBUS.h" // MODBUS RTU SLAVE.
 #include "FbTs.h"
 
 #define SetBit(Var,Bit)   ( (Var) = (Var) |  (1 << (Bit)) )

@@ -1,9 +1,10 @@
-﻿#pragma once
+#pragma once
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
+
 // Аппаратно зависимые функции ATmega328p 16MHz 5VDC
 
 void USART0_INIT(void); // Инициализация USART0 9600 8N1
