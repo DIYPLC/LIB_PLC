@@ -12,6 +12,7 @@
 
 #define MB_PORT_HAS_CLOSE 0
 
+#define F_CPU 16000000UL      // Arduino Nano quartz resonator Hz.
 #define MB_TIMER_PRESCALER (1024UL)
 #define MB_TIMER_TICKS (F_CPU / MB_TIMER_PRESCALER)
 #define MB_50US_TICKS (20000UL)

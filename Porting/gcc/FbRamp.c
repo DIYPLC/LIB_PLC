@@ -44,7 +44,7 @@ void FbRamp(struct DbRamp *p)
   }
 
   // Установившийся режим.
-  if ((AccMode and (Out >= In)) or (DecMode and (Out <= In)) or (In = Out))
+  if ((AccMode and (Out >= In)) or (DecMode and (Out <= In)) or (In == Out))
   {
     Out = In;
   }
