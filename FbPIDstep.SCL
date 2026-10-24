@@ -250,6 +250,8 @@ END_IF;
 // cross platforms by VA
 // https://web.archive.org/web/20220322202418/http://plc4good.org.ua/view_post.php?id=65
 // https://github.com/komatic1/SCL_regulation_control/blob/main/CONT_S.scl
+// https://web.archive.org/web/20220317194858/http://plc4good.org.ua/files/02_materials/pid/S7pidcob.pdf
+// https://web.archive.org/web/20220322202418/http://plc4good.org.ua/files/02_materials/pid/Control_r.pdf
 
 (*
 Добавлен: 1exan    Дата: 2020-04-26
