@@ -6,7 +6,7 @@ TITLE = 'Зона нечувствительности.'
 
 AUTHOR  : VA
 FAMILY  : LIB_PLC
-VERSION : '2.2'
+VERSION : '2.3'
 
 VAR_INPUT // Входные переменные, сохраняемые.
 In    :REAL :=  0.0  ; // Вход зоны нечувствительности.
@@ -30,7 +30,7 @@ BEGIN
 //    +------------+
 
 // Зона нечувствительности.
-IF ((ERMIN < In) AND (In < ERMAX)) THEN
+IF ((ERMIN <= In) AND (In <= ERMAX)) THEN
 Out := 0.0;
 ELSE
 Out := In;
