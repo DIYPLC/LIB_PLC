@@ -65,6 +65,20 @@ void FbTs(struct DbTs *p)
   return;
 }
 
+// Init default values.
+inline void FbTs_init(struct DbTs *p)
+{
+  millis           = 0    ;
+  Reset            = false;
+  Ts_ms            = 0    ;
+  Ts               = 0.0  ;
+  Ts_ms_max        = 0    ;
+  Uptime_s         = 0    ;
+  Time_previous_ms = 0    ;
+  Uptime_ms        = 0    ;
+  return;
+}
+
 // @COPYLEFT ALL WRONGS RESERVED :)
 // Author: VA
 // Contacts: DIY.PLC.314@gmail.com

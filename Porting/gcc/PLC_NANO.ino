@@ -22,8 +22,8 @@
 #define SetBit(Var,Bit)   ( (Var) = (Var) |  (1 << (Bit)) )
 #define ResetBit(Var,Bit) ( (Var) = (Var) & ~(1 << (Bit)) )
 
-struct GlobalVar GV = {0}; // Глобальные переменные ПЛК.
-static struct DbTs DbTs1 = {0};
+struct GlobalVar GV; // Глобальные переменные ПЛК.
+static struct DbTs DbTs1;
 extern uint16_t usRegHoldingBuf[];
 
 int main(void)
@@ -45,6 +45,7 @@ int main(void)
   //    |            Ts_ms_max|->-
   //    |             Uptime_s|->-
   //    +---------------------+
+  FbTs_init(&DbTs1);
   DbTs1.millis = GV.millis_ms   ; // millis() Arduino.
   DbTs1.Reset  = GV.Reset       ; // Сброс при перезагрузке.
   FbTs(&DbTs1)                  ; // Расчет времени скана.
@@ -57,7 +58,7 @@ int main(void)
 
   while (1)
   {
-    PLC_Digital_input_cyclic(&GV) ;
+    //PLC_Digital_input_cyclic(&GV) ;
     (void)eMBPoll();
 
     GV.Reset = false;

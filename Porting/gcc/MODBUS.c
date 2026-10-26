@@ -12,9 +12,9 @@
 
 #define MB_PORT_HAS_CLOSE 0
 
-#define F_CPU 16000000UL      // Arduino Nano quartz resonator Hz.
+#define F_CPU_HZ 16000000UL      // Arduino Nano quartz resonator.
 #define MB_TIMER_PRESCALER (1024UL)
-#define MB_TIMER_TICKS (F_CPU / MB_TIMER_PRESCALER)
+#define MB_TIMER_TICKS (F_CPU_HZ / MB_TIMER_PRESCALER)
 #define MB_50US_TICKS (20000UL)
 
 #define UART_BAUD_RATE 9600
@@ -600,7 +600,7 @@ void eMBRTUStart(void) {
 }
 
 eMBErrorCode eMBRTUReceive(uint8_t *pucRcvAddress, uint8_t **pucFrame, uint16_t *pusLength) {
-  bool xFrameReceived = false;
+  //bool xFrameReceived = false;
   eMBErrorCode eStatus = MB_ENOERR;
   ENTER_CRITICAL_SECTION();
   assert(usRcvBufferPos < MB_SER_PDU_SIZE_MAX);
@@ -609,7 +609,7 @@ eMBErrorCode eMBRTUReceive(uint8_t *pucRcvAddress, uint8_t **pucFrame, uint16_t 
     *pucRcvAddress = ucRTUBuf[MB_SER_PDU_ADDR_OFF];
     *pusLength = (uint16_t)(usRcvBufferPos - MB_SER_PDU_PDU_OFF - MB_SER_PDU_SIZE_CRC);
     *pucFrame = (uint8_t *)&ucRTUBuf[MB_SER_PDU_PDU_OFF];
-    xFrameReceived = true;
+    //xFrameReceived = true;
   } else {
     eStatus = MB_EIO;
   }
@@ -762,7 +762,7 @@ void vMBPortSerialEnable(bool xRxEnable, bool xTxEnable) {
 bool xMBPortSerialInit(uint8_t ucPORT, uint32_t ulBaudRate, uint8_t ucDataBits, eMBParity eParity) {
   uint8_t ucUCSRC = 0;
   (void)ucPORT;
-  UBRR = UART_BAUD_CALC(ulBaudRate, F_CPU);
+  UBRR = UART_BAUD_CALC(ulBaudRate, F_CPU_HZ);
   switch (eParity) {
     case MB_PAR_EVEN:
       ucUCSRC |= _BV(UPM1);

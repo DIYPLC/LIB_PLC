@@ -41,6 +41,7 @@ struct DbTs {
 };
 
 void FbTs(struct DbTs *p);
+void FbTs_init(struct DbTs *p);
 
 #ifdef __cplusplus
 }

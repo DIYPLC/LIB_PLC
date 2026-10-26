@@ -17,7 +17,7 @@ void TIMER1_INIT(void); // Настраиваем прерывание кажд�
 void TIMER2_INIT(void); // Настраиваем прерывание каждые 1ms
 void Program_delay_500ms(void);
 void PLC_Digital_output_cyclic(struct GlobalVar *p);
-void PLC_Digital_input_cyclic(struct GlobalVar *p);
+//void PLC_Digital_input_cyclic(struct GlobalVar *p);
 
 #define INTERRUPT_OFF(); asm volatile ("cli");
 #define INTERRUPT_ON(); asm volatile ("sei");

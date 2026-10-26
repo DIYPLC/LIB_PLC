@@ -78,10 +78,11 @@ void PLC_Digital_output_cyclic(struct GlobalVar *p)
   return;
 }
 
-void PLC_Digital_input_cyclic(struct GlobalVar *p)
-{
-  return;
-}
+// TODO
+// void PLC_Digital_input_cyclic(struct GlobalVar *p)
+// {
+//   return;
+// }
 
 /****************************************************************************************/
 
