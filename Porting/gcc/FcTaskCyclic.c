@@ -18,7 +18,7 @@ void FcTaskCyclic(bool Reset, uint32_t Ts_ms) // Задача выполняет
 
   // Карта регистров MODBUS HOLDING REGISTERS  Slave Address 1
   // Время работы мс.
-  MW[0] = 0x7fff bitand GV.millis_ms; // HOLDING REGISTER 0 int16
+  MW[0] = 0x7fff bitand GV.Uptime_ms; // HOLDING REGISTER 0 int16
   // Время скана мс.
   MW[1] = 0x7fff bitand GV.Ts_ms; // HOLDING REGISTER 1 int16
   // Максимальное время скана мс.

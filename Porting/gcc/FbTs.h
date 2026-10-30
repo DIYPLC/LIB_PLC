@@ -28,8 +28,8 @@ extern "C"
 
 struct DbTs {
   // Входные переменные, сохраняемые.
-  uint32_t millis; // millis() Arduino.
-  bool     Reset ; // Сброс при перезагрузке.
+  uint32_t Uptime_ms; // millis() Arduino.
+  bool     Reset    ; // Сброс при перезагрузке.
   // Выходные переменные, сохраняемые.
   uint32_t Ts_ms ; // Шаг дискретизации по времени [мс].
   float    Ts    ; // Шаг дискретизации по времени [с].
@@ -37,11 +37,9 @@ struct DbTs {
   uint32_t Uptime_s; // Время в работе [с].
   // Внутренние переменные, сохраняемые.
   uint32_t Time_previous_ms; // Предыдущее значение [мс].
-  uint64_t Uptime_ms       ; // Время в работе [мс].
 };
 
 void FbTs(struct DbTs *p);
-void FbTs_init(struct DbTs *p);
 
 #ifdef __cplusplus
 }

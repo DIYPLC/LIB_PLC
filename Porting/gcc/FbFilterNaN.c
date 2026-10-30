@@ -13,8 +13,6 @@ void FbFilterNaN(struct DbFilterNaN *p)
   {
     float    float32;
     uint32_t uint32;
-    uint16_t uint16[2];
-    uint8_t  uint8[4];
   } Convertor;
   Convertor.float32 = In;
 

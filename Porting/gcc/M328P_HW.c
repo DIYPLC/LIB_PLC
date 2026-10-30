@@ -50,7 +50,7 @@ void TIMER2_INIT(void) // Настраиваем прерывание кажды
 ISR(TIMER2_COMPA_vect) // Циклическое прерывание каждую 1ms
 {
   cli(); // Выключить все прерывания.
-  GV.millis_ms = GV.millis_ms + 1; // Аналог Arduino millis();
+  GV.Uptime_ms = GV.Uptime_ms + 1; // Аналог Arduino millis();
   sei(); // Включить все прерывания.
 }
 
@@ -65,7 +65,7 @@ void Program_delay_500ms(void)
   }
 }
 
-void PLC_Digital_output_cyclic(struct GlobalVar *p)
+inline void PLC_Digital_output_cyclic(struct GlobalVar *p)
 {
   if (p->Do1)
   {
@@ -79,7 +79,7 @@ void PLC_Digital_output_cyclic(struct GlobalVar *p)
 }
 
 // TODO
-// void PLC_Digital_input_cyclic(struct GlobalVar *p)
+// inline void PLC_Digital_input_cyclic(struct GlobalVar *p)
 // {
 //   return;
 // }
