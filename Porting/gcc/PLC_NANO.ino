@@ -1,12 +1,12 @@
-// Программирование в стиле ПЛК версия от 01.04.2025.
+// Программирование в стиле ПЛК версия от 30.10.2026.
 // Библиотека LIB_PLC.
 // В файле MODBUS.c Сеть MODBUS RTU SLAVE ADR1 RS485 для SCADA/HMI.
 // Ресурсы ПЛК в GlobalVar.h
 // Arduino Nano ATmega328p 16MHz 5VDC
 // Arduino IDE 1.8.19
-// Для компиляции в AVR Studio 4.18 + WinAVR 2010 перекодировать файлы в формат ANSI
 // Windows 10 pro 64bit
 // Программатор по умолчанию AVRISP mkII old boot loader
+// Для компиляции в AVR Studio 4.18 + WinAVR 2010 перекодировать файлы в формат ANSI
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -40,19 +40,18 @@ int main(void)
   //             DbTs
   //    +---------------------+
   //    |        FbTs         |
-  //   -|millis          Ts_ms|->-
+  //   -|Uptime_ms       Ts_ms|->-
   //   -|Reset              Ts|->-
   //    |            Ts_ms_max|->-
   //    |             Uptime_s|->-
   //    +---------------------+
-  FbTs_init(&DbTs1);
-  DbTs1.millis = GV.millis_ms   ; // millis() Arduino.
-  DbTs1.Reset  = GV.Reset       ; // Сброс при перезагрузке.
-  FbTs(&DbTs1)                  ; // Расчет времени скана.
-  GV.Ts_ms     = DbTs1.Ts_ms    ; // Шаг дискретизации по времени [мс].
-  GV.Ts        = DbTs1.Ts       ; // Шаг дискретизации по времени [с].
-  GV.Ts_ms_max = DbTs1.Ts_ms_max; // Максимальное время скана [мс].
-  GV.Uptime_s  = DbTs1.Uptime_s ; // Время в работе [мс].
+  DbTs1.Uptime_ms = GV.Uptime_ms   ; // millis() Arduino.
+  DbTs1.Reset     = GV.Reset       ; // Сброс при перезагрузке.
+  FbTs(&DbTs1)                     ; // Расчет времени скана.
+  GV.Ts_ms        = DbTs1.Ts_ms    ; // Шаг дискретизации по времени [мс].
+  GV.Ts           = DbTs1.Ts       ; // Шаг дискретизации по времени [с].
+  GV.Ts_ms_max    = DbTs1.Ts_ms_max; // Максимальное время скана [мс].
+  GV.Uptime_s     = DbTs1.Uptime_s ; // Время в работе [мс].
 
   FcTaskCyclic(GV.Reset, GV.Ts_ms); // Задача выполняется с плавающим временем цикла.
 
@@ -66,18 +65,18 @@ int main(void)
     //             DbTs
     //    +---------------------+
     //    |        FbTs         |
-    //   -|millis          Ts_ms|->-
+    //   -|Uptime_ms       Ts_ms|->-
     //   -|Reset              Ts|->-
     //    |            Ts_ms_max|->-
     //    |             Uptime_s|->-
     //    +---------------------+
-    DbTs1.millis = GV.millis_ms   ; // millis() Arduino.
-    DbTs1.Reset  = GV.Reset       ; // Сброс при перезагрузке.
-    FbTs(&DbTs1)                  ; // Расчет времени скана.
-    GV.Ts_ms     = DbTs1.Ts_ms    ; // Шаг дискретизации по времени [мс].
-    GV.Ts        = DbTs1.Ts       ; // Шаг дискретизации по времени [с].
-    GV.Ts_ms_max = DbTs1.Ts_ms_max; // Максимальное время скана [мс].
-    GV.Uptime_s  = DbTs1.Uptime_s ; // Время в работе [мс].
+    DbTs1.Uptime_ms = GV.Uptime_ms   ; // millis() Arduino.
+    DbTs1.Reset     = GV.Reset       ; // Сброс при перезагрузке.
+    FbTs(&DbTs1)                     ; // Расчет времени скана.
+    GV.Ts_ms        = DbTs1.Ts_ms    ; // Шаг дискретизации по времени [мс].
+    GV.Ts           = DbTs1.Ts       ; // Шаг дискретизации по времени [с].
+    GV.Ts_ms_max    = DbTs1.Ts_ms_max; // Максимальное время скана [мс].
+    GV.Uptime_s     = DbTs1.Uptime_s ; // Время в работе [мс].
 
     FcTaskCyclic(GV.Reset, GV.Ts_ms); // Задача выполняется с плавающим временем цикла.
     PLC_Digital_output_cyclic(&GV);
