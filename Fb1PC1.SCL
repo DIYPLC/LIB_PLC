@@ -442,10 +442,10 @@ MV := "Db1PC1Hmi".MV;
 //   -|Ki                  |
 //   -|Kd                  |
 //   -|Kdf                 |
-//   -|ERMAX               |
-//   -|ERMIN               |
-//   -|MVMAX               |
-//   -|MVMIN               |
+//   -|ErMax               |
+//   -|ErMin               |
+//   -|MvMax               |
+//   -|MvMin               |
 //   -|Ts                  |
 //   -|Manual              |
 //   -|ManOn               |
@@ -456,10 +456,10 @@ DbPIDcontrol1.Kp     := "Db1PC1Hmi".Kp   ; // Коэффициент усиления пропорциональ
 DbPIDcontrol1.Ki     := "Db1PC1Hmi".Ki   ; // Коэффициент усиления интегральный.
 DbPIDcontrol1.Kd     := "Db1PC1Hmi".Kd   ; // Коэффициент усиления дифференциальный.
 DbPIDcontrol1.Kdf    := "Db1PC1Hmi".Kdf  ; // Коэффициент фильтрации дифференциальный Kdf=1/Tdf.
-DbPIDcontrol1.ERMAX  := "Db1PC1Hmi".ERMAX; // Зона нечувствительности к ошибке регулирования, максимум.
-DbPIDcontrol1.ERMIN  := "Db1PC1Hmi".ERMIN; // Зона нечувствительности к ошибке регулирования, минимум.
-DbPIDcontrol1.MVMAX  := "Db1PC1Hmi".MVMAX; // Максимальное значение сигнала управления.
-DbPIDcontrol1.MVMIN  := "Db1PC1Hmi".MVMIN; // Минимальное значение сигнала управления.
+DbPIDcontrol1.ErMax  := "Db1PC1Hmi".ErMax; // Зона нечувствительности к ошибке регулирования, максимум.
+DbPIDcontrol1.ErMin  := "Db1PC1Hmi".ErMin; // Зона нечувствительности к ошибке регулирования, минимум.
+DbPIDcontrol1.MvMax  := "Db1PC1Hmi".MvMax; // Максимальное значение сигнала управления.
+DbPIDcontrol1.MvMin  := "Db1PC1Hmi".MvMin; // Минимальное значение сигнала управления.
 DbPIDcontrol1.Ts     := Ts               ; // Шаг дискретизации по времени в секундах.
 DbPIDcontrol1.Manual := MV               ; // Сигнал управления в ручном режиме работы.
 DbPIDcontrol1.ManOn  := NOT(ModeAuto)    ; // Включить ручной режим работы регулятора.
@@ -606,10 +606,10 @@ DbAlarm_MV()                                        ; // Блок предупреждений.
 // | SP       |-----------------+   -|Ki                  |    -|Ts          |              
 // +----------+                     -|Kd                  |     +------------+              
 //                                  -|Kdf                 |                                 
-//                                  -|ERMAX               |                                 
-// +---------------+                -|ERMIN               |                                 
-// | MV            |------------+   -|MVMAX               |                                 
-// +---------------+            |   -|MVMIN               |                                 
+//                                  -|ErMax               |                                 
+// +---------------+                -|ErMin               |                                 
+// | MV            |------------+   -|MvMax               |                                 
+// +---------------+            |   -|MvMin               |                                 
 //                              |   -|Ts                  |                                 
 // +----------+     +-----+     +-->-|Manual              |                                 
 // | ModeAuto |-->--| NOT |-------->-|ManOn               |                                 
