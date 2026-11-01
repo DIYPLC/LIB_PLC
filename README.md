@@ -7,9 +7,9 @@
 > Компилируем библиотеку с помощью файла Makefile.INP
 > Дополнительная информация в файле README 2026.SCL
 
-Библиотека кросс платформенная и может использоваться на ПЛК других производителей.
-Функциональные блоки портируются на C/C++ для применения в Arduino и STM32.
-Порт библиотеки на язык си лежит тут [https://github.com/DIYPLC/DIY_PLC/tree/main/src/PLC_NANO](https://github.com/DIYPLC/DIY_PLC/tree/main/src/PLC_NANO)
+> Библиотека кросс платформенная и может использоваться на ПЛК других производителей.
+> Функциональные блоки портируются на C/C++ для применения в Arduino и STM32.
+> Порт библиотеки на язык си лежит тут [https://github.com/DIYPLC/DIY_PLC/tree/main/src/PLC_NANO](https://github.com/DIYPLC/DIY_PLC/tree/main/src/PLC_NANO)
 
 > Видео лекции по библиотеке смотрите тут:
 > [https://www.youtube.com/@DIY_PLC](https://www.youtube.com/@DIY_PLC)
