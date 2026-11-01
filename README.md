@@ -1,6 +1,6 @@
 ## Библиотека функциональных блоков для ПЛК S7-300,400,1200,1500 STEP7 / PCS7 / TIA Portal.
 
-> Качаем библиотеку в архиве [https://github.com/DIYPLC/LIB_PLC/archive/refs/heads/main.zip](https://drive.google.com/drive/folders/14GDX0i07rwDrl_oPzL-lQAqMiAz3ouJV?usp=sharing)
+> Качаем библиотеку в архиве [https://github.com/DIYPLC/LIB_PLC/archive/refs/heads/main.zip](https://github.com/DIYPLC/LIB_PLC/archive/refs/heads/main.zip)
 > Скачанные файлы открываем в блокноте notepad windows (cp1251) или в STEP7 SCL.
 > Самый первый блок FbPIDcontrol.SCL (2014 год) остальное появилось как надстройка вокруг него.
 > Пример применения библиотеки в файле Fb1PC1.SCL
