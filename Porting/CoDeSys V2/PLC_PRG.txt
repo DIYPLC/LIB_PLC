@@ -1,0 +1,54 @@
+PROGRAM PLC_PRG
+VAR
+	Reset: BOOL := TRUE; (* —брос при перезагрузке. *)
+	time_ms: UDINT := 0;
+	time_previuos_ms: UDINT:= 0;
+	Ts_ms: UDINT := 0; (* Ўаг дискретизации по времени [мс]. *)
+	Ts: REAL := 0.0; (* Ўаг дискретизации по времени в секундах. *)
+	DbTask1:FbTask1;
+END_VAR
+
+(* ƒанное условие должно быть в начале PLC_PRG. *)
+IF Reset THEN
+  time_ms := TIME_TO_UDINT(TIME());
+  time_previuos_ms := time_ms;
+  Ts_ms := 0;
+ELSE
+	time_ms := TIME_TO_UDINT(TIME());
+	IF (time_ms >= time_previuos_ms) THEN
+	Ts_ms := time_ms - time_previuos_ms;
+	ELSE
+	; (* ¬ данном случае исходим из того что врем€ скана мен€етс€ не значительно. *)
+	END_IF
+	time_previuos_ms := time_ms;
+END_IF
+Ts := UDINT_TO_REAL(Ts_ms) * 0.001;
+
+(* ѕользовательска€ задача 1. *)
+DbTask1.Ts_ms := Ts_ms;
+DbTask1.Ts := Ts;
+DbTask1.Reset := Reset;
+DbTask1();
+
+(* ƒанное условие должно быть в конце PLC_PRG. *)
+IF Reset THEN
+Reset := FALSE;
+END_IF
+
+(*
+
+@COPYLEFT ALL WRONGS RESERVED :)
+Author: VA
+Contacts: DIY.PLC.314@gmail.com
+LIB_PLC date start: 2014
+License: GNU GPL-2.0-or-later
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+https://www.youtube.com/watch?v=n1F_MfLRlX0
+https://www.youtube.com/@DIY_PLC
+https://github.com/DIYPLC/LIB_PLC
+https://oshwlab.com/diy.plc.314/PLC_HW1_SW1
+https://3dtoday.ru/3d-models/mechanical-parts/body/korpus-na-din-reiku
+https://t.me/DIY_PLC
+https://drive.google.com/drive/folders/16GDX0i07rwDrl_oPzL-lQAqMiAz3ouJV?usp=sharing
+
+*)
