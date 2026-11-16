@@ -79,7 +79,7 @@ def _unit_test_() -> None:
 
 if __name__ == "__main__":
     _unit_test_()
-    input("press any key for exit...")
+    input("[OK] press Enter for exit...")
 
 # Пример использования №1.
 # Скорость открытия парового клапана от 0 до 100 процентов за 90  секунд.

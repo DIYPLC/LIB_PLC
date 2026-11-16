@@ -88,76 +88,8 @@ class FbBitsToWord(object):
         del self
         return
 
-    def set_in0(self, value: bool) -> None:
-        self.In0 = bool(value)
-        return
-
-    def set_in1(self, value: bool) -> None:
-        self.In1 = bool(value)
-        return
-
-    def set_in2(self, value: bool) -> None:
-        self.In2 = bool(value)
-        return
-
-    def set_in3(self, value: bool) -> None:
-        self.In3 = bool(value)
-        return
-
-    def set_in4(self, value: bool) -> None:
-        self.In4 = bool(value)
-        return
-
-    def set_in5(self, value: bool) -> None:
-        self.In5 = bool(value)
-        return
-
-    def set_in6(self, value: bool) -> None:
-        self.In6 = bool(value)
-        return
-
-    def set_in7(self, value: bool) -> None:
-        self.In7 = bool(value)
-        return
-
-    def set_in8(self, value: bool) -> None:
-        self.In8 = bool(value)
-        return
-
-    def set_in9(self, value: bool) -> None:
-        self.In9 = bool(value)
-        return
-
-    def set_in10(self, value: bool) -> None:
-        self.In10 = bool(value)
-        return
-
-    def set_in11(self, value: bool) -> None:
-        self.In11 = bool(value)
-        return
-
-    def set_in12(self, value: bool) -> None:
-        self.In12 = bool(value)
-        return
-
-    def set_in13(self, value: bool) -> None:
-        self.In13 = bool(value)
-        return
-
-    def set_in14(self, value: bool) -> None:
-        self.In14 = bool(value)
-        return
-
-    def set_in15(self, value: bool) -> None:
-        self.In15 = bool(value)
-        return
-
-    def get_out(self) -> int:
-        return int(self.Out)
-
 
 def _unit_test_() -> None:
-    print("Unit test start")
     from FbWordToBits import FbWordToBits
     word_to_bits = FbWordToBits()
     bits_to_word = FbBitsToWord()
@@ -186,9 +118,9 @@ def _unit_test_() -> None:
         if bits_to_word.Out != word_to_bits.In:
             error_flag = True
     if error_flag:
-        print("Test ERROR")
+        print("[ERROR] _unit_test_() FbBitsToWord()")
     else:
-        print("Test OK")
+        print("[OK] _unit_test_() FbBitsToWord()")
     return
 
 

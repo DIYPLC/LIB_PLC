@@ -71,61 +71,8 @@ class FbWordToBits(object):
         del self
         return
 
-    def set_in(self, value: int) -> None:
-        self.In = int(value)
-        return
-
-    def get_out0(self) -> bool:
-        return bool(self.Out0)
-
-    def get_out1(self) -> bool:
-        return bool(self.Out1)
-
-    def get_out2(self) -> bool:
-        return bool(self.Out2)
-
-    def get_out3(self) -> bool:
-        return bool(self.Out3)
-
-    def get_out4(self) -> bool:
-        return bool(self.Out4)
-
-    def get_out5(self) -> bool:
-        return bool(self.Out5)
-
-    def get_out6(self) -> bool:
-        return bool(self.Out6)
-
-    def get_out7(self) -> bool:
-        return bool(self.Out7)
-
-    def get_out8(self) -> bool:
-        return bool(self.Out8)
-
-    def get_out9(self) -> bool:
-        return bool(self.Out9)
-
-    def get_out10(self) -> bool:
-        return bool(self.Out10)
-
-    def get_out11(self) -> bool:
-        return bool(self.Out11)
-
-    def get_out12(self) -> bool:
-        return bool(self.Out12)
-
-    def get_out13(self) -> bool:
-        return bool(self.Out13)
-
-    def get_out14(self) -> bool:
-        return bool(self.Out14)
-
-    def get_out15(self) -> bool:
-        return bool(self.Out15)
-
 
 def _unit_test_() -> None:
-    print("Unit test start")
     from FbBitsToWord import FbBitsToWord
     word_to_bits = FbWordToBits()
     bits_to_word = FbBitsToWord()
@@ -154,15 +101,15 @@ def _unit_test_() -> None:
         if bits_to_word.Out != word_to_bits.In:
             error_flag = True
     if error_flag:
-        print("Test ERROR")
+        print("[ERROR] _unit_test_() FbWordToBits()")
     else:
-        print("Test OK")
+        print("[OK] _unit_test_() FbWordToBits()")
     return
 
 
 if __name__ == "__main__":
     _unit_test_()
-    input("press any key for exit...")
+    input("[OK] press Enter for exit...")
 
 # @COPYLEFT ALL WRONGS RESERVED :)
 # Author: VA
