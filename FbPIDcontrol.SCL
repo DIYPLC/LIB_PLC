@@ -6,7 +6,7 @@ TITLE = 'ПИД- регулятор.'
 
 AUTHOR  : VA
 FAMILY  : LIB_PLC
-VERSION : '3.9'
+VERSION : '4.0'
 
 VAR_INPUT // Входные переменные, сохраняемые.
 PV     :REAL := 0.0   ; // Измеренное значение регулируемого параметра.
@@ -25,22 +25,33 @@ ManOn  :BOOL := FALSE ; // Включить ручной режим работы регулятора.
 END_VAR
 
 VAR_OUTPUT // Выходные переменные, сохраняемые.
-MV :REAL := 0.0; // Сигнал управления на исполнительный механизм.
+MV     :REAL := 0.0; // Сигнал управления на исполнительный механизм.
+Status :WORD :=   0; // Слово состояния ПИД- регулятра.
 END_VAR
 
 VAR // Внутренние переменные, сохраняемые.
-ER         :REAL := 0.0  ; // Ошибка регулирования.
-Ppart      :REAL := 0.0  ; // Пропорциональная составляющая регулятора.
-Ipart      :REAL := 0.0  ; // Интегратор интегральной составляющей регулятора.
-Dpart      :REAL := 0.0  ; // Дифференциальная составляющая регулятора.
-Dintegral  :REAL := 0.0  ; // Интегратор дифференциальной составляющей регулятора.
-ErrorParam :BOOL := FALSE; // Ошибка в настройках замораживает выходое значение регулятора.
+ER           :REAL := 0.0  ; // Ошибка регулирования.
+Ppart        :REAL := 0.0  ; // Пропорциональная составляющая регулятора.
+Ipart        :REAL := 0.0  ; // Интегратор интегральной составляющей регулятора.
+Dpart        :REAL := 0.0  ; // Дифференциальная составляющая регулятора.
+Dintegral    :REAL := 0.0  ; // Интегратор дифференциальной составляющей регулятора.
+Auto         :REAL := 0.0  ; // Выход ПИД- алгоритма и вход переключателя режимов работы.
+Selector     :REAL := 0.0  ; // Выход с переключателя режимов работы.
+FlagErTs     :BOOL := FALSE; // Ошибка отрицательный шаг дискретизации по времени.
+FlagErLimit  :BOOL := FALSE; // Ошибка в настройках амплитудного ограничителя.
+FlagLimHi    :BOOL := FALSE; // Индикация максимальное ограничение амплитуды.
+FlagLimLo    :BOOL := FALSE; // Индикация минимальное ограничение амплитуды.
+FlagOffDband :BOOL := FALSE; // Индикация зона нечувствительности к ошибке отключена.
+FlagOffIpart :BOOL := FALSE; // Индикация интегральная составляющая отключена.
+FlagOffDpart :BOOL := FALSE; // Индикация дифференциальная составляющая отключена.
+FlagOffAuto  :BOOL := FALSE; // Индикация автоматический режим отключен.
 END_VAR
 
 VAR_TEMP // Временные переменные, не сохраняемые.
-Auto :REAL; // Выход ПИД- алгоритма и вход переключателя режимов работы.
-Sw   :REAL; // Выход с переключателя режимов работы.
 END_VAR
+
+CONST // Константы.
+END_CONST
 
 BEGIN
 
@@ -49,7 +60,7 @@ BEGIN
 //    +--------------------+
 //    |    FbPIDcontrol    |
 // ->-|PV                MV|->-
-//   -|SP                  |
+//   -|SP            Status|-
 //   -|Kp                  |
 //   -|Ki                  |
 //   -|Kd                  |
@@ -65,9 +76,10 @@ BEGIN
 
 // Ошибка в настройках переводит регулятор в ручной режим без ограничений.
 // При этом в переменных замораживается последнее корректное значение.
-// Ts периодически может быть равен 0, но обычно Ts > 0.
-ErrorParam := (MvMax <= MvMin) OR (Ts < 0.0);
-IF (ErrorParam) THEN
+// Ts иногда может быть равен 0, но обычно Ts > 0.
+FlagErTs := Ts < 0.0; // Ошибка отрицательный шаг дискретизации по времени.
+FlagErLimit := MvMax <= MvMin;
+IF (FlagErTs OR FlagErLimit) THEN
 MV := Manual;
 ELSE
   
@@ -76,18 +88,22 @@ ELSE
   
   // Ошибка в настройках зоны нечувствительности (ErMax <= ErMin) приводит к ее отключению.
   // Для штатного отключения данной функции использовать настройки: ErMax = ErMin = 0
-  IF (ErMax >= ErMin) THEN
+  IF (ErMax >= ErMin) AND (ErMax >= 0.0) AND (ErMin <= 0.0) THEN
     // Зона нечувствительности к ошибке.
     IF ((ErMin <= ER) AND (ER <= ErMax)) THEN
     ER := 0.0;
     END_IF;
+    FlagOffDband := FALSE;
+  ELSE
+    FlagOffDband := TRUE;
   END_IF;
   
   // Пропорциональная составляющая.
   Ppart := Kp * ER;
   
   // Интегральная составляющая.
-  IF (0.0 = Ki) THEN
+  FlagOffIpart := (0.0 = Ki);
+  IF (FlagOffIpart) THEN
   Ipart := 0.0;
   ELSE
   Ipart := Ipart + Ki * ER * Ts;
@@ -100,7 +116,8 @@ ELSE
   // Что такое магическая константа 2.0 по непроверенным данным:
   // -Условие уcтойчивости это полюс внутри единичной окружности |1-Ts/Tf| < 1
   // -Частота выборки должна быть минимум в два раза больше частоты сигнала.
-  IF (0.0 = Kd) OR (Kdf <= 0.0) OR (Kdf*Ts >= 2.0) THEN
+  FlagOffDpart := (0.0 = Kd) OR (Kdf <= 0.0) OR (Kdf*Ts >= 2.0);
+  IF (FlagOffDpart) THEN
   Dpart := 0.0;
   Dintegral := 0.0;
   ELSE
@@ -113,35 +130,58 @@ ELSE
   
   // Переключение режима работы "Ручной / Автоматический".
   IF (ManOn) THEN
-  Sw := Manual;
+  Selector := Manual;
   ELSE
-  Sw := Auto;
+  Selector := Auto;
   END_IF;
+  FlagOffAuto := ManOn;
   
   // Амплитудный ограничитель- максимум.
-  IF (Sw >= MvMax) THEN
+  IF (Selector >= MvMax) THEN
   MV := MvMax;
   // Ограничение интегральной составляющей методом обратного вычисления.
   Ipart := MV - (Ppart + Dpart);
+  FlagLimHi := TRUE;
   END_IF;
   
   // Амплитудный ограничитель- минимум.
-  IF (Sw <= MvMin) THEN
+  IF (Selector <= MvMin) THEN
   MV := MvMin;
   // Ограничение интегральной составляющей методом обратного вычисления.
   Ipart := MV - (Ppart + Dpart);
+  FlagLimLo := TRUE;
   END_IF;
   
   // Амплитудный ограничитель- без ограничений.
-  IF ((MvMin < Sw) AND (Sw < MvMax)) THEN
-  MV := Sw;
+  IF ((MvMin < Selector) AND (Selector < MvMax)) THEN
+  MV := Selector;
+  FlagLimHi := FALSE;
+  FlagLimLo := FALSE;
     IF (ManOn) THEN
     // Ограничение интегральной составляющей методом обратного вычисления.
     Ipart := MV - (Ppart + Dpart);
     END_IF;
   END_IF;
   
-END_IF; // IF NOT(ErrorParam) THEN
+END_IF; // IF (FlagErTs OR FlagErLimit) THEN
+
+Status := 0; // Слово состояния ПИД- регулятра.
+// Status Bit 0 Ошибка отрицательный шаг дискретизации по времени.
+IF FlagErTs THEN Status := Status OR 1; END_IF;
+// Status Bit 1 Ошибка в настройках амплитудного ограничителя.
+IF FlagErLimit THEN Status := Status OR 2; END_IF;
+// Status Bit 2 Индикация максимальное ограничение амплитуды.
+IF FlagLimHi THEN Status := Status OR 4; END_IF;
+// Status Bit 3 Индикация минимальное ограничение амплитуды.
+IF FlagLimLo THEN Status := Status OR 8; END_IF;
+// Status Bit 4 Индикация зона нечувствительности к ошибке отключена.
+IF FlagOffDband THEN Status := Status OR 16; END_IF;
+// Status Bit 5 Индикация интегральная составляющая отключена.
+IF FlagOffIpart THEN Status := Status OR 32; END_IF;
+// Status Bit 6 Индикация дифференциальная составляющая отключена.
+IF FlagOffDpart THEN Status := Status OR 64; END_IF;
+// Status Bit 7 Индикация автоматический режим отключен.
+IF FlagOffAuto THEN Status := Status OR 128; END_IF;
 
 // Передаточная функция ПИД- регулятора (при Ts -> 0):
 //
@@ -176,7 +216,6 @@ END_IF; // IF NOT(ErrorParam) THEN
 // MvMin       - MV minimum           - Минимум сигнала управления.
 // Ts          - Sample Time          - Шаг дискретизации по времени.
 // ManOn       - Manual on            - Включить ручной режим управления.
-// Sw          - Switch               - Переключатель.
 // CW          - Control Word         - Слово (ui16 бит) управления (по битам).
 // SW          - Status Word          - Слово (ui16 бит) состояния (по битам).
 // EW          - Error Word           - Слово (ui16 бит) ошибок (по битам).
@@ -346,7 +385,7 @@ END_IF; // IF NOT(ErrorParam) THEN
 //          |     |
 // Auto--->-|-+   |
 //          |  \  |
-//          |   +-|->-Sw
+//          |   +-|->-Selector
 //          |     |
 // Manual->-|-+   |
 //          |     |
@@ -355,17 +394,17 @@ END_IF; // IF NOT(ErrorParam) THEN
 // ManOn-->----+
 //
 // Амплитудный ограничитель.
-//          MvMax
-//      +-----------+
-//      |           |
-//      |       +-- |
-//      |      /    |
-// Sw->-|     /     |->-MV
-//      |    /      |
-//      | --+       |
-//      |           |
-//      +-----------+
-//          MvMin
+//                MvMax
+//            +-----------+
+//            |           |
+//            |       +-- |
+//            |      /    |
+// Selector->-|     /     |->-MV
+//            |    /      |
+//            | --+       |
+//            |           |
+//            +-----------+
+//                MvMin
 
 
 // Реакция разомкнутого контура регулятора на единичное ступечатое воздействие по каналу управления.

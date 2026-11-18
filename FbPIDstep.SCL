@@ -245,7 +245,7 @@ ELSE
     END_IF;
 END_IF;
 
-// src CONT_S FB42
+// ASM (IL) CONT_S FB42
 // reversed by komatic
 // cross platforms by VA
 // https://web.archive.org/web/20220322202418/http://plc4good.org.ua/view_post.php?id=65
